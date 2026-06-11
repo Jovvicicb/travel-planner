@@ -15,4 +15,8 @@
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="8.4.205-rc" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TravelPlanner.Contracts\TravelPlanner.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>
