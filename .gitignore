@@ -1,0 +1,27 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.rsuser
+
+# Build output
+bin/
+obj/
+
+# Service Fabric
+pkg/
+GeneratedArtifacts/
+*.sfproj.user
+
+# NuGet packages folder
+packages/
+
+# React / Node
+node_modules/
+dist/
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
