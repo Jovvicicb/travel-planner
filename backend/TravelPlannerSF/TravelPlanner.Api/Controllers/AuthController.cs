@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
-using TravelPlanner.Contracts.DTOs.Auth;
-using TravelPlanner.Contracts.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using TravelPlanner.Api.Helpers;
+using TravelPlanner.Contracts.DTOs.Auth;
+using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.Interfaces;
 
 namespace TravelPlanner.Api.Controllers
 {
@@ -25,12 +27,7 @@ namespace TravelPlanner.Api.Controllers
         {
             var result = await authService.RegisterAsync(request);
 
-            if (!result.Success)
-            {
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return ResponseHelper.Send(this, result);
         }
 
         [HttpPost("login")]
@@ -38,12 +35,7 @@ namespace TravelPlanner.Api.Controllers
         {
             var result = await authService.LoginAsync(request);
 
-            if (!result.Success)
-            {
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return ResponseHelper.Send(this, result);
         }
 
         [Authorize]
@@ -54,17 +46,15 @@ namespace TravelPlanner.Api.Controllers
 
             if (!int.TryParse(userIdClaim, out var userId))
             {
-                return Unauthorized();
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
             }
 
-            var user = await authService.GetCurrentUserAsync(userId);
+            var result = await authService.GetCurrentUserAsync(userId);
 
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            return Ok(user);
+            return ResponseHelper.Send(this, result);
         }
     }
 }

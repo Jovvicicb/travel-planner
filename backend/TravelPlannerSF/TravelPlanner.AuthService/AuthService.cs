@@ -10,6 +10,7 @@ using TravelPlanner.AuthService.Data;
 using TravelPlanner.AuthService.Repositories;
 using TravelPlanner.AuthService.Services;
 using TravelPlanner.Contracts.DTOs.Auth;
+using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.Interfaces;
 
 
@@ -43,7 +44,7 @@ namespace TravelPlanner.AuthService
             this.serviceProvider = services.BuildServiceProvider();
         }
 
-        public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
+        public async Task<ServiceResultDto<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
         {
             using var scope = serviceProvider.CreateScope();
 
@@ -52,7 +53,7 @@ namespace TravelPlanner.AuthService
             return await authManager.RegisterAsync(request);
         }
 
-        public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
+        public async Task<ServiceResultDto<AuthResponseDto>> LoginAsync(LoginRequestDto request)
         {
             using var scope = serviceProvider.CreateScope();
 
@@ -61,7 +62,7 @@ namespace TravelPlanner.AuthService
             return await authManager.LoginAsync(request);
         }
 
-        public async Task<CurrentUserDto?> GetCurrentUserAsync(int userId)
+        public async Task<ServiceResultDto<CurrentUserDto>> GetCurrentUserAsync(int userId)
         {
             using var scope = serviceProvider.CreateScope();
 

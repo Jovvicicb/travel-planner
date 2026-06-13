@@ -23,7 +23,6 @@
     <Folder Include="Configuration\" />
     <Folder Include="Extensions\" />
     <Folder Include="Middleware\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
 
   <ItemGroup>

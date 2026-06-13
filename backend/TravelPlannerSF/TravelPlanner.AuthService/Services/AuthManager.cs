@@ -1,8 +1,8 @@
-﻿using BCrypt.Net;
-using TravelPlanner.AuthService.Entities;
+﻿using TravelPlanner.AuthService.Entities;
 using TravelPlanner.AuthService.Repositories;
 using TravelPlanner.AuthService.Validation;
 using TravelPlanner.Contracts.DTOs.Auth;
+using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.Enums;
 
 namespace TravelPlanner.AuthService.Services
@@ -20,13 +20,13 @@ namespace TravelPlanner.AuthService.Services
             this.jwtTokenGenerator = jwtTokenGenerator;
         }
 
-        public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
+        public async Task<ServiceResultDto<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
         {
             var validation = AuthValidator.ValidateRegister(request);
 
             if (!validation.IsValid)
             {
-                return Fail(validation.Message);
+                return ServiceResultDto<AuthResponseDto>.Fail(validation.Message);
             }
 
             var normalizedEmail = request.Email.Trim().ToLower();
@@ -35,7 +35,7 @@ namespace TravelPlanner.AuthService.Services
 
             if (emailExists)
             {
-                return Fail("Email is already registered.");
+                return ServiceResultDto<AuthResponseDto>.Fail("Email is already registered.", 409);
             }
 
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -54,16 +54,22 @@ namespace TravelPlanner.AuthService.Services
 
             var token = jwtTokenGenerator.GenerateToken(createdUser);
 
-            return Success("Registration successful.", createdUser, token);
+            var response = new AuthResponseDto
+            {
+                Token = token,
+                User = MapToCurrentUser(createdUser)
+            };
+
+            return ServiceResultDto<AuthResponseDto>.Created(response, "Registration successful.");
         }
 
-        public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
+        public async Task<ServiceResultDto<AuthResponseDto>> LoginAsync(LoginRequestDto request)
         {
             var validation = AuthValidator.ValidateLogin(request);
 
             if (!validation.IsValid)
             {
-                return Fail(validation.Message);
+                return ServiceResultDto<AuthResponseDto>.Fail(validation.Message);
             }
 
             var normalizedEmail = request.Email.Trim().ToLower();
@@ -72,7 +78,7 @@ namespace TravelPlanner.AuthService.Services
 
             if (user == null)
             {
-                return Fail("Invalid email or password.");
+                return ServiceResultDto<AuthResponseDto>.Fail("Invalid email or password.", 401);
             }
 
             var passwordValid = BCrypt.Net.BCrypt.Verify(
@@ -82,44 +88,33 @@ namespace TravelPlanner.AuthService.Services
 
             if (!passwordValid)
             {
-                return Fail("Invalid email or password.");
+                return ServiceResultDto<AuthResponseDto>.Fail("Invalid email or password.", 401);
             }
 
             var token = jwtTokenGenerator.GenerateToken(user);
 
-            return Success("Login successful.", user, token);
+            var response = new AuthResponseDto
+            {
+                Token = token,
+                User = MapToCurrentUser(user)
+            };
+
+            return ServiceResultDto<AuthResponseDto>.Ok(response, "Login successful.");
         }
 
-        public async Task<CurrentUserDto?> GetCurrentUserAsync(int userId)
+        public async Task<ServiceResultDto<CurrentUserDto>> GetCurrentUserAsync(int userId)
         {
             var user = await userRepository.GetByIdAsync(userId);
 
             if (user == null)
             {
-                return null;
+                return ServiceResultDto<CurrentUserDto>.Fail("User not found.", 404);
             }
 
-            return MapToCurrentUser(user);
-        }
-
-        private static AuthResponseDto Success(string message, User user, string token)
-        {
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = message,
-                Token = token,
-                User = MapToCurrentUser(user)
-            };
-        }
-
-        private static AuthResponseDto Fail(string message)
-        {
-            return new AuthResponseDto
-            {
-                Success = false,
-                Message = message
-            };
+            return ServiceResultDto<CurrentUserDto>.Ok(
+                MapToCurrentUser(user),
+                "Current user fetched successfully."
+            );
         }
 
         private static CurrentUserDto MapToCurrentUser(User user)
