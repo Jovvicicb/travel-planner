@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Enums\" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="8.4.268" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="8.4.268" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@
 *.user
 *.suo
 *.rsuser
+**/appsettings.Development.json
 
 # Build output
 bin/

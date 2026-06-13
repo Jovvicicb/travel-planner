@@ -2,6 +2,10 @@ using System.Fabric;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
 
 
 namespace TravelPlanner.Api
@@ -29,14 +33,70 @@ namespace TravelPlanner.Api
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
                                     .UseUrls(url);
                         builder.Services.AddControllers();
+
+                        builder.Configuration
+                            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+
+                        var jwtSection = builder.Configuration.GetSection("Jwt");
+                        var secret = jwtSection["Secret"];
+
+                        builder.Services
+                            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                            .AddJwtBearer(options =>
+                            {
+                                options.TokenValidationParameters = new TokenValidationParameters
+                                {
+                                    ValidateIssuer = true,
+                                    ValidateAudience = true,
+                                    ValidateLifetime = true,
+                                    ValidateIssuerSigningKey = true,
+                                    ValidIssuer = jwtSection["Issuer"],
+                                    ValidAudience = jwtSection["Audience"],
+                                    IssuerSigningKey = new SymmetricSecurityKey(
+                                        Encoding.UTF8.GetBytes(secret!)
+                                    )
+                                };
+                            });
+
+                        builder.Services.AddAuthorization();
+
                         builder.Services.AddEndpointsApiExplorer();
-                        builder.Services.AddSwaggerGen();
+                        builder.Services.AddSwaggerGen(options =>
+                        {
+                            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                            {
+                                Name = "Authorization",
+                                Type = SecuritySchemeType.Http,
+                                Scheme = "Bearer",
+                                BearerFormat = "JWT",
+                                In = ParameterLocation.Header,
+                                Description = "Enter JWT token."
+                            });
+
+                            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                            {
+                                {
+                                    new OpenApiSecurityScheme
+                                    {
+                                        Reference = new OpenApiReference
+                                        {
+                                            Type = ReferenceType.SecurityScheme,
+                                            Id = "Bearer"
+                                        }
+                                    },
+                                    Array.Empty<string>()
+                                }
+                            });
+                        });
+
                         var app = builder.Build();
                         if (app.Environment.IsDevelopment())
                         {
                             app.UseSwagger();
                             app.UseSwaggerUI();
                         }
+                        app.UseAuthentication();
                         app.UseAuthorization();
                         app.MapControllers();
                         

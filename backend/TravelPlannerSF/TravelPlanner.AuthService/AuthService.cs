@@ -1,49 +1,78 @@
-using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Fabric;
+using TravelPlanner.AuthService.Configuration;
+using TravelPlanner.AuthService.Data;
+using TravelPlanner.AuthService.Repositories;
+using TravelPlanner.AuthService.Services;
+using TravelPlanner.Contracts.DTOs.Auth;
+using TravelPlanner.Contracts.Interfaces;
+
 
 namespace TravelPlanner.AuthService
 {
-
-    internal sealed class AuthService : StatelessService
+    internal sealed class AuthService : StatelessService, IAuthService
     {
+        private readonly IServiceProvider serviceProvider;
+
         public AuthService(StatelessServiceContext context)
             : base(context)
-        { }
-
-        /// <summary>
-        /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
-        /// </summary>
-        /// <returns>A collection of listeners.</returns>
-        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(context.CodePackageActivationContext.GetCodePackageObject("Code").Path)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            var services = new ServiceCollection();
+
+            services.AddDbContext<AuthDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("AuthDb"));
+            });
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<IAuthManager, AuthManager>();
+
+            this.serviceProvider = services.BuildServiceProvider();
         }
 
-        /// <summary>
-        /// This is the main entry point for your service instance.
-        /// </summary>
-        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
-        protected override async Task RunAsync(CancellationToken cancellationToken)
+        public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
         {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
+            using var scope = serviceProvider.CreateScope();
 
-            long iterations = 0;
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
 
-            while (true)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+            return await authManager.RegisterAsync(request);
+        }
 
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
+        public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
+        {
+            using var scope = serviceProvider.CreateScope();
 
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            }
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
+
+            return await authManager.LoginAsync(request);
+        }
+
+        public async Task<CurrentUserDto?> GetCurrentUserAsync(int userId)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
+
+            return await authManager.GetCurrentUserAsync(userId);
+        }
+
+        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        {
+            return this.CreateServiceRemotingInstanceListeners();
         }
     }
 }
