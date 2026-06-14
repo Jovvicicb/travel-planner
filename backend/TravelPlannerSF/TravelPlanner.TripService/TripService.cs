@@ -1,49 +1,56 @@
-using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Fabric;
+using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
+using TravelPlanner.Contracts.Interfaces.Trips;
+using TravelPlanner.TripService.Data;
+using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.TravelPlans;
 
 namespace TravelPlanner.TripService
 {
-
-    internal sealed class TripService : StatelessService
+    internal sealed class TripService : StatelessService, ITripService
     {
-        public TripService(StatelessServiceContext context)
-            : base(context)
-        { }
+        private readonly IServiceProvider serviceProvider;
 
-        /// <summary>
-        /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
-        /// </summary>
-        /// <returns>A collection of listeners.</returns>
-        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        public TripService(StatelessServiceContext context): base(context)
         {
-            return new ServiceInstanceListener[0];
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(context.CodePackageActivationContext.GetCodePackageObject("Code").Path)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            var services = new ServiceCollection();
+
+            services.AddDbContext<TripDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("TripDb"));
+            });
+
+            services.AddScoped<ITravelPlanRepository, TravelPlanRepository>();
+            services.AddScoped<ITravelPlanManager, TravelPlanManager>();
+
+            this.serviceProvider = services.BuildServiceProvider();
         }
 
-        /// <summary>
-        /// This is the main entry point for your service instance.
-        /// </summary>
-        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
-        protected override async Task RunAsync(CancellationToken cancellationToken)
+        public async Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command)
         {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
+            using var scope = serviceProvider.CreateScope();
 
-            long iterations = 0;
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanManager>();
 
-            while (true)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+            return await manager.CreateTravelPlanAsync(command);
+        }
 
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            }
+        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        {
+            return this.CreateServiceRemotingInstanceListeners();
         }
     }
 }

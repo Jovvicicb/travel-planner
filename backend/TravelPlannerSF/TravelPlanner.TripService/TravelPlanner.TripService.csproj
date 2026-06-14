@@ -30,10 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Configuration\" />
-    <Folder Include="Mapping\TravelPlans\" />
-    <Folder Include="Repositories\TravelPlans\" />
-    <Folder Include="Services\TravelPlans\" />
-    <Folder Include="Validation\TravelPlans\" />
   </ItemGroup>
 
   <ItemGroup>
