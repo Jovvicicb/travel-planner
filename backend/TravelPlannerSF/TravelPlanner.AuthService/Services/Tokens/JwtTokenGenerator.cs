@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using TravelPlanner.AuthService.Configuration;
 using TravelPlanner.AuthService.Entities;
 
-namespace TravelPlanner.AuthService.Services
+namespace TravelPlanner.AuthService.Services.Tokens
 {
     public class JwtTokenGenerator : IJwtTokenGenerator
     {

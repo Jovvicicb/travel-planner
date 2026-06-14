@@ -9,7 +9,6 @@ namespace TravelPlanner.Api
         {
             try
             {
-
                 ServiceRuntime.RegisterServiceAsync("TravelPlanner.ApiType",
                     context => new ApiService(context)).GetAwaiter().GetResult();
 

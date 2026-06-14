@@ -1,11 +1,13 @@
 ﻿using TravelPlanner.AuthService.Entities;
+using TravelPlanner.AuthService.Mapping.Auth;
 using TravelPlanner.AuthService.Repositories;
-using TravelPlanner.AuthService.Validation;
+using TravelPlanner.AuthService.Services.Tokens;
+using TravelPlanner.AuthService.Validation.Auth;
 using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.Enums;
 
-namespace TravelPlanner.AuthService.Services
+namespace TravelPlanner.AuthService.Services.Auth
 {
     public class AuthManager : IAuthManager
     {
@@ -51,14 +53,8 @@ namespace TravelPlanner.AuthService.Services
             };
 
             var createdUser = await userRepository.CreateAsync(user);
-
             var token = jwtTokenGenerator.GenerateToken(createdUser);
-
-            var response = new AuthResponseDto
-            {
-                Token = token,
-                User = MapToCurrentUser(createdUser)
-            };
+            var response = AuthMapper.ToAuthResponse(createdUser, token);
 
             return ServiceResultDto<AuthResponseDto>.Created(response, "Registration successful.");
         }
@@ -92,12 +88,7 @@ namespace TravelPlanner.AuthService.Services
             }
 
             var token = jwtTokenGenerator.GenerateToken(user);
-
-            var response = new AuthResponseDto
-            {
-                Token = token,
-                User = MapToCurrentUser(user)
-            };
+            var response = AuthMapper.ToAuthResponse(user, token);
 
             return ServiceResultDto<AuthResponseDto>.Ok(response, "Login successful.");
         }
@@ -112,20 +103,9 @@ namespace TravelPlanner.AuthService.Services
             }
 
             return ServiceResultDto<CurrentUserDto>.Ok(
-                MapToCurrentUser(user),
+                AuthMapper.ToCurrentUser(user),
                 "Current user fetched successfully."
             );
-        }
-
-        private static CurrentUserDto MapToCurrentUser(User user)
-        {
-            return new CurrentUserDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Role = user.Role
-            };
         }
     }
 }

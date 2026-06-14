@@ -1,6 +1,6 @@
 ﻿using TravelPlanner.AuthService.Entities;
 
-namespace TravelPlanner.AuthService.Services
+namespace TravelPlanner.AuthService.Services.Tokens
 {
     public interface IJwtTokenGenerator
     {

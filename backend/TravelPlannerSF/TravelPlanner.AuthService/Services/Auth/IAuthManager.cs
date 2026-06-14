@@ -1,7 +1,7 @@
 ﻿using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
 
-namespace TravelPlanner.AuthService.Services
+namespace TravelPlanner.AuthService.Services.Auth
 {
     public interface IAuthManager
     {
