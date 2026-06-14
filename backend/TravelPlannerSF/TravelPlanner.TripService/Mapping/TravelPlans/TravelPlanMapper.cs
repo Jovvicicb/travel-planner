@@ -21,5 +21,18 @@ namespace TravelPlanner.TripService.Mapping.TravelPlans
                 UpdatedAt = plan.UpdatedAt
             };
         }
+
+        public static TravelPlanListItemDto ToListItem(TravelPlan plan)
+        {
+            return new TravelPlanListItemDto
+            {
+                Id = plan.Id,
+                OwnerUserId = plan.OwnerUserId,
+                Title = plan.Title,
+                StartDate = plan.StartDate,
+                EndDate = plan.EndDate,
+                Budget = plan.Budget
+            };
+        }
     }
 }

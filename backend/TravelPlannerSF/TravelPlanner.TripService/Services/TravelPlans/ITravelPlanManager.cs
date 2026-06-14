@@ -6,5 +6,9 @@ namespace TravelPlanner.TripService.Services.TravelPlans
     public interface ITravelPlanManager
     {
         Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command);
+
+        Task<ServiceResultDto<List<TravelPlanListItemDto>>> GetTravelPlansAsync(int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto<TravelPlanResponseDto>> GetTravelPlanByIdAsync(int planId,  int requestUserId, bool isAdmin);
     }
 }

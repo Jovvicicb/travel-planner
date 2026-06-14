@@ -21,5 +21,26 @@ namespace TravelPlanner.TripService.Repositories.TravelPlans
 
             return plan;
         }
+
+        public async Task<List<TravelPlan>> GetAllAsync()
+        {
+            return await context.TravelPlans
+                .OrderByDescending(plan => plan.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<TravelPlan>> GetByOwnerIdAsync(int ownerUserId)
+        {
+            return await context.TravelPlans
+                .Where(plan => plan.OwnerUserId == ownerUserId)
+                .OrderByDescending(plan => plan.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<TravelPlan?> GetByIdAsync(int planId)
+        {
+            return await context.TravelPlans
+                .FirstOrDefaultAsync(plan => plan.Id == planId);
+        }
     }
 }

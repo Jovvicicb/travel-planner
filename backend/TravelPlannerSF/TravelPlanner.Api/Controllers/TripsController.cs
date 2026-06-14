@@ -50,5 +50,48 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await tripService.GetTravelPlansAsync(
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await tripService.GetTravelPlanByIdAsync(
+                id,
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

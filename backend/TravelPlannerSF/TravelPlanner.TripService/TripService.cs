@@ -48,6 +48,24 @@ namespace TravelPlanner.TripService
             return await manager.CreateTravelPlanAsync(command);
         }
 
+        public async Task<ServiceResultDto<List<TravelPlanListItemDto>>> GetTravelPlansAsync(int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanManager>();
+
+            return await manager.GetTravelPlansAsync(requestUserId, isAdmin);
+        }
+
+        public async Task<ServiceResultDto<TravelPlanResponseDto>> GetTravelPlanByIdAsync(int planId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanManager>();
+
+            return await manager.GetTravelPlanByIdAsync(planId, requestUserId, isAdmin);
+        }
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();

@@ -44,5 +44,70 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 "Travel plan created successfully."
             );
         }
+
+        public async Task<ServiceResultDto<List<TravelPlanListItemDto>>> GetTravelPlansAsync(int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<TravelPlanListItemDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            var plans = isAdmin
+                ? await travelPlanRepository.GetAllAsync()
+                : await travelPlanRepository.GetByOwnerIdAsync(requestUserId);
+
+            var response = plans
+                .Select(TravelPlanMapper.ToListItem)
+                .ToList();
+
+            return ServiceResultDto<List<TravelPlanListItemDto>>.Ok(
+                response,
+                "Travel plans fetched successfully."
+            );
+        }
+
+        public async Task<ServiceResultDto<TravelPlanResponseDto>> GetTravelPlanByIdAsync(int planId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (planId <= 0)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var plan = await travelPlanRepository.GetByIdAsync(planId);
+
+            if (plan == null)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && plan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    "You do not have permission to view this travel plan.",
+                    403
+                );
+            }
+
+            return ServiceResultDto<TravelPlanResponseDto>.Ok(
+                TravelPlanMapper.ToResponse(plan),
+                "Travel plan fetched successfully."
+            );
+        }
     }
 }
