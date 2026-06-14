@@ -42,5 +42,12 @@ namespace TravelPlanner.TripService.Repositories.TravelPlans
             return await context.TravelPlans
                 .FirstOrDefaultAsync(plan => plan.Id == planId);
         }
+
+        public async Task UpdateAsync(TravelPlan plan)
+        {
+            context.TravelPlans.Update(plan);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

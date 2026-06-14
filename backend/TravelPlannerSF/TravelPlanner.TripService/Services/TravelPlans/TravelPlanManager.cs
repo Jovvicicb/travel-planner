@@ -109,5 +109,48 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 "Travel plan fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<TravelPlanResponseDto>> UpdateTravelPlanAsync(UpdateTravelPlanCommandDto command)
+        {
+            var validation = TravelPlanValidator.ValidateUpdate(command);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(validation.Message);
+            }
+
+            var plan = await travelPlanRepository.GetByIdAsync(command.PlanId);
+
+            if (plan == null)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!command.IsAdmin && plan.OwnerUserId != command.RequestUserId)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    "You do not have permission to update this travel plan.",
+                    403
+                );
+            }
+
+            plan.Title = command.Title.Trim();
+            plan.Description = command.Description?.Trim();
+            plan.StartDate = command.StartDate;
+            plan.EndDate = command.EndDate;
+            plan.Budget = command.Budget;
+            plan.Notes = command.Notes?.Trim();
+            plan.UpdatedAt = DateTime.UtcNow;
+
+            await travelPlanRepository.UpdateAsync(plan);
+
+            return ServiceResultDto<TravelPlanResponseDto>.Ok(
+                TravelPlanMapper.ToResponse(plan),
+                "Travel plan updated successfully."
+            );
+        }
     }
 }

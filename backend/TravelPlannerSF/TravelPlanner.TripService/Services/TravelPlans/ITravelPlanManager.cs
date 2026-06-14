@@ -10,5 +10,7 @@ namespace TravelPlanner.TripService.Services.TravelPlans
         Task<ServiceResultDto<List<TravelPlanListItemDto>>> GetTravelPlansAsync(int requestUserId, bool isAdmin);
 
         Task<ServiceResultDto<TravelPlanResponseDto>> GetTravelPlanByIdAsync(int planId,  int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto<TravelPlanResponseDto>> UpdateTravelPlanAsync(UpdateTravelPlanCommandDto command);
     }
 }

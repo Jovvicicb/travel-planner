@@ -11,5 +11,7 @@ namespace TravelPlanner.TripService.Repositories.TravelPlans
         Task<List<TravelPlan>> GetByOwnerIdAsync(int ownerUserId);
 
         Task<TravelPlan?> GetByIdAsync(int planId);
+
+        Task UpdateAsync(TravelPlan plan);
     }
 }
