@@ -40,6 +40,7 @@
       <ServiceLaunchUrl>http://localhost:{ServicePort}/swagger</ServiceLaunchUrl>
     </ProjectReference>
     <ProjectReference Include="..\TravelPlanner.AuthService\TravelPlanner.AuthService.csproj" />
+    <ProjectReference Include="..\TravelPlanner.TripService\TravelPlanner.TripService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>
