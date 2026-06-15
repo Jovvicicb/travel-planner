@@ -1,11 +1,12 @@
-using System.Fabric;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using System.Fabric;
 using System.Text;
-using Microsoft.OpenApi.Models;
+using TravelPlanner.Api.Extensions;
 
 
 namespace TravelPlanner.Api
@@ -90,14 +91,19 @@ namespace TravelPlanner.Api
                             });
                         });
 
-                        var app = builder.Build();
+                        var app = builder.Build(); 
+
+                        app.UseGlobalExceptionHandler();
+
                         if (app.Environment.IsDevelopment())
                         {
                             app.UseSwagger();
                             app.UseSwaggerUI();
                         }
+
                         app.UseAuthentication();
                         app.UseAuthorization();
+
                         app.MapControllers();
                         
                         return app;
