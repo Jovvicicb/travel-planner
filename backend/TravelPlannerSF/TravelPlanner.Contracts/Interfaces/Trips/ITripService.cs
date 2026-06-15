@@ -1,11 +1,13 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
 using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 
 namespace TravelPlanner.Contracts.Interfaces.Trips
 {
     public interface ITripService : IService
     {
+        //TravelPlan
         Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command);
 
         Task<ServiceResultDto<List<TravelPlanListItemDto>>> GetTravelPlansAsync(int requestUserId, bool isAdmin);
@@ -15,5 +17,8 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto<TravelPlanResponseDto>> UpdateTravelPlanAsync(UpdateTravelPlanCommandDto command);
 
         Task<ServiceResultDto> DeleteTravelPlanAsync(int planId, int requestUserId, bool isAdmin);
+
+        //Destination
+        Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command);
     }
 }

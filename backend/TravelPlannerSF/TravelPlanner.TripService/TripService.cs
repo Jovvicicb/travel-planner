@@ -6,10 +6,13 @@ using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System.Fabric;
 using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
 using TravelPlanner.TripService.Data;
+using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.Destinations;
 using TravelPlanner.TripService.Services.TravelPlans;
 
 namespace TravelPlanner.TripService
@@ -36,9 +39,13 @@ namespace TravelPlanner.TripService
             services.AddScoped<ITravelPlanRepository, TravelPlanRepository>();
             services.AddScoped<ITravelPlanManager, TravelPlanManager>();
 
+            services.AddScoped<IDestinationRepository, DestinationRepository>();
+            services.AddScoped<IDestinationManager, DestinationManager>();
+
             this.serviceProvider = services.BuildServiceProvider();
         }
 
+        //TravelPlan
         public async Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command)
         {
             using var scope = serviceProvider.CreateScope();
@@ -82,6 +89,16 @@ namespace TravelPlanner.TripService
             var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanManager>();
 
             return await manager.DeleteTravelPlanAsync(planId, requestUserId, isAdmin);
+        }
+
+        //Destination
+        public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IDestinationManager>();
+
+            return await manager.CreateDestinationAsync(command);
         }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
