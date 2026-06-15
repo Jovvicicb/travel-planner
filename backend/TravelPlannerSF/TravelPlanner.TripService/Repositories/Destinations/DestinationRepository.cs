@@ -1,4 +1,5 @@
-﻿using TravelPlanner.TripService.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.TripService.Data;
 using TravelPlanner.TripService.Entities.Destinations;
 
 namespace TravelPlanner.TripService.Repositories.Destinations
@@ -19,6 +20,14 @@ namespace TravelPlanner.TripService.Repositories.Destinations
             await context.SaveChangesAsync();
 
             return destination;
+        }
+
+        public async Task<List<Destination>> GetByTravelPlanIdAsync(int travelPlanId)
+        {
+            return await context.Destinations
+                .Where(destination => destination.TravelPlanId == travelPlanId)
+                .OrderBy(destination => destination.StartDate)
+                .ToListAsync();
         }
     }
 }

@@ -178,5 +178,27 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpGet("{tripId:int}/destinations")]
+        public async Task<IActionResult> GetDestinations(int tripId)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await tripService.GetDestinationsAsync(
+                tripId,
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

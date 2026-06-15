@@ -21,8 +21,7 @@ namespace TravelPlanner.TripService.Services.Destinations
             this.travelPlanRepository = travelPlanRepository;
         }
 
-        public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(
-            CreateDestinationCommandDto command)
+        public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command)
         {
             var travelPlan = await travelPlanRepository.GetByIdAsync(command.TravelPlanId);
 
@@ -65,6 +64,53 @@ namespace TravelPlanner.TripService.Services.Destinations
             return ServiceResultDto<DestinationResponseDto>.Created(
                 DestinationMapper.ToResponse(createdDestination),
                 "Destination created successfully."
+            );
+        }
+
+        public async Task<ServiceResultDto<List<DestinationResponseDto>>> GetDestinationsAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<DestinationResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<List<DestinationResponseDto>>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<List<DestinationResponseDto>>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<List<DestinationResponseDto>>.Fail(
+                    "You do not have permission to view destinations for this travel plan.",
+                    403
+                );
+            }
+
+            var destinations = await destinationRepository.GetByTravelPlanIdAsync(travelPlanId);
+
+            var response = destinations
+                .Select(DestinationMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<DestinationResponseDto>>.Ok(
+                response,
+                "Destinations fetched successfully."
             );
         }
     }

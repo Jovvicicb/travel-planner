@@ -20,5 +20,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
 
         //Destination
         Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command);
+
+        Task<ServiceResultDto<List<DestinationResponseDto>>> GetDestinationsAsync(int travelPlanId, int requestUserId, bool isAdmin);
     }
 }
