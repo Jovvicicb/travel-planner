@@ -11,5 +11,7 @@ namespace TravelPlanner.TripService.Repositories.Destinations
         Task<Destination?> GetByIdAsync(int destinationId);
 
         Task UpdateAsync(Destination destination);
+
+        Task DeleteAsync(Destination destination);
     }
 }

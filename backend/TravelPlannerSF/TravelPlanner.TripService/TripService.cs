@@ -119,6 +119,15 @@ namespace TravelPlanner.TripService
             return await manager.UpdateDestinationAsync(command);
         }
 
+        public async Task<ServiceResultDto> DeleteDestinationAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IDestinationManager>();
+
+            return await manager.DeleteDestinationAsync(travelPlanId, destinationId, requestUserId, isAdmin);
+        }
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();
