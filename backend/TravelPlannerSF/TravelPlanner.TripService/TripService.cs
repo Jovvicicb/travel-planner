@@ -110,6 +110,15 @@ namespace TravelPlanner.TripService
             return await manager.GetDestinationsAsync(travelPlanId, requestUserId, isAdmin);
         }
 
+        public async Task<ServiceResultDto<DestinationResponseDto>> UpdateDestinationAsync(UpdateDestinationCommandDto command)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IDestinationManager>();
+
+            return await manager.UpdateDestinationAsync(command);
+        }
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();

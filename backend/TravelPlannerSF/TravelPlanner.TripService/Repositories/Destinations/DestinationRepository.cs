@@ -29,5 +29,19 @@ namespace TravelPlanner.TripService.Repositories.Destinations
                 .OrderBy(destination => destination.StartDate)
                 .ToListAsync();
         }
+
+        public async Task<Destination?> GetByIdAsync(int destinationId)
+        {
+            return await context.Destinations
+                .FirstOrDefaultAsync(destination =>
+                    destination.Id == destinationId);
+        }
+
+        public async Task UpdateAsync(Destination destination)
+        {
+            context.Destinations.Update(destination);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

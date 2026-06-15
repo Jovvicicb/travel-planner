@@ -113,5 +113,72 @@ namespace TravelPlanner.TripService.Services.Destinations
                 "Destinations fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<DestinationResponseDto>> UpdateDestinationAsync(UpdateDestinationCommandDto command)
+        {
+            if (command == null)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    "Destination data is required."
+                );
+            }
+
+            var destination = await destinationRepository.GetByIdAsync(command.DestinationId);
+
+            if (destination == null)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    "Destination not found.",
+                    404
+                );
+            }
+
+            if (destination.TravelPlanId != command.TravelPlanId)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    "Destination does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(destination.TravelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    "You do not have permission to update this destination.",
+                    403
+                );
+            }
+
+            var validation = DestinationValidator.ValidateUpdate(command, travelPlan);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail(validation.Message);
+            }
+
+            destination.Name = command.Name.Trim();
+            destination.Location = command.Location.Trim();
+            destination.StartDate = command.StartDate;
+            destination.EndDate = command.EndDate;
+            destination.Notes = command.Notes?.Trim();
+            destination.UpdatedAt = DateTime.UtcNow;
+
+            await destinationRepository.UpdateAsync(destination);
+
+            return ServiceResultDto<DestinationResponseDto>.Ok(
+                DestinationMapper.ToResponse(destination),
+                "Destination updated successfully."
+            );
+        }
     }
 }
