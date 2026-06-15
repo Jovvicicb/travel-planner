@@ -49,5 +49,12 @@ namespace TravelPlanner.TripService.Repositories.TravelPlans
 
             await context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(TravelPlan plan)
+        {
+            context.TravelPlans.Remove(plan);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

@@ -152,5 +152,37 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 "Travel plan updated successfully."
             );
         }
+
+        public async Task<ServiceResultDto> DeleteTravelPlanAsync(int planId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (planId <= 0)
+            {
+                return ServiceResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            var plan = await travelPlanRepository.GetByIdAsync(planId);
+
+            if (plan == null)
+            {
+                return ServiceResultDto.Fail("Travel plan not found.", 404);
+            }
+
+            if (!isAdmin && plan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto.Fail(
+                    "You do not have permission to delete this travel plan.",
+                    403
+                );
+            }
+
+            await travelPlanRepository.DeleteAsync(plan);
+
+            return ServiceResultDto.Ok("Travel plan deleted successfully.");
+        }
     }
 }
