@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelPlanner.TripService.Entities.TravelPlans;
+using TravelPlanner.TripService.Entities.Destinations;
 
 namespace TravelPlanner.TripService.Data
 {
@@ -11,6 +12,7 @@ namespace TravelPlanner.TripService.Data
         }
 
         public DbSet<TravelPlan> TravelPlans => Set<TravelPlan>();
+        public DbSet<Destination> Destinations => Set<Destination>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +52,44 @@ namespace TravelPlanner.TripService.Data
 
                 entity.Property(plan => plan.UpdatedAt)
                     .IsRequired(false);
+            });
+
+            modelBuilder.Entity<Destination>(entity =>
+            {
+                entity.ToTable("Destinations");
+
+                entity.HasKey(destination => destination.Id);
+
+                entity.Property(destination => destination.TravelPlanId)
+                    .IsRequired();
+
+                entity.Property(destination => destination.Name)
+                    .IsRequired()
+                    .HasMaxLength(120);
+
+                entity.Property(destination => destination.Location)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(destination => destination.StartDate)
+                    .IsRequired();
+
+                entity.Property(destination => destination.EndDate)
+                    .IsRequired();
+
+                entity.Property(destination => destination.Notes)
+                    .HasMaxLength(2000);
+
+                entity.Property(destination => destination.CreatedAt)
+                    .IsRequired();
+
+                entity.Property(destination => destination.UpdatedAt)
+                    .IsRequired(false);
+
+                entity.HasOne(destination => destination.TravelPlan)
+                    .WithMany(plan => plan.Destinations)
+                    .HasForeignKey(destination => destination.TravelPlanId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

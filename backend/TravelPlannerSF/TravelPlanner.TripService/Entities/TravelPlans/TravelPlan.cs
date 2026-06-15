@@ -1,4 +1,6 @@
-﻿namespace TravelPlanner.TripService.Entities.TravelPlans
+﻿using TravelPlanner.TripService.Entities.Destinations;
+
+namespace TravelPlanner.TripService.Entities.TravelPlans
 {
     public class TravelPlan
     {
@@ -21,5 +23,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
+
+        public ICollection<Destination> Destinations { get; set; } = new List<Destination>();
     }
 }
