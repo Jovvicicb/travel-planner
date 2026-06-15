@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelPlanner.TripService.Entities.TravelPlans;
 using TravelPlanner.TripService.Entities.Destinations;
+using TravelPlanner.TripService.Entities.Activities;
 
 namespace TravelPlanner.TripService.Data
 {
@@ -13,6 +14,7 @@ namespace TravelPlanner.TripService.Data
 
         public DbSet<TravelPlan> TravelPlans => Set<TravelPlan>();
         public DbSet<Destination> Destinations => Set<Destination>();
+        public DbSet<Activity> Activities => Set<Activity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -89,6 +91,56 @@ namespace TravelPlanner.TripService.Data
                 entity.HasOne(destination => destination.TravelPlan)
                     .WithMany(plan => plan.Destinations)
                     .HasForeignKey(destination => destination.TravelPlanId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Activity>(entity =>
+            {
+                entity.ToTable("Activities");
+
+                entity.HasKey(activity => activity.Id);
+
+                entity.Property(activity => activity.DestinationId)
+                    .IsRequired();
+
+                entity.Property(activity => activity.Title)
+                    .IsRequired()
+                    .HasMaxLength(120);
+
+                entity.Property(activity => activity.ActivityDate)
+                    .IsRequired();
+
+                entity.Property(activity => activity.StartTime)
+                    .IsRequired();
+
+                entity.Property(activity => activity.EndTime)
+                    .IsRequired();
+
+                entity.Property(activity => activity.Location)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(activity => activity.Description)
+                    .HasMaxLength(1000);
+
+                entity.Property(activity => activity.EstimatedCost)
+                    .IsRequired()
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(activity => activity.Status)
+                    .IsRequired()
+                    .HasConversion<string>()
+                    .HasMaxLength(30);
+
+                entity.Property(activity => activity.CreatedAt)
+                    .IsRequired();
+
+                entity.Property(activity => activity.UpdatedAt)
+                    .IsRequired(false);
+
+                entity.HasOne(activity => activity.Destination)
+                    .WithMany(destination => destination.Activities)
+                    .HasForeignKey(activity => activity.DestinationId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }

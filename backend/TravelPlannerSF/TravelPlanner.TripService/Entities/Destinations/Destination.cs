@@ -1,4 +1,6 @@
-﻿namespace TravelPlanner.TripService.Entities.Destinations
+﻿using TravelPlanner.TripService.Entities.Activities;
+
+namespace TravelPlanner.TripService.Entities.Destinations
 {
     public class Destination
     {
@@ -21,5 +23,7 @@
         public DateTime? UpdatedAt { get; set; }
 
         public TravelPlans.TravelPlan TravelPlan { get; set; } = null!;
+
+        public ICollection<Activity> Activities { get; set; } = new List<Activity>();
     }
 }
