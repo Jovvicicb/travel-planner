@@ -31,6 +31,16 @@ namespace TravelPlanner.TripService.Repositories.Activities
                 .ToListAsync();
         }
 
+        public async Task<List<Activity>> GetByTravelPlanIdAsync(int travelPlanId)
+        {
+            return await context.Activities
+                .Include(activity => activity.Destination)
+                .Where(activity => activity.Destination.TravelPlanId == travelPlanId)
+                .OrderBy(activity => activity.ActivityDate)
+                .ThenBy(activity => activity.StartTime)
+                .ToListAsync();
+        }
+
         public async Task<Activity?> GetByIdAsync(int activityId)
         {
             return await context.Activities

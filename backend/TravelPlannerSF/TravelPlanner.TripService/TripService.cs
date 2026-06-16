@@ -7,6 +7,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using System.Fabric;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities;
+using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
@@ -151,6 +152,15 @@ namespace TravelPlanner.TripService
             var manager = scope.ServiceProvider.GetRequiredService<IActivityManager>();
 
             return await manager.GetActivitiesAsync(travelPlanId, destinationId, requestUserId, isAdmin);
+        }
+
+        public async Task<ServiceResultDto<List<CalendarDayDto>>> GetActivityCalendarAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IActivityManager>();
+
+            return await manager.GetCalendarAsync(travelPlanId, requestUserId, isAdmin);
         }
 
         public async Task<ServiceResultDto<ActivityResponseDto>> UpdateActivityAsync(UpdateActivityCommandDto command)

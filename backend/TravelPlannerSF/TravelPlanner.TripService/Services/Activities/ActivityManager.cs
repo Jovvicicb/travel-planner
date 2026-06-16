@@ -1,5 +1,6 @@
 ﻿using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities;
+using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.TripService.Entities.Activities;
 using TravelPlanner.TripService.Mapping.Activities;
 using TravelPlanner.TripService.Repositories.Activities;
@@ -160,6 +161,62 @@ namespace TravelPlanner.TripService.Services.Activities
             return ServiceResultDto<List<ActivityResponseDto>>.Ok(
                 response,
                 "Activities fetched successfully."
+            );
+        }
+
+        public async Task<ServiceResultDto<List<CalendarDayDto>>> GetCalendarAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<CalendarDayDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<List<CalendarDayDto>>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<List<CalendarDayDto>>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<List<CalendarDayDto>>.Fail(
+                    "You do not have permission to view this travel plan calendar.",
+                    403
+                );
+            }
+
+            var activities = await activityRepository.GetByTravelPlanIdAsync(travelPlanId);
+
+            var calendar = activities
+                .GroupBy(activity => activity.ActivityDate.Date)
+                .OrderBy(group => group.Key)
+                .Select(group => new CalendarDayDto
+                {
+                    Date = group.Key,
+                    Activities = group
+                        .OrderBy(activity => activity.StartTime)
+                        .Select(ActivityMapper.ToResponse)
+                        .ToList()
+                })
+                .ToList();
+
+            return ServiceResultDto<List<CalendarDayDto>>.Ok(
+                calendar,
+                "Activity calendar fetched successfully."
             );
         }
 

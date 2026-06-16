@@ -1,6 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities;
+using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 
@@ -32,6 +33,8 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto<ActivityResponseDto>> CreateActivityAsync(CreateActivityCommandDto command);
 
         Task<ServiceResultDto<List<ActivityResponseDto>>> GetActivitiesAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto<List<CalendarDayDto>>> GetActivityCalendarAsync(int travelPlanId, int requestUserId, bool isAdmin);
 
         Task<ServiceResultDto<ActivityResponseDto>> UpdateActivityAsync(UpdateActivityCommandDto command);
 
