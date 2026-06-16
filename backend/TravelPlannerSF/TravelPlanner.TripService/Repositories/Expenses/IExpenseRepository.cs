@@ -7,5 +7,9 @@ namespace TravelPlanner.TripService.Repositories.Expenses
         Task<Expense> CreateAsync(Expense expense);
 
         Task<List<Expense>> GetByTravelPlanIdAsync(int travelPlanId);
+
+        Task<Expense?> GetByIdAsync(int expenseId);
+
+        Task UpdateAsync(Expense expense);
     }
 }

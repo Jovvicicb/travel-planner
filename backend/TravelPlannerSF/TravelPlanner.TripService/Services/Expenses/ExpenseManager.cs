@@ -118,5 +118,64 @@ namespace TravelPlanner.TripService.Services.Expenses
                 "Expenses fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<ExpenseResponseDto>> UpdateExpenseAsync(UpdateExpenseCommandDto command)
+        {
+            if (command == null)
+            {
+                return ServiceResultDto<ExpenseResponseDto>.Fail("Expense data is required.");
+            }
+
+            var expense = await expenseRepository.GetByIdAsync(command.ExpenseId);
+
+            if (expense == null)
+            {
+                return ServiceResultDto<ExpenseResponseDto>.Fail("Expense not found.", 404);
+            }
+
+            if (expense.TravelPlanId != command.TravelPlanId)
+            {
+                return ServiceResultDto<ExpenseResponseDto>.Fail(
+                    "Expense does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(command.TravelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<ExpenseResponseDto>.Fail("Travel plan not found.", 404);
+            }
+
+            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            {
+                return ServiceResultDto<ExpenseResponseDto>.Fail(
+                    "You do not have permission to update this expense.",
+                    403
+                );
+            }
+
+            var validation = ExpenseValidator.ValidateUpdate(command);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<ExpenseResponseDto>.Fail(validation.Message);
+            }
+
+            expense.Title = command.Title.Trim();
+            expense.Category = command.Category;
+            expense.Amount = command.Amount;
+            expense.ExpenseDate = command.ExpenseDate;
+            expense.Description = command.Description?.Trim();
+            expense.UpdatedAt = DateTime.UtcNow;
+
+            await expenseRepository.UpdateAsync(expense);
+
+            return ServiceResultDto<ExpenseResponseDto>.Ok(
+                ExpenseMapper.ToResponse(expense),
+                "Expense updated successfully."
+            );
+        }
     }
 }

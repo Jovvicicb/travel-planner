@@ -452,5 +452,36 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpPut("{tripId:int}/expenses/{expenseId:int}")]
+        public async Task<IActionResult> UpdateExpense(int tripId, int expenseId, [FromBody] UpdateExpenseRequestDto request)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var command = new UpdateExpenseCommandDto
+            {
+                TravelPlanId = tripId,
+                ExpenseId = expenseId,
+                RequestUserId = userContext.Value.UserId,
+                IsAdmin = userContext.Value.IsAdmin,
+                Title = request.Title,
+                Category = request.Category,
+                Amount = request.Amount,
+                ExpenseDate = request.ExpenseDate,
+                Description = request.Description
+            };
+
+            var result = await tripService.UpdateExpenseAsync(command);
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

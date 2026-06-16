@@ -30,5 +30,18 @@ namespace TravelPlanner.TripService.Repositories.Expenses
                 .ThenByDescending(expense => expense.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task<Expense?> GetByIdAsync(int expenseId)
+        {
+            return await context.Expenses
+                .FirstOrDefaultAsync(expense => expense.Id == expenseId);
+        }
+
+        public async Task UpdateAsync(Expense expense)
+        {
+            context.Expenses.Update(expense);
+
+            await context.SaveChangesAsync();
+        }
     }
 }
