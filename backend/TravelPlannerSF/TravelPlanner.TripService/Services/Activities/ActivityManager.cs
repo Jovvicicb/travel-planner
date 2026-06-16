@@ -239,5 +239,77 @@ namespace TravelPlanner.TripService.Services.Activities
                 "Activity updated successfully."
             );
         }
+
+        public async Task<ServiceResultDto> DeleteActivityAsync(int travelPlanId, int destinationId, int activityId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (destinationId <= 0)
+            {
+                return ServiceResultDto.Fail("Destination id is not valid.");
+            }
+
+            if (activityId <= 0)
+            {
+                return ServiceResultDto.Fail("Activity id is not valid.");
+            }
+
+            var activity = await activityRepository.GetByIdAsync(activityId);
+
+            if (activity == null)
+            {
+                return ServiceResultDto.Fail("Activity not found.", 404);
+            }
+
+            if (activity.DestinationId != destinationId)
+            {
+                return ServiceResultDto.Fail(
+                    "Activity does not belong to the specified destination.",
+                    400
+                );
+            }
+
+            var destination = await destinationRepository.GetByIdAsync(destinationId);
+
+            if (destination == null)
+            {
+                return ServiceResultDto.Fail("Destination not found.", 404);
+            }
+
+            if (destination.TravelPlanId != travelPlanId)
+            {
+                return ServiceResultDto.Fail(
+                    "Destination does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto.Fail("Travel plan not found.", 404);
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto.Fail(
+                    "You do not have permission to delete this activity.",
+                    403
+                );
+            }
+
+            await activityRepository.DeleteAsync(activity);
+
+            return ServiceResultDto.Ok("Activity deleted successfully.");
+        }
     }
 }

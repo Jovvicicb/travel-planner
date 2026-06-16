@@ -348,5 +348,29 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpDelete("{tripId:int}/destinations/{destinationId:int}/activities/{activityId:int}")]
+        public async Task<IActionResult> DeleteActivity(int tripId, int destinationId, int activityId)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await tripService.DeleteActivityAsync(
+                tripId,
+                destinationId,
+                activityId,
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

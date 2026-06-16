@@ -35,5 +35,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
 
         Task<ServiceResultDto<ActivityResponseDto>> UpdateActivityAsync(UpdateActivityCommandDto command);
 
+        Task<ServiceResultDto> DeleteActivityAsync(int travelPlanId, int destinationId, int activityId, int requestUserId, bool isAdmin);
+
     }
 }

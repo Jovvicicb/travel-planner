@@ -11,5 +11,7 @@ namespace TravelPlanner.TripService.Repositories.Activities
         Task<Activity?> GetByIdAsync(int activityId);
 
         Task UpdateAsync(Activity activity);
+
+        Task DeleteAsync(Activity activity);
     }
 }
