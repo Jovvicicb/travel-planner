@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using TravelPlanner.Api.Helpers;
 using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.DTOs.Trips.Activities;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
@@ -251,6 +252,41 @@ namespace TravelPlanner.Api.Controllers
                 userContext.Value.UserId,
                 userContext.Value.IsAdmin
             );
+
+            return ResponseHelper.Send(this, result);
+        }
+
+        //Activity
+        [HttpPost("{tripId:int}/destinations/{destinationId:int}/activities")]
+        public async Task<IActionResult> CreateActivity(int tripId, int destinationId, [FromBody] CreateActivityRequestDto request)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var command = new CreateActivityCommandDto
+            {
+                TravelPlanId = tripId,
+                DestinationId = destinationId,
+                RequestUserId = userContext.Value.UserId,
+                IsAdmin = userContext.Value.IsAdmin,
+                Title = request.Title,
+                ActivityDate = request.ActivityDate,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                Location = request.Location,
+                Description = request.Description,
+                EstimatedCost = request.EstimatedCost,
+                Status = request.Status
+            };
+
+            var result = await tripService.CreateActivityAsync(command);
 
             return ResponseHelper.Send(this, result);
         }

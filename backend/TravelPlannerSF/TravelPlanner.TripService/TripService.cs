@@ -6,12 +6,15 @@ using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System.Fabric;
 using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.DTOs.Trips.Activities;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
 using TravelPlanner.TripService.Data;
+using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.Activities;
 using TravelPlanner.TripService.Services.Destinations;
 using TravelPlanner.TripService.Services.TravelPlans;
 
@@ -41,6 +44,9 @@ namespace TravelPlanner.TripService
 
             services.AddScoped<IDestinationRepository, DestinationRepository>();
             services.AddScoped<IDestinationManager, DestinationManager>();
+
+            services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<IActivityManager, ActivityManager>();
 
             this.serviceProvider = services.BuildServiceProvider();
         }
@@ -126,6 +132,16 @@ namespace TravelPlanner.TripService
             var manager = scope.ServiceProvider.GetRequiredService<IDestinationManager>();
 
             return await manager.DeleteDestinationAsync(travelPlanId, destinationId, requestUserId, isAdmin);
+        }
+
+        //Activity
+        public async Task<ServiceResultDto<ActivityResponseDto>> CreateActivityAsync(CreateActivityCommandDto command)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IActivityManager>();
+
+            return await manager.CreateActivityAsync(command);
         }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
