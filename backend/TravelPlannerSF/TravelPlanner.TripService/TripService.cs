@@ -9,14 +9,17 @@ using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities;
 using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
+using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
 using TravelPlanner.TripService.Data;
 using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Destinations;
+using TravelPlanner.TripService.Repositories.Expenses;
 using TravelPlanner.TripService.Repositories.TravelPlans;
 using TravelPlanner.TripService.Services.Activities;
 using TravelPlanner.TripService.Services.Destinations;
+using TravelPlanner.TripService.Services.Expenses;
 using TravelPlanner.TripService.Services.TravelPlans;
 
 namespace TravelPlanner.TripService
@@ -48,6 +51,9 @@ namespace TravelPlanner.TripService
 
             services.AddScoped<IActivityRepository, ActivityRepository>();
             services.AddScoped<IActivityManager, ActivityManager>();
+
+            services.AddScoped<IExpenseRepository, ExpenseRepository>();
+            services.AddScoped<IExpenseManager, ExpenseManager>();
 
             this.serviceProvider = services.BuildServiceProvider();
         }
@@ -98,6 +104,7 @@ namespace TravelPlanner.TripService
             return await manager.DeleteTravelPlanAsync(planId, requestUserId, isAdmin);
         }
 
+
         //Destination
         public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command)
         {
@@ -134,6 +141,7 @@ namespace TravelPlanner.TripService
 
             return await manager.DeleteDestinationAsync(travelPlanId, destinationId, requestUserId, isAdmin);
         }
+
 
         //Activity
         public async Task<ServiceResultDto<ActivityResponseDto>> CreateActivityAsync(CreateActivityCommandDto command)
@@ -181,6 +189,16 @@ namespace TravelPlanner.TripService
             return await manager.DeleteActivityAsync( travelPlanId, destinationId, activityId, requestUserId, isAdmin);
         }
 
+
+        //Expense
+        public async Task<ServiceResultDto<ExpenseResponseDto>> CreateExpenseAsync(CreateExpenseCommandDto command)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IExpenseManager>();
+
+            return await manager.CreateExpenseAsync(command);
+        }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

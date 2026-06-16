@@ -5,6 +5,7 @@ using TravelPlanner.Api.Helpers;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
+using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
 
@@ -23,6 +24,7 @@ namespace TravelPlanner.Api.Controllers
                 new Uri("fabric:/TravelPlannerSF/TravelPlanner.TripService")
             );
         }
+
         //TravelPlan
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTravelPlanRequestDto request)
@@ -149,6 +151,7 @@ namespace TravelPlanner.Api.Controllers
             return ResponseHelper.Send(this, result);
         }
 
+
         //Destination
         [HttpPost("{tripId:int}/destinations")]
         public async Task<IActionResult> CreateDestination(int tripId, [FromBody] CreateDestinationRequestDto request)
@@ -255,6 +258,7 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
 
         //Activity
         [HttpPost("{tripId:int}/destinations/{destinationId:int}/activities")]
@@ -391,6 +395,38 @@ namespace TravelPlanner.Api.Controllers
                 userContext.Value.UserId,
                 userContext.Value.IsAdmin
             );
+
+            return ResponseHelper.Send(this, result);
+        }
+
+
+        //Expense
+        [HttpPost("{tripId:int}/expenses")]
+        public async Task<IActionResult> CreateExpense(int tripId, [FromBody] CreateExpenseRequestDto request)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var command = new CreateExpenseCommandDto
+            {
+                TravelPlanId = tripId,
+                RequestUserId = userContext.Value.UserId,
+                IsAdmin = userContext.Value.IsAdmin,
+                Title = request.Title,
+                Category = request.Category,
+                Amount = request.Amount,
+                ExpenseDate = request.ExpenseDate,
+                Description = request.Description
+            };
+
+            var result = await tripService.CreateExpenseAsync(command);
 
             return ResponseHelper.Send(this, result);
         }
