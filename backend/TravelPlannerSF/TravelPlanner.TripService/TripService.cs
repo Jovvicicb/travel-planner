@@ -144,6 +144,15 @@ namespace TravelPlanner.TripService
             return await manager.CreateActivityAsync(command);
         }
 
+        public async Task<ServiceResultDto<List<ActivityResponseDto>>> GetActivitiesAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IActivityManager>();
+
+            return await manager.GetActivitiesAsync(travelPlanId, destinationId, requestUserId, isAdmin);
+        }
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();

@@ -90,5 +90,77 @@ namespace TravelPlanner.TripService.Services.Activities
                 "Activity created successfully."
             );
         }
+
+        public async Task<ServiceResultDto<List<ActivityResponseDto>>> GetActivitiesAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            if (destinationId <= 0)
+            {
+                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
+                    "Destination id is not valid."
+                );
+            }
+
+            var destination = await destinationRepository.GetByIdAsync(destinationId);
+
+            if (destination == null)
+            {
+                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
+                    "Destination not found.",
+                    404
+                );
+            }
+
+            if (destination.TravelPlanId != travelPlanId)
+            {
+                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
+                    "Destination does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
+                    "You do not have permission to view activities for this destination.",
+                    403
+                );
+            }
+
+            var activities = await activityRepository.GetByDestinationIdAsync(destinationId);
+
+            var response = activities
+                .Select(ActivityMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<ActivityResponseDto>>.Ok(
+                response,
+                "Activities fetched successfully."
+            );
+        }
     }
 }

@@ -31,5 +31,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         //Activity
         Task<ServiceResultDto<ActivityResponseDto>> CreateActivityAsync(CreateActivityCommandDto command);
 
+        Task<ServiceResultDto<List<ActivityResponseDto>>> GetActivitiesAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin);
+
     }
 }
