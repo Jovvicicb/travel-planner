@@ -30,5 +30,19 @@ namespace TravelPlanner.TripService.Repositories.Activities
                 .ThenBy(activity => activity.StartTime)
                 .ToListAsync();
         }
+
+        public async Task<Activity?> GetByIdAsync(int activityId)
+        {
+            return await context.Activities
+                .FirstOrDefaultAsync(activity =>
+                    activity.Id == activityId);
+        }
+
+        public async Task UpdateAsync(Activity activity)
+        {
+            context.Activities.Update(activity);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

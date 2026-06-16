@@ -313,5 +313,40 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpPut("{tripId:int}/destinations/{destinationId:int}/activities/{activityId:int}")]
+        public async Task<IActionResult> UpdateActivity(int tripId, int destinationId, int activityId, [FromBody] UpdateActivityRequestDto request)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var command = new UpdateActivityCommandDto
+            {
+                TravelPlanId = tripId,
+                DestinationId = destinationId,
+                ActivityId = activityId,
+                RequestUserId = userContext.Value.UserId,
+                IsAdmin = userContext.Value.IsAdmin,
+                Title = request.Title,
+                ActivityDate = request.ActivityDate,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                Location = request.Location,
+                Description = request.Description,
+                EstimatedCost = request.EstimatedCost,
+                Status = request.Status
+            };
+
+            var result = await tripService.UpdateActivityAsync(command);
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

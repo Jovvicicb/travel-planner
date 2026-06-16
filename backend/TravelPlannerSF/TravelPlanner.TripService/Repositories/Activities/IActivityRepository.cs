@@ -7,5 +7,9 @@ namespace TravelPlanner.TripService.Repositories.Activities
         Task<Activity> CreateAsync(Activity activity);
 
         Task<List<Activity>> GetByDestinationIdAsync(int destinationId);
+
+        Task<Activity?> GetByIdAsync(int activityId);
+
+        Task UpdateAsync(Activity activity);
     }
 }

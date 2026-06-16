@@ -162,5 +162,82 @@ namespace TravelPlanner.TripService.Services.Activities
                 "Activities fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<ActivityResponseDto>> UpdateActivityAsync(UpdateActivityCommandDto command)
+        {
+            if (command == null)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail("Activity data is required.");
+            }
+
+            var activity = await activityRepository.GetByIdAsync(command.ActivityId);
+
+            if (activity == null)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail("Activity not found.", 404);
+            }
+
+            if (activity.DestinationId != command.DestinationId)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail(
+                    "Activity does not belong to the specified destination.",
+                    400
+                );
+            }
+
+            var destination = await destinationRepository.GetByIdAsync(command.DestinationId);
+
+            if (destination == null)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail("Destination not found.", 404);
+            }
+
+            if (destination.TravelPlanId != command.TravelPlanId)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail(
+                    "Destination does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(command.TravelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail("Travel plan not found.", 404);
+            }
+
+            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail(
+                    "You do not have permission to update this activity.",
+                    403
+                );
+            }
+
+            var validation = ActivityValidator.ValidateUpdate(command, destination);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<ActivityResponseDto>.Fail(validation.Message);
+            }
+
+            activity.Title = command.Title.Trim();
+            activity.ActivityDate = command.ActivityDate;
+            activity.StartTime = command.StartTime;
+            activity.EndTime = command.EndTime;
+            activity.Location = command.Location.Trim();
+            activity.Description = command.Description?.Trim();
+            activity.EstimatedCost = command.EstimatedCost;
+            activity.Status = command.Status;
+            activity.UpdatedAt = DateTime.UtcNow;
+
+            await activityRepository.UpdateAsync(activity);
+
+            return ServiceResultDto<ActivityResponseDto>.Ok(
+                ActivityMapper.ToResponse(activity),
+                "Activity updated successfully."
+            );
+        }
     }
 }
