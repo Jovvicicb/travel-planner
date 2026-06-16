@@ -483,5 +483,28 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpDelete("{tripId:int}/expenses/{expenseId:int}")]
+        public async Task<IActionResult> DeleteExpense(int tripId, int expenseId)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await tripService.DeleteExpenseAsync(
+                tripId,
+                expenseId,
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

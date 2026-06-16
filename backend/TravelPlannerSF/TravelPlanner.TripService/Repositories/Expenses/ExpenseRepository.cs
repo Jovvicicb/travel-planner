@@ -43,5 +43,12 @@ namespace TravelPlanner.TripService.Repositories.Expenses
 
             await context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(Expense expense)
+        {
+            context.Expenses.Remove(expense);
+
+            await context.SaveChangesAsync();
+        }
     }
 }
