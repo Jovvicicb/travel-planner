@@ -1,4 +1,5 @@
 ﻿using TravelPlanner.TripService.Entities.Destinations;
+using TravelPlanner.TripService.Entities.Expenses;
 
 namespace TravelPlanner.TripService.Entities.TravelPlans
 {
@@ -25,5 +26,7 @@ namespace TravelPlanner.TripService.Entities.TravelPlans
         public DateTime? UpdatedAt { get; set; }
 
         public ICollection<Destination> Destinations { get; set; } = new List<Destination>();
+
+        public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
     }
 }

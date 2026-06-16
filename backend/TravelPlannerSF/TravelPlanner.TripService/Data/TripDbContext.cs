@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TravelPlanner.TripService.Entities.TravelPlans;
-using TravelPlanner.TripService.Entities.Destinations;
 using TravelPlanner.TripService.Entities.Activities;
+using TravelPlanner.TripService.Entities.Destinations;
+using TravelPlanner.TripService.Entities.Expenses;
+using TravelPlanner.TripService.Entities.TravelPlans;
 
 namespace TravelPlanner.TripService.Data
 {
@@ -15,6 +16,7 @@ namespace TravelPlanner.TripService.Data
         public DbSet<TravelPlan> TravelPlans => Set<TravelPlan>();
         public DbSet<Destination> Destinations => Set<Destination>();
         public DbSet<Activity> Activities => Set<Activity>();
+        public DbSet<Expense> Expenses => Set<Expense>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -141,6 +143,46 @@ namespace TravelPlanner.TripService.Data
                 entity.HasOne(activity => activity.Destination)
                     .WithMany(destination => destination.Activities)
                     .HasForeignKey(activity => activity.DestinationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Expense>(entity =>
+            {
+                entity.ToTable("Expenses");
+
+                entity.HasKey(expense => expense.Id);
+
+                entity.Property(expense => expense.TravelPlanId)
+                    .IsRequired();
+
+                entity.Property(expense => expense.Title)
+                    .IsRequired()
+                    .HasMaxLength(120);
+
+                entity.Property(expense => expense.Category)
+                    .IsRequired()
+                    .HasConversion<string>()
+                    .HasMaxLength(30);
+
+                entity.Property(expense => expense.Amount)
+                    .IsRequired()
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(expense => expense.ExpenseDate)
+                    .IsRequired();
+
+                entity.Property(expense => expense.Description)
+                    .HasMaxLength(1000);
+
+                entity.Property(expense => expense.CreatedAt)
+                    .IsRequired();
+
+                entity.Property(expense => expense.UpdatedAt)
+                    .IsRequired(false);
+
+                entity.HasOne(expense => expense.TravelPlan)
+                    .WithMany(plan => plan.Expenses)
+                    .HasForeignKey(expense => expense.TravelPlanId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }
