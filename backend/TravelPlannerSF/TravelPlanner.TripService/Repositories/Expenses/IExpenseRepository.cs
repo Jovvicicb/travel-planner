@@ -5,5 +5,7 @@ namespace TravelPlanner.TripService.Repositories.Expenses
     public interface IExpenseRepository
     {
         Task<Expense> CreateAsync(Expense expense);
+
+        Task<List<Expense>> GetByTravelPlanIdAsync(int travelPlanId);
     }
 }

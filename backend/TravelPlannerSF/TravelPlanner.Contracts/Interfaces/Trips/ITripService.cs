@@ -46,5 +46,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
 
         //Expense
         Task<ServiceResultDto<ExpenseResponseDto>> CreateExpenseAsync(CreateExpenseCommandDto command);
+
+        Task<ServiceResultDto<List<ExpenseResponseDto>>> GetExpensesAsync(int travelPlanId, int requestUserId, bool isAdmin);
     }
 }

@@ -200,6 +200,15 @@ namespace TravelPlanner.TripService
             return await manager.CreateExpenseAsync(command);
         }
 
+        public async Task<ServiceResultDto<List<ExpenseResponseDto>>> GetExpensesAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IExpenseManager>();
+
+            return await manager.GetExpensesAsync(travelPlanId, requestUserId, isAdmin);
+        }
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();

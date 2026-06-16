@@ -71,5 +71,52 @@ namespace TravelPlanner.TripService.Services.Expenses
                 "Expense created successfully."
             );
         }
+
+        public async Task<ServiceResultDto<List<ExpenseResponseDto>>> GetExpensesAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<ExpenseResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<List<ExpenseResponseDto>>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<List<ExpenseResponseDto>>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<List<ExpenseResponseDto>>.Fail(
+                    "You do not have permission to view expenses for this travel plan.",
+                    403
+                );
+            }
+
+            var expenses = await expenseRepository.GetByTravelPlanIdAsync(travelPlanId);
+
+            var response = expenses
+                .Select(ExpenseMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<ExpenseResponseDto>>.Ok(
+                response,
+                "Expenses fetched successfully."
+            );
+        }
     }
 }
