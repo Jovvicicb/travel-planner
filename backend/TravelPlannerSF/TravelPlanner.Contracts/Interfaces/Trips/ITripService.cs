@@ -52,5 +52,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto<ExpenseResponseDto>> UpdateExpenseAsync(UpdateExpenseCommandDto command);
 
         Task<ServiceResultDto> DeleteExpenseAsync(int travelPlanId, int expenseId, int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto<BudgetSummaryDto>> GetBudgetSummaryAsync(int travelPlanId, int requestUserId, bool isAdmin);
     }
 }

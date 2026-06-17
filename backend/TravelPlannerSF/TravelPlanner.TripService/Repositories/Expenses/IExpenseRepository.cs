@@ -13,5 +13,7 @@ namespace TravelPlanner.TripService.Repositories.Expenses
         Task UpdateAsync(Expense expense);
 
         Task DeleteAsync(Expense expense);
+
+        Task<decimal> GetTotalAmountByTravelPlanIdAsync(int travelPlanId);
     }
 }

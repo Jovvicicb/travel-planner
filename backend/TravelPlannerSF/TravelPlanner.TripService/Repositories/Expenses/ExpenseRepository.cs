@@ -50,5 +50,12 @@ namespace TravelPlanner.TripService.Repositories.Expenses
 
             await context.SaveChangesAsync();
         }
+
+        public async Task<decimal> GetTotalAmountByTravelPlanIdAsync(int travelPlanId)
+        {
+            return await context.Expenses
+                .Where(expense => expense.TravelPlanId == travelPlanId)
+                .SumAsync(expense => expense.Amount);
+        }
     }
 }

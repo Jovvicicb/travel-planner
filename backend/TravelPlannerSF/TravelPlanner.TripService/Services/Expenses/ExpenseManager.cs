@@ -229,5 +229,57 @@ namespace TravelPlanner.TripService.Services.Expenses
 
             return ServiceResultDto.Ok("Expense deleted successfully.");
         }
+
+        public async Task<ServiceResultDto<BudgetSummaryDto>> GetBudgetSummaryAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<BudgetSummaryDto>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<BudgetSummaryDto>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<BudgetSummaryDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<BudgetSummaryDto>.Fail(
+                    "You do not have permission to view budget summary for this travel plan.",
+                    403
+                );
+            }
+
+            var totalExpenses = await expenseRepository.GetTotalAmountByTravelPlanIdAsync(travelPlanId);
+
+            var summary = new BudgetSummaryDto
+            {
+                TravelPlanId = travelPlan.Id,
+                PlannedBudget = travelPlan.Budget,
+                TotalExpenses = totalExpenses,
+                RemainingBudget = travelPlan.Budget - totalExpenses,
+                IsOverBudget = totalExpenses > travelPlan.Budget
+            };
+
+            return ServiceResultDto<BudgetSummaryDto>.Ok(
+                summary,
+                "Budget summary fetched successfully."
+            );
+        }
     }
 }
