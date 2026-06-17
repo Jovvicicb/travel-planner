@@ -59,5 +59,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
 
         //ChecklistIt
         Task<ServiceResultDto<ChecklistItemResponseDto>> CreateChecklistItemAsync(CreateChecklistItemCommandDto command);
+
+        Task<ServiceResultDto<List<ChecklistItemResponseDto>>> GetChecklistItemsAsync(int travelPlanId, int requestUserId, bool isAdmin);
     }
 }

@@ -253,6 +253,15 @@ namespace TravelPlanner.TripService
             return await manager.CreateChecklistItemAsync(command);
         }
 
+        public async Task<ServiceResultDto<List<ChecklistItemResponseDto>>> GetChecklistItemsAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IChecklistManager>();
+
+            return await manager.GetChecklistItemsAsync(travelPlanId, requestUserId, isAdmin);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

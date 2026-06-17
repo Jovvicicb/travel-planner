@@ -70,5 +70,52 @@ namespace TravelPlanner.TripService.Services.Checklist
                 "Checklist item created successfully."
             );
         }
+
+        public async Task<ServiceResultDto<List<ChecklistItemResponseDto>>> GetChecklistItemsAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<ChecklistItemResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<List<ChecklistItemResponseDto>>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<List<ChecklistItemResponseDto>>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<List<ChecklistItemResponseDto>>.Fail(
+                    "You do not have permission to view checklist items for this travel plan.",
+                    403
+                );
+            }
+
+            var items = await checklistRepository.GetByTravelPlanIdAsync(travelPlanId);
+
+            var response = items
+                .Select(ChecklistMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<ChecklistItemResponseDto>>.Ok(
+                response,
+                "Checklist items fetched successfully."
+            );
+        }
     }
 }

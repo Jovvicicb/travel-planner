@@ -1,4 +1,5 @@
-﻿using TravelPlanner.TripService.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.TripService.Data;
 using TravelPlanner.TripService.Entities.Checklist;
 
 namespace TravelPlanner.TripService.Repositories.Checklist
@@ -19,6 +20,15 @@ namespace TravelPlanner.TripService.Repositories.Checklist
             await context.SaveChangesAsync();
 
             return item;
+        }
+
+        public async Task<List<ChecklistItem>> GetByTravelPlanIdAsync(int travelPlanId)
+        {
+            return await context.ChecklistItems
+                .Where(item => item.TravelPlanId == travelPlanId)
+                .OrderBy(item => item.IsCompleted)
+                .ThenByDescending(item => item.CreatedAt)
+                .ToListAsync();
         }
     }
 }
