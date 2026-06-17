@@ -4,6 +4,7 @@ using Microsoft.ServiceFabric.Services.Remoting.Client;
 using TravelPlanner.Api.Helpers;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities;
+using TravelPlanner.Contracts.DTOs.Trips.Checklist;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
@@ -525,6 +526,34 @@ namespace TravelPlanner.Api.Controllers
                 userContext.Value.UserId,
                 userContext.Value.IsAdmin
             );
+
+            return ResponseHelper.Send(this, result);
+        }
+
+
+        //Checklist
+        [HttpPost("{tripId:int}/checklist")]
+        public async Task<IActionResult> CreateChecklistItem(int tripId, [FromBody] CreateChecklistItemRequestDto request)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var command = new CreateChecklistItemCommandDto
+            {
+                TravelPlanId = tripId,
+                RequestUserId = userContext.Value.UserId,
+                IsAdmin = userContext.Value.IsAdmin,
+                Title = request.Title
+            };
+
+            var result = await tripService.CreateChecklistItemAsync(command);
 
             return ResponseHelper.Send(this, result);
         }
