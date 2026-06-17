@@ -1,4 +1,5 @@
-﻿using TravelPlanner.TripService.Entities.Destinations;
+﻿using TravelPlanner.TripService.Entities.Checklist;
+using TravelPlanner.TripService.Entities.Destinations;
 using TravelPlanner.TripService.Entities.Expenses;
 
 namespace TravelPlanner.TripService.Entities.TravelPlans
@@ -28,5 +29,7 @@ namespace TravelPlanner.TripService.Entities.TravelPlans
         public ICollection<Destination> Destinations { get; set; } = new List<Destination>();
 
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+
+        public ICollection<ChecklistItem> ChecklistItems { get; set; } = new List<ChecklistItem>();
     }
 }

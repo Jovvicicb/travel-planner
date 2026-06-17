@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelPlanner.TripService.Entities.Activities;
+using TravelPlanner.TripService.Entities.Checklist;
 using TravelPlanner.TripService.Entities.Destinations;
 using TravelPlanner.TripService.Entities.Expenses;
 using TravelPlanner.TripService.Entities.TravelPlans;
@@ -17,6 +18,7 @@ namespace TravelPlanner.TripService.Data
         public DbSet<Destination> Destinations => Set<Destination>();
         public DbSet<Activity> Activities => Set<Activity>();
         public DbSet<Expense> Expenses => Set<Expense>();
+        public DbSet<ChecklistItem> ChecklistItems => Set<ChecklistItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -183,6 +185,34 @@ namespace TravelPlanner.TripService.Data
                 entity.HasOne(expense => expense.TravelPlan)
                     .WithMany(plan => plan.Expenses)
                     .HasForeignKey(expense => expense.TravelPlanId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ChecklistItem>(entity =>
+            {
+                entity.ToTable("ChecklistItems");
+
+                entity.HasKey(item => item.Id);
+
+                entity.Property(item => item.TravelPlanId)
+                    .IsRequired();
+
+                entity.Property(item => item.Title)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.Property(item => item.IsCompleted)
+                    .IsRequired();
+
+                entity.Property(item => item.CreatedAt)
+                    .IsRequired();
+
+                entity.Property(item => item.UpdatedAt)
+                    .IsRequired(false);
+
+                entity.HasOne(item => item.TravelPlan)
+                    .WithMany(plan => plan.ChecklistItems)
+                    .HasForeignKey(item => item.TravelPlanId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }
