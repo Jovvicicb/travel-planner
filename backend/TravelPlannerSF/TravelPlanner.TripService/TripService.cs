@@ -280,6 +280,15 @@ namespace TravelPlanner.TripService
             return await manager.ToggleChecklistItemAsync(travelPlanId, itemId, requestUserId, isAdmin);
         }
 
+        public async Task<ServiceResultDto> DeleteChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IChecklistManager>();
+
+            return await manager.DeleteChecklistItemAsync(travelPlanId, itemId, requestUserId, isAdmin);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

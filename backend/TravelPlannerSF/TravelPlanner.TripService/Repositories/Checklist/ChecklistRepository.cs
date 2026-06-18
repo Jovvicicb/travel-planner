@@ -43,5 +43,12 @@ namespace TravelPlanner.TripService.Repositories.Checklist
 
             await context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(ChecklistItem item)
+        {
+            context.ChecklistItems.Remove(item);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

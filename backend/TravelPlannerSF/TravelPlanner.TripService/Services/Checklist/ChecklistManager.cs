@@ -252,5 +252,57 @@ namespace TravelPlanner.TripService.Services.Checklist
                 "Checklist item status updated successfully."
             );
         }
+
+        public async Task<ServiceResultDto> DeleteChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (itemId <= 0)
+            {
+                return ServiceResultDto.Fail("Checklist item id is not valid.");
+            }
+
+            var item = await checklistRepository.GetByIdAsync(itemId);
+
+            if (item == null)
+            {
+                return ServiceResultDto.Fail("Checklist item not found.", 404);
+            }
+
+            if (item.TravelPlanId != travelPlanId)
+            {
+                return ServiceResultDto.Fail(
+                    "Checklist item does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto.Fail("Travel plan not found.", 404);
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto.Fail(
+                    "You do not have permission to delete this checklist item.",
+                    403
+                );
+            }
+
+            await checklistRepository.DeleteAsync(item);
+
+            return ServiceResultDto.Ok("Checklist item deleted successfully.");
+        }
     }
 }

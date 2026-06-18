@@ -11,5 +11,7 @@ namespace TravelPlanner.TripService.Repositories.Checklist
         Task<ChecklistItem?> GetByIdAsync(int itemId);
 
         Task UpdateAsync(ChecklistItem item);
+
+        Task DeleteAsync(ChecklistItem item);
     }
 }
