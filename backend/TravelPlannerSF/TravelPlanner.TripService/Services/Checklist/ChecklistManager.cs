@@ -181,5 +181,76 @@ namespace TravelPlanner.TripService.Services.Checklist
                 "Checklist item updated successfully."
             );
         }
+
+        public async Task<ServiceResultDto<ChecklistItemResponseDto>> ToggleChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            if (itemId <= 0)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Checklist item id is not valid."
+                );
+            }
+
+            var item = await checklistRepository.GetByIdAsync(itemId);
+
+            if (item == null)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Checklist item not found.",
+                    404
+                );
+            }
+
+            if (item.TravelPlanId != travelPlanId)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Checklist item does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "You do not have permission to update this checklist item.",
+                    403
+                );
+            }
+
+            item.IsCompleted = !item.IsCompleted;
+            item.UpdatedAt = DateTime.UtcNow;
+
+            await checklistRepository.UpdateAsync(item);
+
+            return ServiceResultDto<ChecklistItemResponseDto>.Ok(
+                ChecklistMapper.ToResponse(item),
+                "Checklist item status updated successfully."
+            );
+        }
     }
 }

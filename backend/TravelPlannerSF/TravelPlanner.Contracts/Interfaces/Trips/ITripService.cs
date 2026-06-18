@@ -63,5 +63,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto<List<ChecklistItemResponseDto>>> GetChecklistItemsAsync(int travelPlanId, int requestUserId, bool isAdmin);
 
         Task<ServiceResultDto<ChecklistItemResponseDto>> UpdateChecklistItemAsync(UpdateChecklistItemCommandDto command);
+
+        Task<ServiceResultDto<ChecklistItemResponseDto>> ToggleChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin);
     }
 }

@@ -10,5 +10,7 @@ namespace TravelPlanner.TripService.Services.Checklist
         Task<ServiceResultDto<List<ChecklistItemResponseDto>>> GetChecklistItemsAsync(int travelPlanId, int requestUserId, bool isAdmin);
 
         Task<ServiceResultDto<ChecklistItemResponseDto>> UpdateChecklistItemAsync(UpdateChecklistItemCommandDto command);
+
+        Task<ServiceResultDto<ChecklistItemResponseDto>> ToggleChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin);
     }
 }
