@@ -3,6 +3,7 @@ using TravelPlanner.TripService.Entities.Activities;
 using TravelPlanner.TripService.Entities.Checklist;
 using TravelPlanner.TripService.Entities.Destinations;
 using TravelPlanner.TripService.Entities.Expenses;
+using TravelPlanner.TripService.Entities.Shares;
 using TravelPlanner.TripService.Entities.TravelPlans;
 
 namespace TravelPlanner.TripService.Data
@@ -19,6 +20,7 @@ namespace TravelPlanner.TripService.Data
         public DbSet<Activity> Activities => Set<Activity>();
         public DbSet<Expense> Expenses => Set<Expense>();
         public DbSet<ChecklistItem> ChecklistItems => Set<ChecklistItem>();
+        public DbSet<TravelPlanShare> TravelPlanShares => Set<TravelPlanShare>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -213,6 +215,42 @@ namespace TravelPlanner.TripService.Data
                 entity.HasOne(item => item.TravelPlan)
                     .WithMany(plan => plan.ChecklistItems)
                     .HasForeignKey(item => item.TravelPlanId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<TravelPlanShare>(entity =>
+            {
+                entity.ToTable("TravelPlanShares");
+
+                entity.HasKey(share => share.Id);
+
+                entity.Property(share => share.TravelPlanId)
+                    .IsRequired();
+
+                entity.Property(share => share.Token)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.HasIndex(share => share.Token)
+                    .IsUnique();
+
+                entity.Property(share => share.AccessLevel)
+                    .IsRequired()
+                    .HasConversion<string>()
+                    .HasMaxLength(30);
+
+                entity.Property(share => share.ExpiresAt)
+                    .IsRequired(false);
+
+                entity.Property(share => share.IsActive)
+                    .IsRequired();
+
+                entity.Property(share => share.CreatedAt)
+                    .IsRequired();
+
+                entity.HasOne(share => share.TravelPlan)
+                    .WithMany(plan => plan.Shares)
+                    .HasForeignKey(share => share.TravelPlanId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }
