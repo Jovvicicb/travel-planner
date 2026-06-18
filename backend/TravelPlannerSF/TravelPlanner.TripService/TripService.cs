@@ -262,6 +262,15 @@ namespace TravelPlanner.TripService
             return await manager.GetChecklistItemsAsync(travelPlanId, requestUserId, isAdmin);
         }
 
+        public async Task<ServiceResultDto<ChecklistItemResponseDto>> UpdateChecklistItemAsync(UpdateChecklistItemCommandDto command)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<IChecklistManager>();
+
+            return await manager.UpdateChecklistItemAsync(command);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

@@ -579,5 +579,33 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpPut("{tripId:int}/checklist/{itemId:int}")]
+        public async Task<IActionResult> UpdateChecklistItem(int tripId, int itemId, [FromBody] UpdateChecklistItemRequestDto request)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var command = new UpdateChecklistItemCommandDto
+            {
+                TravelPlanId = tripId,
+                ItemId = itemId,
+                RequestUserId = userContext.Value.UserId,
+                IsAdmin = userContext.Value.IsAdmin,
+                Title = request.Title,
+                IsCompleted = request.IsCompleted
+            };
+
+            var result = await tripService.UpdateChecklistItemAsync(command);
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

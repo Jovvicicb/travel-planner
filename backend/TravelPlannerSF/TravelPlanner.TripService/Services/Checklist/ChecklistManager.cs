@@ -117,5 +117,69 @@ namespace TravelPlanner.TripService.Services.Checklist
                 "Checklist items fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<ChecklistItemResponseDto>> UpdateChecklistItemAsync(UpdateChecklistItemCommandDto command)
+        {
+            if (command == null)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Checklist item data is required."
+                );
+            }
+
+            var item = await checklistRepository.GetByIdAsync(command.ItemId);
+
+            if (item == null)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Checklist item not found.",
+                    404
+                );
+            }
+
+            if (item.TravelPlanId != command.TravelPlanId)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Checklist item does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(command.TravelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    "You do not have permission to update this checklist item.",
+                    403
+                );
+            }
+
+            var validation = ChecklistValidator.ValidateUpdate(command);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(validation.Message);
+            }
+
+            item.Title = command.Title.Trim();
+            item.IsCompleted = command.IsCompleted;
+            item.UpdatedAt = DateTime.UtcNow;
+
+            await checklistRepository.UpdateAsync(item);
+
+            return ServiceResultDto<ChecklistItemResponseDto>.Ok(
+                ChecklistMapper.ToResponse(item),
+                "Checklist item updated successfully."
+            );
+        }
     }
 }

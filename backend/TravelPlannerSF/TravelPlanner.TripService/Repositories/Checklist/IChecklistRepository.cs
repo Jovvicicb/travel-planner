@@ -7,5 +7,9 @@ namespace TravelPlanner.TripService.Repositories.Checklist
         Task<ChecklistItem> CreateAsync(ChecklistItem item);
 
         Task<List<ChecklistItem>> GetByTravelPlanIdAsync(int travelPlanId);
+
+        Task<ChecklistItem?> GetByIdAsync(int itemId);
+
+        Task UpdateAsync(ChecklistItem item);
     }
 }

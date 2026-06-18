@@ -30,5 +30,18 @@ namespace TravelPlanner.TripService.Repositories.Checklist
                 .ThenByDescending(item => item.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task<ChecklistItem?> GetByIdAsync(int itemId)
+        {
+            return await context.ChecklistItems
+                .FirstOrDefaultAsync(item => item.Id == itemId);
+        }
+
+        public async Task UpdateAsync(ChecklistItem item)
+        {
+            context.ChecklistItems.Update(item);
+
+            await context.SaveChangesAsync();
+        }
     }
 }
