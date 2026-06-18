@@ -306,6 +306,15 @@ namespace TravelPlanner.TripService
             return await manager.CreateShareAsync(command);
         }
 
+        public async Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
+
+            return await manager.GetSharedTravelPlanAsync(token);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

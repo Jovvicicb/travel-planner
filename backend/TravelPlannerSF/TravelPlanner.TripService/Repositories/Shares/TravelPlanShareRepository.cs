@@ -1,4 +1,5 @@
-﻿using TravelPlanner.TripService.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.TripService.Data;
 using TravelPlanner.TripService.Entities.Shares;
 
 namespace TravelPlanner.TripService.Repositories.Shares
@@ -19,6 +20,12 @@ namespace TravelPlanner.TripService.Repositories.Shares
             await context.SaveChangesAsync();
 
             return share;
+        }
+
+        public async Task<TravelPlanShare?> GetByTokenAsync(string token)
+        {
+            return await context.TravelPlanShares
+                .FirstOrDefaultAsync(share => share.Token == token);
         }
     }
 }

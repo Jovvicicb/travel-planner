@@ -72,5 +72,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
 
         //Share
         Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command);
+
+        Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token);
     }
 }

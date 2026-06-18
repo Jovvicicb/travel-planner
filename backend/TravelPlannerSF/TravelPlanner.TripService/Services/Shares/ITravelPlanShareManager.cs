@@ -6,5 +6,7 @@ namespace TravelPlanner.TripService.Services.Shares
     public interface ITravelPlanShareManager
     {
         Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command);
+
+        Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token);
     }
 }

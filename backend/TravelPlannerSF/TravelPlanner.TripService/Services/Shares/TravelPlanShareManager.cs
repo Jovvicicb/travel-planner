@@ -1,8 +1,19 @@
 ﻿using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
+using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.Contracts.DTOs.Trips.Shares;
 using TravelPlanner.TripService.Entities.Shares;
 using TravelPlanner.TripService.Helpers;
+using TravelPlanner.TripService.Mapping.Activities;
+using TravelPlanner.TripService.Mapping.Checklist;
+using TravelPlanner.TripService.Mapping.Destinations;
+using TravelPlanner.TripService.Mapping.Expenses;
 using TravelPlanner.TripService.Mapping.Shares;
+using TravelPlanner.TripService.Mapping.TravelPlans;
+using TravelPlanner.TripService.Repositories.Activities;
+using TravelPlanner.TripService.Repositories.Checklist;
+using TravelPlanner.TripService.Repositories.Destinations;
+using TravelPlanner.TripService.Repositories.Expenses;
 using TravelPlanner.TripService.Repositories.Shares;
 using TravelPlanner.TripService.Repositories.TravelPlans;
 using TravelPlanner.TripService.Validation.Shares;
@@ -15,13 +26,26 @@ namespace TravelPlanner.TripService.Services.Shares
 
         private readonly ITravelPlanRepository travelPlanRepository;
         private readonly ITravelPlanShareRepository shareRepository;
+        private readonly IDestinationRepository destinationRepository;
+        private readonly IActivityRepository activityRepository;
+        private readonly IExpenseRepository expenseRepository;
+        private readonly IChecklistRepository checklistRepository;
 
         public TravelPlanShareManager(
             ITravelPlanRepository travelPlanRepository,
-            ITravelPlanShareRepository shareRepository)
+            ITravelPlanShareRepository shareRepository,
+            IDestinationRepository destinationRepository,
+            IActivityRepository activityRepository,
+            IExpenseRepository expenseRepository,
+            IChecklistRepository checklistRepository)
         {
             this.travelPlanRepository = travelPlanRepository;
             this.shareRepository = shareRepository;
+            this.destinationRepository = destinationRepository;
+            this.activityRepository = activityRepository;
+            this.expenseRepository = expenseRepository;
+            this.checklistRepository = checklistRepository;
+
         }
 
         public async Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command)
@@ -73,6 +97,86 @@ namespace TravelPlanner.TripService.Services.Shares
             return ServiceResultDto<TravelPlanShareResponseDto>.Created(
                 TravelPlanShareMapper.ToResponse(createdShare, ShareBaseUrl),
                 "Travel plan share link created successfully."
+            );
+        }
+
+        public async Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return ServiceResultDto<SharedTravelPlanViewDto>.Fail("Share token is required.");
+            }
+
+            var share = await shareRepository.GetByTokenAsync(token.Trim());
+
+            if (share == null || !share.IsActive)
+            {
+                return ServiceResultDto<SharedTravelPlanViewDto>.Fail(
+                    "Share link is not valid.",
+                    404
+                );
+            }
+
+            if (share.ExpiresAt.HasValue && share.ExpiresAt.Value <= DateTime.UtcNow)
+            {
+                return ServiceResultDto<SharedTravelPlanViewDto>.Fail(
+                    "Share link has expired.",
+                    410
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(share.TravelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<SharedTravelPlanViewDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            var destinations = await destinationRepository.GetByTravelPlanIdAsync(travelPlan.Id);
+            var activities = await activityRepository.GetByTravelPlanIdAsync(travelPlan.Id);
+            var expenses = await expenseRepository.GetByTravelPlanIdAsync(travelPlan.Id);
+            var checklistItems = await checklistRepository.GetByTravelPlanIdAsync(travelPlan.Id);
+            var totalExpenses = await expenseRepository.GetTotalAmountByTravelPlanIdAsync(travelPlan.Id);
+
+            var calendar = activities
+                .GroupBy(activity => activity.ActivityDate.Date)
+                .OrderBy(group => group.Key)
+                .Select(group => new CalendarDayDto
+                {
+                    Date = group.Key,
+                    Activities = group
+                        .OrderBy(activity => activity.StartTime)
+                        .Select(ActivityMapper.ToResponse)
+                        .ToList()
+                })
+                .ToList();
+
+            var budgetSummary = new BudgetSummaryDto
+            {
+                TravelPlanId = travelPlan.Id,
+                PlannedBudget = travelPlan.Budget,
+                TotalExpenses = totalExpenses,
+                RemainingBudget = travelPlan.Budget - totalExpenses,
+                IsOverBudget = totalExpenses > travelPlan.Budget
+            };
+
+            var response = new SharedTravelPlanViewDto
+            {
+                AccessLevel = share.AccessLevel,
+                TravelPlan = TravelPlanMapper.ToResponse(travelPlan),
+                Destinations = destinations.Select(DestinationMapper.ToResponse).ToList(),
+                ActivityCalendar = calendar,
+                Expenses = expenses.Select(ExpenseMapper.ToResponse).ToList(),
+                BudgetSummary = budgetSummary,
+                ChecklistItems = checklistItems.Select(ChecklistMapper.ToResponse).ToList()
+            };
+
+            return ServiceResultDto<SharedTravelPlanViewDto>.Ok(
+                response,
+                "Shared travel plan fetched successfully."
             );
         }
     }
