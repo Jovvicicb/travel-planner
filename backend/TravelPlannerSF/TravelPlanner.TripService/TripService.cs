@@ -315,6 +315,15 @@ namespace TravelPlanner.TripService
             return await manager.GetSharedTravelPlanAsync(token);
         }
 
+        public async Task<ServiceResultDto<List<TravelPlanShareResponseDto>>> GetSharesAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
+
+            return await manager.GetSharesAsync(travelPlanId, requestUserId, isAdmin);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

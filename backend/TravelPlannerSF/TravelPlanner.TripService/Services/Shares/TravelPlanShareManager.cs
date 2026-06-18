@@ -179,5 +179,52 @@ namespace TravelPlanner.TripService.Services.Shares
                 "Shared travel plan fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<List<TravelPlanShareResponseDto>>> GetSharesAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<TravelPlanShareResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<List<TravelPlanShareResponseDto>>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<List<TravelPlanShareResponseDto>>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<List<TravelPlanShareResponseDto>>.Fail(
+                    "You do not have permission to view share links for this travel plan.",
+                    403
+                );
+            }
+
+            var shares = await shareRepository.GetByTravelPlanIdAsync(travelPlanId);
+
+            var response = shares
+                .Select(share => TravelPlanShareMapper.ToResponse(share, ShareBaseUrl))
+                .ToList();
+
+            return ServiceResultDto<List<TravelPlanShareResponseDto>>.Ok(
+                response,
+                "Share links fetched successfully."
+            );
+        }
     }
 }

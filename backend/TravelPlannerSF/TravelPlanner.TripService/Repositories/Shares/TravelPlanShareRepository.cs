@@ -27,5 +27,13 @@ namespace TravelPlanner.TripService.Repositories.Shares
             return await context.TravelPlanShares
                 .FirstOrDefaultAsync(share => share.Token == token);
         }
+
+        public async Task<List<TravelPlanShare>> GetByTravelPlanIdAsync(int travelPlanId)
+        {
+            return await context.TravelPlanShares
+                .Where(share => share.TravelPlanId == travelPlanId)
+                .OrderByDescending(share => share.CreatedAt)
+                .ToListAsync();
+        }
     }
 }

@@ -7,5 +7,7 @@ namespace TravelPlanner.TripService.Repositories.Shares
         Task<TravelPlanShare> CreateAsync(TravelPlanShare share);
 
         Task<TravelPlanShare?> GetByTokenAsync(string token);
+
+        Task<List<TravelPlanShare>> GetByTravelPlanIdAsync(int travelPlanId);
     }
 }
