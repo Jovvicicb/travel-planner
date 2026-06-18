@@ -11,6 +11,7 @@ using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.Contracts.DTOs.Trips.Checklist;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
+using TravelPlanner.Contracts.DTOs.Trips.Shares;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
 using TravelPlanner.TripService.Data;
@@ -18,11 +19,13 @@ using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Checklist;
 using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.Expenses;
+using TravelPlanner.TripService.Repositories.Shares;
 using TravelPlanner.TripService.Repositories.TravelPlans;
 using TravelPlanner.TripService.Services.Activities;
 using TravelPlanner.TripService.Services.Checklist;
 using TravelPlanner.TripService.Services.Destinations;
 using TravelPlanner.TripService.Services.Expenses;
+using TravelPlanner.TripService.Services.Shares;
 using TravelPlanner.TripService.Services.TravelPlans;
 
 namespace TravelPlanner.TripService
@@ -60,6 +63,9 @@ namespace TravelPlanner.TripService
 
             services.AddScoped<IChecklistRepository, ChecklistRepository>();
             services.AddScoped<IChecklistManager, ChecklistManager>();
+
+            services.AddScoped<ITravelPlanShareRepository, TravelPlanShareRepository>();
+            services.AddScoped<ITravelPlanShareManager, TravelPlanShareManager>();
 
             this.serviceProvider = services.BuildServiceProvider();
         }
@@ -287,6 +293,17 @@ namespace TravelPlanner.TripService
             var manager = scope.ServiceProvider.GetRequiredService<IChecklistManager>();
 
             return await manager.DeleteChecklistItemAsync(travelPlanId, itemId, requestUserId, isAdmin);
+        }
+
+
+        //Share
+        public async Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
+
+            return await manager.CreateShareAsync(command);
         }
 
 

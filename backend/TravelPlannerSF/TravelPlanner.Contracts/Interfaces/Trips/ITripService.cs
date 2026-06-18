@@ -5,6 +5,7 @@ using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.Contracts.DTOs.Trips.Checklist;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
+using TravelPlanner.Contracts.DTOs.Trips.Shares;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 
 namespace TravelPlanner.Contracts.Interfaces.Trips
@@ -67,5 +68,9 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto<ChecklistItemResponseDto>> ToggleChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin);
 
         Task<ServiceResultDto> DeleteChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin);
+
+
+        //Share
+        Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command);
     }
 }

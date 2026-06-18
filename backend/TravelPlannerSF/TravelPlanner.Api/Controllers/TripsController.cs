@@ -7,6 +7,7 @@ using TravelPlanner.Contracts.DTOs.Trips.Activities;
 using TravelPlanner.Contracts.DTOs.Trips.Checklist;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
+using TravelPlanner.Contracts.DTOs.Trips.Shares;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.Contracts.Interfaces.Trips;
 
@@ -650,6 +651,35 @@ namespace TravelPlanner.Api.Controllers
                 userContext.Value.UserId,
                 userContext.Value.IsAdmin
             );
+
+            return ResponseHelper.Send(this, result);
+        }
+
+
+        //Share
+        [HttpPost("{tripId:int}/shares")]
+        public async Task<IActionResult> CreateShare(int tripId, [FromBody] CreateTravelPlanShareRequestDto request)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var command = new CreateTravelPlanShareCommandDto
+            {
+                TravelPlanId = tripId,
+                RequestUserId = userContext.Value.UserId,
+                IsAdmin = userContext.Value.IsAdmin,
+                AccessLevel = request.AccessLevel,
+                ExpiresAt = request.ExpiresAt
+            };
+
+            var result = await tripService.CreateShareAsync(command);
 
             return ResponseHelper.Send(this, result);
         }
