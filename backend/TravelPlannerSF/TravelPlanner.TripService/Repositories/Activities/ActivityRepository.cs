@@ -48,6 +48,14 @@ namespace TravelPlanner.TripService.Repositories.Activities
                     activity.Id == activityId);
         }
 
+        public async Task<decimal> GetTotalEstimatedCostByTravelPlanIdAsync(int travelPlanId)
+        {
+            return await context.Activities
+                .Include(activity => activity.Destination)
+                .Where(activity => activity.Destination.TravelPlanId == travelPlanId)
+                .SumAsync(activity => activity.EstimatedCost);
+        }
+
         public async Task UpdateAsync(Activity activity)
         {
             context.Activities.Update(activity);

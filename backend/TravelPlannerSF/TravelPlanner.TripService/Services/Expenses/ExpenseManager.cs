@@ -2,6 +2,7 @@
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.TripService.Entities.Expenses;
 using TravelPlanner.TripService.Mapping.Expenses;
+using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Expenses;
 using TravelPlanner.TripService.Repositories.TravelPlans;
 using TravelPlanner.TripService.Validation.Expenses;
@@ -12,13 +13,16 @@ namespace TravelPlanner.TripService.Services.Expenses
     {
         private readonly IExpenseRepository expenseRepository;
         private readonly ITravelPlanRepository travelPlanRepository;
+        private readonly IActivityRepository activityRepository;
 
         public ExpenseManager(
             IExpenseRepository expenseRepository,
-            ITravelPlanRepository travelPlanRepository)
+            ITravelPlanRepository travelPlanRepository,
+            IActivityRepository activityRepository)
         {
             this.expenseRepository = expenseRepository;
             this.travelPlanRepository = travelPlanRepository;
+            this.activityRepository = activityRepository;
         }
 
         public async Task<ServiceResultDto<ExpenseResponseDto>> CreateExpenseAsync(CreateExpenseCommandDto command)
@@ -265,7 +269,9 @@ namespace TravelPlanner.TripService.Services.Expenses
                 );
             }
 
-            var totalExpenses = await expenseRepository.GetTotalAmountByTravelPlanIdAsync(travelPlanId);
+            var totalRecordedExpenses = await expenseRepository.GetTotalAmountByTravelPlanIdAsync(travelPlanId);
+            var totalActivityEstimatedCosts = await activityRepository.GetTotalEstimatedCostByTravelPlanIdAsync(travelPlanId);
+            var totalExpenses = totalRecordedExpenses + totalActivityEstimatedCosts;
 
             var summary = new BudgetSummaryDto
             {

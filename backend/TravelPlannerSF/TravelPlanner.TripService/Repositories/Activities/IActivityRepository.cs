@@ -12,6 +12,8 @@ namespace TravelPlanner.TripService.Repositories.Activities
 
         Task<Activity?> GetByIdAsync(int activityId);
 
+        Task<decimal> GetTotalEstimatedCostByTravelPlanIdAsync(int travelPlanId);
+
         Task UpdateAsync(Activity activity);
 
         Task DeleteAsync(Activity activity);
