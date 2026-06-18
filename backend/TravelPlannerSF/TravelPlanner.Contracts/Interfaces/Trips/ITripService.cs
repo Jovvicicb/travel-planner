@@ -76,5 +76,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token);
 
         Task<ServiceResultDto<List<TravelPlanShareResponseDto>>> GetSharesAsync(int travelPlanId, int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto> DeactivateShareAsync(int travelPlanId, int shareId, int requestUserId, bool isAdmin);
     }
 }

@@ -226,5 +226,59 @@ namespace TravelPlanner.TripService.Services.Shares
                 "Share links fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto> DeactivateShareAsync(int travelPlanId,int shareId,int requestUserId,bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (shareId <= 0)
+            {
+                return ServiceResultDto.Fail("Share link id is not valid.");
+            }
+
+            var share = await shareRepository.GetByIdAsync(shareId);
+
+            if (share == null)
+            {
+                return ServiceResultDto.Fail("Share link not found.", 404);
+            }
+
+            if (share.TravelPlanId != travelPlanId)
+            {
+                return ServiceResultDto.Fail(
+                    "Share link does not belong to the specified travel plan.",
+                    400
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto.Fail("Travel plan not found.", 404);
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto.Fail(
+                    "You do not have permission to deactivate this share link.",
+                    403
+                );
+            }
+
+            share.IsActive = false;
+
+            await shareRepository.UpdateAsync(share);
+
+            return ServiceResultDto.Ok("Share link deactivated successfully.");
+        }
     }
 }

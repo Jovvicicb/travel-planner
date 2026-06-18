@@ -35,5 +35,18 @@ namespace TravelPlanner.TripService.Repositories.Shares
                 .OrderByDescending(share => share.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task<TravelPlanShare?> GetByIdAsync(int shareId)
+        {
+            return await context.TravelPlanShares
+                .FirstOrDefaultAsync(share => share.Id == shareId);
+        }
+
+        public async Task UpdateAsync(TravelPlanShare share)
+        {
+            context.TravelPlanShares.Update(share);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

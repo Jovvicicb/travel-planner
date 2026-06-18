@@ -9,5 +9,9 @@ namespace TravelPlanner.TripService.Repositories.Shares
         Task<TravelPlanShare?> GetByTokenAsync(string token);
 
         Task<List<TravelPlanShare>> GetByTravelPlanIdAsync(int travelPlanId);
+
+        Task<TravelPlanShare?> GetByIdAsync(int shareId);
+
+        Task UpdateAsync(TravelPlanShare share);
     }
 }
