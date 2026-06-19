@@ -11,5 +11,9 @@ namespace TravelPlanner.Contracts.Interfaces
         Task<ServiceResultDto<AuthResponseDto>> LoginAsync(LoginRequestDto request);
 
         Task<ServiceResultDto<CurrentUserDto>> GetCurrentUserAsync(int userId);
+
+        Task<ServiceResultDto<List<AdminUserResponseDto>>> GetUsersAsync();
+
+        Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId);
     }
 }

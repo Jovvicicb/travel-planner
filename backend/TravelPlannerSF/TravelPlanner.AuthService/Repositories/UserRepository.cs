@@ -8,6 +8,12 @@ namespace TravelPlanner.AuthService.Repositories
     {
         private readonly AuthDbContext dbContext;
 
+        public async Task<List<User>> GetAllAsync()
+        {
+            return await dbContext.Users
+                .OrderByDescending(user => user.CreatedAt)
+                .ToListAsync();
+        }
         public UserRepository(AuthDbContext dbContext)
         {
             this.dbContext = dbContext;

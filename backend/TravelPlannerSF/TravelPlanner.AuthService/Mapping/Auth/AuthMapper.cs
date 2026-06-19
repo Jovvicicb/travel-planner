@@ -24,5 +24,18 @@ namespace TravelPlanner.AuthService.Mapping.Auth
                 User = ToCurrentUser(user)
             };
         }
+
+        public static AdminUserResponseDto ToAdminUserResponse(User user)
+        {
+            return new AdminUserResponseDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Role = user.Role,
+                IsActive = user.IsActive,
+                CreatedAt = user.CreatedAt
+            };
+        }
     }
 }

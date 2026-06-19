@@ -107,5 +107,39 @@ namespace TravelPlanner.AuthService.Services.Auth
                 "Current user fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<List<AdminUserResponseDto>>> GetUsersAsync()
+        {
+            var users = await userRepository.GetAllAsync();
+
+            var response = users
+                .Select(AuthMapper.ToAdminUserResponse)
+                .ToList();
+
+            return ServiceResultDto<List<AdminUserResponseDto>>.Ok(
+                response,
+                "Users fetched successfully."
+            );
+        }
+
+        public async Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId)
+        {
+            if (userId <= 0)
+            {
+                return ServiceResultDto<AdminUserResponseDto>.Fail("User id is not valid.");
+            }
+
+            var user = await userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                return ServiceResultDto<AdminUserResponseDto>.Fail("User not found.", 404);
+            }
+
+            return ServiceResultDto<AdminUserResponseDto>.Ok(
+                AuthMapper.ToAdminUserResponse(user),
+                "User fetched successfully."
+            );
+        }
     }
 }

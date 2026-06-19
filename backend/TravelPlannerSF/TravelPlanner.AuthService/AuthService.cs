@@ -72,6 +72,24 @@ namespace TravelPlanner.AuthService
             return await authManager.GetCurrentUserAsync(userId);
         }
 
+        public async Task<ServiceResultDto<List<AdminUserResponseDto>>> GetUsersAsync()
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
+
+            return await authManager.GetUsersAsync();
+        }
+
+        public async Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
+
+            return await authManager.GetUserByIdAsync(userId);
+        }
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();
