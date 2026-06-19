@@ -4,6 +4,7 @@ using TravelPlanner.TripService.Entities.Destinations;
 using TravelPlanner.TripService.Mapping.Destinations;
 using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Validation.Destinations;
 
 namespace TravelPlanner.TripService.Services.Destinations
@@ -12,13 +13,16 @@ namespace TravelPlanner.TripService.Services.Destinations
     {
         private readonly IDestinationRepository destinationRepository;
         private readonly ITravelPlanRepository travelPlanRepository;
+        private readonly ITravelPlanPermissionService permissionService;
 
         public DestinationManager(
             IDestinationRepository destinationRepository,
-            ITravelPlanRepository travelPlanRepository)
+            ITravelPlanRepository travelPlanRepository,
+            ITravelPlanPermissionService permissionService)
         {
             this.destinationRepository = destinationRepository;
             this.travelPlanRepository = travelPlanRepository;
+            this.permissionService = permissionService;
         }
 
         public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command)
@@ -33,7 +37,9 @@ namespace TravelPlanner.TripService.Services.Destinations
                 );
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync( travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<DestinationResponseDto>.Fail(
                     "You do not have permission to add destinations to this travel plan.",
@@ -94,7 +100,9 @@ namespace TravelPlanner.TripService.Services.Destinations
                 );
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canView = await permissionService.CanViewAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canView)
             {
                 return ServiceResultDto<List<DestinationResponseDto>>.Fail(
                     "You do not have permission to view destinations for this travel plan.",
@@ -151,7 +159,9 @@ namespace TravelPlanner.TripService.Services.Destinations
                 );
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<DestinationResponseDto>.Fail(
                     "You do not have permission to update this destination.",
@@ -220,7 +230,9 @@ namespace TravelPlanner.TripService.Services.Destinations
                 return ServiceResultDto.Fail("Travel plan not found.", 404);
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto.Fail(
                     "You do not have permission to delete this destination.",

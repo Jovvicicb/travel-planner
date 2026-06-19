@@ -37,6 +37,14 @@ namespace TravelPlanner.TripService.Repositories.TravelPlans
                 .ToListAsync();
         }
 
+        public async Task<List<TravelPlan>> GetByIdsAsync(List<int> planIds)
+        {
+            return await context.TravelPlans
+                .Where(plan => planIds.Contains(plan.Id))
+                .OrderByDescending(plan => plan.CreatedAt)
+                .ToListAsync();
+        }
+
         public async Task<TravelPlan?> GetByIdAsync(int planId)
         {
             return await context.TravelPlans

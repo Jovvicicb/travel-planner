@@ -5,6 +5,7 @@ using TravelPlanner.TripService.Mapping.Expenses;
 using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Expenses;
 using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Validation.Expenses;
 
 namespace TravelPlanner.TripService.Services.Expenses
@@ -14,15 +15,19 @@ namespace TravelPlanner.TripService.Services.Expenses
         private readonly IExpenseRepository expenseRepository;
         private readonly ITravelPlanRepository travelPlanRepository;
         private readonly IActivityRepository activityRepository;
+        private readonly ITravelPlanPermissionService permissionService;
+
 
         public ExpenseManager(
             IExpenseRepository expenseRepository,
             ITravelPlanRepository travelPlanRepository,
-            IActivityRepository activityRepository)
+            IActivityRepository activityRepository,
+            ITravelPlanPermissionService permissionService)
         {
             this.expenseRepository = expenseRepository;
             this.travelPlanRepository = travelPlanRepository;
             this.activityRepository = activityRepository;
+            this.permissionService = permissionService;
         }
 
         public async Task<ServiceResultDto<ExpenseResponseDto>> CreateExpenseAsync(CreateExpenseCommandDto command)
@@ -42,7 +47,9 @@ namespace TravelPlanner.TripService.Services.Expenses
                 );
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<ExpenseResponseDto>.Fail(
                     "You do not have permission to add expenses to this travel plan.",
@@ -103,7 +110,9 @@ namespace TravelPlanner.TripService.Services.Expenses
                 );
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canView = await permissionService.CanViewAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canView)
             {
                 return ServiceResultDto<List<ExpenseResponseDto>>.Fail(
                     "You do not have permission to view expenses for this travel plan.",
@@ -152,7 +161,9 @@ namespace TravelPlanner.TripService.Services.Expenses
                 return ServiceResultDto<ExpenseResponseDto>.Fail("Travel plan not found.", 404);
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<ExpenseResponseDto>.Fail(
                     "You do not have permission to update this expense.",
@@ -221,7 +232,9 @@ namespace TravelPlanner.TripService.Services.Expenses
                 return ServiceResultDto.Fail("Travel plan not found.", 404);
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto.Fail(
                     "You do not have permission to delete this expense.",
@@ -261,7 +274,9 @@ namespace TravelPlanner.TripService.Services.Expenses
                 );
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canView = await permissionService.CanViewAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canView)
             {
                 return ServiceResultDto<BudgetSummaryDto>.Fail(
                     "You do not have permission to view budget summary for this travel plan.",

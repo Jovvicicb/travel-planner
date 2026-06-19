@@ -1,9 +1,11 @@
 ﻿using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 using TravelPlanner.TripService.Entities.TravelPlans;
-using TravelPlanner.TripService.Repositories.TravelPlans;
-using TravelPlanner.TripService.Validation.TravelPlans;
 using TravelPlanner.TripService.Mapping.TravelPlans;
+using TravelPlanner.TripService.Repositories.Collaborators;
+using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.Permissions;
+using TravelPlanner.TripService.Validation.TravelPlans;
 
 namespace TravelPlanner.TripService.Services.TravelPlans
 {
@@ -11,9 +13,18 @@ namespace TravelPlanner.TripService.Services.TravelPlans
     {
         private readonly ITravelPlanRepository travelPlanRepository;
 
-        public TravelPlanManager(ITravelPlanRepository travelPlanRepository)
+        private readonly ITravelPlanCollaboratorRepository collaboratorRepository;
+
+        private readonly ITravelPlanPermissionService permissionService;
+
+        public TravelPlanManager(
+            ITravelPlanRepository travelPlanRepository,
+            ITravelPlanCollaboratorRepository collaboratorRepository,
+            ITravelPlanPermissionService permissionService)
         {
             this.travelPlanRepository = travelPlanRepository;
+            this.collaboratorRepository = collaboratorRepository;
+            this.permissionService = permissionService;
         }
 
         public async Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command)
@@ -55,9 +66,29 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 );
             }
 
-            var plans = isAdmin
-                ? await travelPlanRepository.GetAllAsync()
-                : await travelPlanRepository.GetByOwnerIdAsync(requestUserId);
+            var plans = new List<TravelPlan>();
+
+            if (isAdmin)
+            {
+                plans = await travelPlanRepository.GetAllAsync();
+            }
+            else
+            {
+                var ownerPlans = await travelPlanRepository.GetByOwnerIdAsync(requestUserId);
+
+                var collaboratorPlanIds = await collaboratorRepository.GetTravelPlanIdsByUserIdAsync(requestUserId);
+
+                var collaboratorPlans = collaboratorPlanIds.Count == 0
+                    ? new List<TravelPlan>()
+                    : await travelPlanRepository.GetByIdsAsync(collaboratorPlanIds);
+
+                plans = ownerPlans
+                    .Concat(collaboratorPlans)
+                    .GroupBy(plan => plan.Id)
+                    .Select(group => group.First())
+                    .OrderByDescending(plan => plan.CreatedAt)
+                    .ToList();
+            }
 
             var response = plans
                 .Select(TravelPlanMapper.ToListItem)
@@ -96,7 +127,9 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 );
             }
 
-            if (!isAdmin && plan.OwnerUserId != requestUserId)
+            var canView = await permissionService.CanViewAsync(plan, requestUserId, isAdmin);
+
+            if (!canView)
             {
                 return ServiceResultDto<TravelPlanResponseDto>.Fail(
                     "You do not have permission to view this travel plan.",
@@ -129,7 +162,9 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 );
             }
 
-            if (!command.IsAdmin && plan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(plan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<TravelPlanResponseDto>.Fail(
                     "You do not have permission to update this travel plan.",
@@ -172,7 +207,9 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 return ServiceResultDto.Fail("Travel plan not found.", 404);
             }
 
-            if (!isAdmin && plan.OwnerUserId != requestUserId)
+            var canEdit = await permissionService.CanEditAsync(plan, requestUserId, isAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto.Fail(
                     "You do not have permission to delete this travel plan.",

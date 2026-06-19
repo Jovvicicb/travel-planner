@@ -4,6 +4,7 @@ using TravelPlanner.TripService.Entities.Checklist;
 using TravelPlanner.TripService.Mapping.Checklist;
 using TravelPlanner.TripService.Repositories.Checklist;
 using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Validation.Checklist;
 
 namespace TravelPlanner.TripService.Services.Checklist
@@ -12,13 +13,17 @@ namespace TravelPlanner.TripService.Services.Checklist
     {
         private readonly IChecklistRepository checklistRepository;
         private readonly ITravelPlanRepository travelPlanRepository;
+        private readonly ITravelPlanPermissionService permissionService;
+
 
         public ChecklistManager(
             IChecklistRepository checklistRepository,
-            ITravelPlanRepository travelPlanRepository)
+            ITravelPlanRepository travelPlanRepository,
+            ITravelPlanPermissionService permissionService)
         {
             this.checklistRepository = checklistRepository;
             this.travelPlanRepository = travelPlanRepository;
+            this.permissionService = permissionService;
         }
 
         public async Task<ServiceResultDto<ChecklistItemResponseDto>> CreateChecklistItemAsync(CreateChecklistItemCommandDto command)
@@ -40,7 +45,9 @@ namespace TravelPlanner.TripService.Services.Checklist
                 );
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<ChecklistItemResponseDto>.Fail(
                     "You do not have permission to add checklist items to this travel plan.",
@@ -98,7 +105,9 @@ namespace TravelPlanner.TripService.Services.Checklist
                 );
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canView = await permissionService.CanViewAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canView)
             {
                 return ServiceResultDto<List<ChecklistItemResponseDto>>.Fail(
                     "You do not have permission to view checklist items for this travel plan.",
@@ -155,7 +164,9 @@ namespace TravelPlanner.TripService.Services.Checklist
                 );
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<ChecklistItemResponseDto>.Fail(
                     "You do not have permission to update this checklist item.",
@@ -234,7 +245,9 @@ namespace TravelPlanner.TripService.Services.Checklist
                 );
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<ChecklistItemResponseDto>.Fail(
                     "You do not have permission to update this checklist item.",
@@ -292,7 +305,9 @@ namespace TravelPlanner.TripService.Services.Checklist
                 return ServiceResultDto.Fail("Travel plan not found.", 404);
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto.Fail(
                     "You do not have permission to delete this checklist item.",

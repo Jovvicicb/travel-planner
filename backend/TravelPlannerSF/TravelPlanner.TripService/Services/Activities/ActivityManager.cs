@@ -6,6 +6,7 @@ using TravelPlanner.TripService.Mapping.Activities;
 using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.TravelPlans;
+using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Validation.Activities;
 
 namespace TravelPlanner.TripService.Services.Activities
@@ -15,15 +16,19 @@ namespace TravelPlanner.TripService.Services.Activities
         private readonly IActivityRepository activityRepository;
         private readonly IDestinationRepository destinationRepository;
         private readonly ITravelPlanRepository travelPlanRepository;
+        private readonly ITravelPlanPermissionService permissionService;
+
 
         public ActivityManager(
             IActivityRepository activityRepository,
             IDestinationRepository destinationRepository,
-            ITravelPlanRepository travelPlanRepository)
+            ITravelPlanRepository travelPlanRepository,
+            ITravelPlanPermissionService permissionService)
         {
             this.activityRepository = activityRepository;
             this.destinationRepository = destinationRepository;
             this.travelPlanRepository = travelPlanRepository;
+            this.permissionService = permissionService;
         }
 
         public async Task<ServiceResultDto<ActivityResponseDto>> CreateActivityAsync(CreateActivityCommandDto command)
@@ -55,7 +60,9 @@ namespace TravelPlanner.TripService.Services.Activities
                 return ServiceResultDto<ActivityResponseDto>.Fail("Travel plan not found.", 404);
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<ActivityResponseDto>.Fail(
                     "You do not have permission to add activities to this destination.",
@@ -144,7 +151,9 @@ namespace TravelPlanner.TripService.Services.Activities
                 );
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canView = await permissionService.CanViewAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canView)
             {
                 return ServiceResultDto<List<ActivityResponseDto>>.Fail(
                     "You do not have permission to view activities for this destination.",
@@ -191,7 +200,9 @@ namespace TravelPlanner.TripService.Services.Activities
                 );
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canView = await permissionService.CanViewAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canView)
             {
                 return ServiceResultDto<List<CalendarDayDto>>.Fail(
                     "You do not have permission to view this travel plan calendar.",
@@ -264,7 +275,9 @@ namespace TravelPlanner.TripService.Services.Activities
                 return ServiceResultDto<ActivityResponseDto>.Fail("Travel plan not found.", 404);
             }
 
-            if (!command.IsAdmin && travelPlan.OwnerUserId != command.RequestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto<ActivityResponseDto>.Fail(
                     "You do not have permission to update this activity.",
@@ -356,7 +369,9 @@ namespace TravelPlanner.TripService.Services.Activities
                 return ServiceResultDto.Fail("Travel plan not found.", 404);
             }
 
-            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            var canEdit = await permissionService.CanEditAsync(travelPlan, requestUserId, isAdmin);
+
+            if (!canEdit)
             {
                 return ServiceResultDto.Fail(
                     "You do not have permission to delete this activity.",

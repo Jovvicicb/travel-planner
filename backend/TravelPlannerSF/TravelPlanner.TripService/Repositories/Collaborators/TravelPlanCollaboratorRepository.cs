@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.Contracts.Enums;
 using TravelPlanner.TripService.Data;
 using TravelPlanner.TripService.Entities.Collaborators;
 
@@ -28,6 +29,23 @@ namespace TravelPlanner.TripService.Repositories.Collaborators
             await context.SaveChangesAsync();
 
             return collaborator;
+        }
+
+        public async Task<bool> HasEditAccessAsync(int travelPlanId, int userId)
+        {
+            return await context.TravelPlanCollaborators
+                .AnyAsync(collaborator =>
+                    collaborator.TravelPlanId == travelPlanId &&
+                    collaborator.UserId == userId &&
+                    collaborator.AccessLevel == ShareAccessLevel.Edit);
+        }
+
+        public async Task<List<int>> GetTravelPlanIdsByUserIdAsync(int userId)
+        {
+            return await context.TravelPlanCollaborators
+                .Where(collaborator => collaborator.UserId == userId)
+                .Select(collaborator => collaborator.TravelPlanId)
+                .ToListAsync();
         }
     }
 }

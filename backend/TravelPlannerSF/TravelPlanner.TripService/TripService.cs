@@ -26,6 +26,7 @@ using TravelPlanner.TripService.Services.Activities;
 using TravelPlanner.TripService.Services.Checklist;
 using TravelPlanner.TripService.Services.Destinations;
 using TravelPlanner.TripService.Services.Expenses;
+using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Services.Shares;
 using TravelPlanner.TripService.Services.TravelPlans;
 
@@ -69,6 +70,7 @@ namespace TravelPlanner.TripService
             services.AddScoped<ITravelPlanShareManager, TravelPlanShareManager>();
 
             services.AddScoped<ITravelPlanCollaboratorRepository, TravelPlanCollaboratorRepository>();
+            services.AddScoped<ITravelPlanPermissionService, TravelPlanPermissionService>();
 
             this.serviceProvider = services.BuildServiceProvider();
         }
