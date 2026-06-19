@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelPlanner.TripService.Entities.Activities;
 using TravelPlanner.TripService.Entities.Checklist;
+using TravelPlanner.TripService.Entities.Collaborators;
 using TravelPlanner.TripService.Entities.Destinations;
 using TravelPlanner.TripService.Entities.Expenses;
 using TravelPlanner.TripService.Entities.Shares;
@@ -21,6 +22,7 @@ namespace TravelPlanner.TripService.Data
         public DbSet<Expense> Expenses => Set<Expense>();
         public DbSet<ChecklistItem> ChecklistItems => Set<ChecklistItem>();
         public DbSet<TravelPlanShare> TravelPlanShares => Set<TravelPlanShare>();
+        public DbSet<TravelPlanCollaborator> TravelPlanCollaborators => Set<TravelPlanCollaborator>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -251,6 +253,38 @@ namespace TravelPlanner.TripService.Data
                 entity.HasOne(share => share.TravelPlan)
                     .WithMany(plan => plan.Shares)
                     .HasForeignKey(share => share.TravelPlanId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<TravelPlanCollaborator>(entity =>
+            {
+                entity.ToTable("TravelPlanCollaborators");
+
+                entity.HasKey(collaborator => collaborator.Id);
+
+                entity.Property(collaborator => collaborator.TravelPlanId)
+                    .IsRequired();
+
+                entity.Property(collaborator => collaborator.UserId)
+                    .IsRequired();
+
+                entity.Property(collaborator => collaborator.AccessLevel)
+                    .IsRequired()
+                    .HasConversion<string>()
+                    .HasMaxLength(30);
+
+                entity.Property(collaborator => collaborator.CreatedAt)
+                    .IsRequired();
+
+                entity.HasIndex(collaborator => new
+                {
+                    collaborator.TravelPlanId,
+                    collaborator.UserId
+                }).IsUnique();
+
+                entity.HasOne(collaborator => collaborator.TravelPlan)
+                    .WithMany(plan => plan.Collaborators)
+                    .HasForeignKey(collaborator => collaborator.TravelPlanId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }

@@ -1,4 +1,5 @@
 ﻿using TravelPlanner.TripService.Entities.Checklist;
+using TravelPlanner.TripService.Entities.Collaborators;
 using TravelPlanner.TripService.Entities.Destinations;
 using TravelPlanner.TripService.Entities.Expenses;
 using TravelPlanner.TripService.Entities.Shares;
@@ -34,5 +35,7 @@ namespace TravelPlanner.TripService.Entities.TravelPlans
         public ICollection<ChecklistItem> ChecklistItems { get; set; } = new List<ChecklistItem>();
 
         public ICollection<TravelPlanShare> Shares { get; set; } = new List<TravelPlanShare>();
+
+        public ICollection<TravelPlanCollaborator> Collaborators { get; set; } = new List<TravelPlanCollaborator>();
     }
 }
