@@ -17,6 +17,7 @@ using TravelPlanner.Contracts.Interfaces.Trips;
 using TravelPlanner.TripService.Data;
 using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Checklist;
+using TravelPlanner.TripService.Repositories.Collaborators;
 using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.Expenses;
 using TravelPlanner.TripService.Repositories.Shares;
@@ -66,6 +67,8 @@ namespace TravelPlanner.TripService
 
             services.AddScoped<ITravelPlanShareRepository, TravelPlanShareRepository>();
             services.AddScoped<ITravelPlanShareManager, TravelPlanShareManager>();
+
+            services.AddScoped<ITravelPlanCollaboratorRepository, TravelPlanCollaboratorRepository>();
 
             this.serviceProvider = services.BuildServiceProvider();
         }
@@ -331,6 +334,16 @@ namespace TravelPlanner.TripService
             var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
 
             return await manager.DeactivateShareAsync(travelPlanId, shareId, requestUserId, isAdmin);
+        }
+
+
+        public async Task<ServiceResultDto<ClaimShareResponseDto>> ClaimEditShareAsync(string token, int requestUserId)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
+
+            return await manager.ClaimEditShareAsync(token, requestUserId);
         }
 
 

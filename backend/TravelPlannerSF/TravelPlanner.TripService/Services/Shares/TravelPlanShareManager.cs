@@ -2,6 +2,8 @@
 using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.Contracts.DTOs.Trips.Shares;
+using TravelPlanner.Contracts.Enums;
+using TravelPlanner.TripService.Entities.Collaborators;
 using TravelPlanner.TripService.Entities.Shares;
 using TravelPlanner.TripService.Helpers;
 using TravelPlanner.TripService.Mapping.Activities;
@@ -12,6 +14,7 @@ using TravelPlanner.TripService.Mapping.Shares;
 using TravelPlanner.TripService.Mapping.TravelPlans;
 using TravelPlanner.TripService.Repositories.Activities;
 using TravelPlanner.TripService.Repositories.Checklist;
+using TravelPlanner.TripService.Repositories.Collaborators;
 using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.Expenses;
 using TravelPlanner.TripService.Repositories.Shares;
@@ -30,6 +33,7 @@ namespace TravelPlanner.TripService.Services.Shares
         private readonly IActivityRepository activityRepository;
         private readonly IExpenseRepository expenseRepository;
         private readonly IChecklistRepository checklistRepository;
+        private readonly ITravelPlanCollaboratorRepository collaboratorRepository;
 
         public TravelPlanShareManager(
             ITravelPlanRepository travelPlanRepository,
@@ -37,7 +41,8 @@ namespace TravelPlanner.TripService.Services.Shares
             IDestinationRepository destinationRepository,
             IActivityRepository activityRepository,
             IExpenseRepository expenseRepository,
-            IChecklistRepository checklistRepository)
+            IChecklistRepository checklistRepository,
+            ITravelPlanCollaboratorRepository collaboratorRepository)
         {
             this.travelPlanRepository = travelPlanRepository;
             this.shareRepository = shareRepository;
@@ -45,7 +50,7 @@ namespace TravelPlanner.TripService.Services.Shares
             this.activityRepository = activityRepository;
             this.expenseRepository = expenseRepository;
             this.checklistRepository = checklistRepository;
-
+            this.collaboratorRepository = collaboratorRepository;
         }
 
         public async Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command)
@@ -279,6 +284,112 @@ namespace TravelPlanner.TripService.Services.Shares
             await shareRepository.UpdateAsync(share);
 
             return ServiceResultDto.Ok("Share link deactivated successfully.");
+        }
+
+        public async Task<ServiceResultDto<ClaimShareResponseDto>> ClaimEditShareAsync(string token, int requestUserId)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Fail("Share token is required.");
+            }
+
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            var share = await shareRepository.GetByTokenAsync(token.Trim());
+
+            if (share == null || !share.IsActive)
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Fail(
+                    "Share link is not valid.",
+                    404
+                );
+            }
+
+            if (share.ExpiresAt.HasValue && share.ExpiresAt.Value <= DateTime.UtcNow)
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Fail(
+                    "Share link has expired.",
+                    410
+                );
+            }
+
+            if (share.AccessLevel != ShareAccessLevel.Edit)
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Fail(
+                    "This share link does not allow edit access.",
+                    403
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(share.TravelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (travelPlan.OwnerUserId == requestUserId)
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Ok(
+                    new ClaimShareResponseDto
+                    {
+                        TravelPlanId = travelPlan.Id,
+                        UserId = requestUserId,
+                        AccessLevel = ShareAccessLevel.Edit,
+                        AlreadyHadAccess = true
+                    },
+                    "You already own this travel plan."
+                );
+            }
+
+            var existingCollaborator = await collaboratorRepository.GetByPlanAndUserAsync(
+                travelPlan.Id,
+                requestUserId
+            );
+
+            if (existingCollaborator != null)
+            {
+                return ServiceResultDto<ClaimShareResponseDto>.Ok(
+                    new ClaimShareResponseDto
+                    {
+                        TravelPlanId = travelPlan.Id,
+                        UserId = requestUserId,
+                        AccessLevel = existingCollaborator.AccessLevel,
+                        AlreadyHadAccess = true
+                    },
+                    "You already have edit access to this travel plan."
+                );
+            }
+
+            var collaborator = new TravelPlanCollaborator
+            {
+                TravelPlanId = travelPlan.Id,
+                UserId = requestUserId,
+                AccessLevel = ShareAccessLevel.Edit,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var createdCollaborator = await collaboratorRepository.CreateAsync(collaborator);
+
+            return ServiceResultDto<ClaimShareResponseDto>.Created(
+                new ClaimShareResponseDto
+                {
+                    TravelPlanId = createdCollaborator.TravelPlanId,
+                    UserId = createdCollaborator.UserId,
+                    AccessLevel = createdCollaborator.AccessLevel,
+                    AlreadyHadAccess = false
+                },
+                "Edit access claimed successfully."
+            );
         }
     }
 }

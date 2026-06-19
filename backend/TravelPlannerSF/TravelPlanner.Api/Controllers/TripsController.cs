@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
+using System.Security.Claims;
 using TravelPlanner.Api.Helpers;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities;
@@ -725,6 +726,25 @@ namespace TravelPlanner.Api.Controllers
                 userContext.Value.UserId,
                 userContext.Value.IsAdmin
             );
+
+            return ResponseHelper.Send(this, result);
+        }
+
+        [Authorize]
+        [HttpPost("{token}/claim")]
+        public async Task<IActionResult> ClaimEditShare(string token)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await tripService.ClaimEditShareAsync(token, userId);
 
             return ResponseHelper.Send(this, result);
         }
