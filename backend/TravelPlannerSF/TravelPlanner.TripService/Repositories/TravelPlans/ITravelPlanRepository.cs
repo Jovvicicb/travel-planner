@@ -17,5 +17,7 @@ namespace TravelPlanner.TripService.Repositories.TravelPlans
         Task UpdateAsync(TravelPlan plan);
 
         Task DeleteAsync(TravelPlan plan);
+
+        Task DeleteRangeAsync(List<TravelPlan> travelPlans);
     }
 }

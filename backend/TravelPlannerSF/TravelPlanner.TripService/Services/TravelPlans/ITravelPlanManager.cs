@@ -14,5 +14,7 @@ namespace TravelPlanner.TripService.Services.TravelPlans
         Task<ServiceResultDto<TravelPlanResponseDto>> UpdateTravelPlanAsync(UpdateTravelPlanCommandDto command);
 
         Task<ServiceResultDto> DeleteTravelPlanAsync(int planId, int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto> DeleteTravelPlansByOwnerAsync(int ownerUserId);
     }
 }

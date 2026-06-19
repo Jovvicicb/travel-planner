@@ -221,5 +221,24 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
             return ServiceResultDto.Ok("Travel plan deleted successfully.");
         }
+
+        public async Task<ServiceResultDto> DeleteTravelPlansByOwnerAsync(int ownerUserId)
+        {
+            if (ownerUserId <= 0)
+            {
+                return ServiceResultDto.Fail("Owner user id is not valid.");
+            }
+
+            var travelPlans = await travelPlanRepository.GetByOwnerIdAsync(ownerUserId);
+
+            if (travelPlans.Count == 0)
+            {
+                return ServiceResultDto.Ok("User has no travel plans to delete.");
+            }
+
+            await travelPlanRepository.DeleteRangeAsync(travelPlans);
+
+            return ServiceResultDto.Ok("User travel plans deleted successfully.");
+        }
     }
 }

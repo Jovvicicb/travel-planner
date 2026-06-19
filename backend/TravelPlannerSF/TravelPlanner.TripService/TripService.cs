@@ -366,6 +366,15 @@ namespace TravelPlanner.TripService
             return await manager.RemoveCollaboratorAsync(travelPlanId, collaboratorUserId, requestUserId, isAdmin);
         }
 
+        public async Task<ServiceResultDto> DeleteTravelPlansByOwnerAsync(int ownerUserId)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanManager>();
+
+            return await manager.DeleteTravelPlansByOwnerAsync(ownerUserId);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
