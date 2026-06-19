@@ -44,5 +44,12 @@ namespace TravelPlanner.AuthService.Repositories
 
             return user;
         }
+
+        public async Task UpdateAsync(User user)
+        {
+            dbContext.Users.Update(user);
+
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

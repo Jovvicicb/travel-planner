@@ -1,5 +1,6 @@
 ﻿using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.Enums;
 
 namespace TravelPlanner.AuthService.Services.Auth
 {
@@ -14,5 +15,7 @@ namespace TravelPlanner.AuthService.Services.Auth
         Task<ServiceResultDto<List<AdminUserResponseDto>>> GetUsersAsync();
 
         Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId);
+
+        Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role);
     }
 }

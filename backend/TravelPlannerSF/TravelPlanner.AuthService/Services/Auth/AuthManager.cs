@@ -141,5 +141,34 @@ namespace TravelPlanner.AuthService.Services.Auth
                 "User fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role)
+        {
+            if (userId <= 0)
+            {
+                return ServiceResultDto<AdminUserResponseDto>.Fail("User id is not valid.");
+            }
+
+            if (!Enum.IsDefined(typeof(UserRole), role))
+            {
+                return ServiceResultDto<AdminUserResponseDto>.Fail("User role is not valid.");
+            }
+
+            var user = await userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                return ServiceResultDto<AdminUserResponseDto>.Fail("User not found.", 404);
+            }
+
+            user.Role = role;
+
+            await userRepository.UpdateAsync(user);
+
+            return ServiceResultDto<AdminUserResponseDto>.Ok(
+                AuthMapper.ToAdminUserResponse(user),
+                "User role updated successfully."
+            );
+        }
     }
 }

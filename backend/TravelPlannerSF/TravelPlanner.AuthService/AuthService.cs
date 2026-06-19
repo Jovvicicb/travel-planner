@@ -12,6 +12,7 @@ using TravelPlanner.AuthService.Services.Auth;
 using TravelPlanner.AuthService.Services.Tokens;
 using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.Enums;
 using TravelPlanner.Contracts.Interfaces;
 
 
@@ -88,6 +89,15 @@ namespace TravelPlanner.AuthService
             var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
 
             return await authManager.GetUserByIdAsync(userId);
+        }
+
+        public async Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
+
+            return await authManager.UpdateUserRoleAsync(userId, role);
         }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()

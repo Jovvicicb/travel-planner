@@ -14,5 +14,7 @@ namespace TravelPlanner.AuthService.Repositories
         Task<bool> EmailExistsAsync(string email);
 
         Task<User> CreateAsync(User user);
+
+        Task UpdateAsync(User user);
     }
 }

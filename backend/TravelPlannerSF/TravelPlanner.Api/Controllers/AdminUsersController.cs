@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using TravelPlanner.Api.Helpers;
+using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.Enums;
 using TravelPlanner.Contracts.Interfaces;
 
@@ -33,6 +34,17 @@ namespace TravelPlanner.Api.Controllers
         public async Task<IActionResult> GetUserById(int userId)
         {
             var result = await authService.GetUserByIdAsync(userId);
+
+            return ResponseHelper.Send(this, result);
+        }
+
+        [HttpPut("{userId:int}/role")]
+        public async Task<IActionResult> UpdateUserRole(int userId, [FromBody] UpdateUserRoleRequestDto request)
+        {
+            var result = await authService.UpdateUserRoleAsync(
+                userId,
+                request.Role
+            );
 
             return ResponseHelper.Send(this, result);
         }
