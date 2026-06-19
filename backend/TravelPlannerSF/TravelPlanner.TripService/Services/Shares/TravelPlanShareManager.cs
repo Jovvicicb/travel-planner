@@ -391,5 +391,52 @@ namespace TravelPlanner.TripService.Services.Shares
                 "Edit access claimed successfully."
             );
         }
+
+        public async Task<ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>> GetCollaboratorsAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Fail(
+                    "Travel plan id is not valid."
+                );
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Fail(
+                    "Travel plan not found.",
+                    404
+                );
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Fail(
+                    "You do not have permission to view collaborators for this travel plan.",
+                    403
+                );
+            }
+
+            var collaborators = await collaboratorRepository.GetByTravelPlanIdAsync(travelPlanId);
+
+            var response = collaborators
+                .Select(TravelPlanCollaboratorMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Ok(
+                response,
+                "Collaborators fetched successfully."
+            );
+        }
     }
 }

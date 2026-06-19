@@ -348,6 +348,15 @@ namespace TravelPlanner.TripService
             return await manager.ClaimEditShareAsync(token, requestUserId);
         }
 
+        public async Task<ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>> GetCollaboratorsAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
+
+            return await manager.GetCollaboratorsAsync(travelPlanId, requestUserId,isAdmin);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

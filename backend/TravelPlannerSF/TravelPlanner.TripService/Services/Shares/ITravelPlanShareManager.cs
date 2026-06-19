@@ -16,5 +16,7 @@ namespace TravelPlanner.TripService.Services.Shares
 
         
         Task<ServiceResultDto<ClaimShareResponseDto>> ClaimEditShareAsync(string token, int requestUserId);
+
+        Task<ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>> GetCollaboratorsAsync(int travelPlanId, int requestUserId, bool isAdmin);
     }
 }

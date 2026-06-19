@@ -8,8 +8,12 @@ namespace TravelPlanner.TripService.Repositories.Collaborators
 
         Task<TravelPlanCollaborator> CreateAsync(TravelPlanCollaborator collaborator);
 
+
         Task<bool> HasEditAccessAsync(int travelPlanId, int userId);
 
         Task<List<int>> GetTravelPlanIdsByUserIdAsync(int userId);
+
+
+        Task<List<TravelPlanCollaborator>> GetByTravelPlanIdAsync(int travelPlanId);
     }
 }
