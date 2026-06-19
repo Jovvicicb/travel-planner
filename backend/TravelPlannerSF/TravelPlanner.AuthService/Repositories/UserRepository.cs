@@ -51,5 +51,12 @@ namespace TravelPlanner.AuthService.Repositories
 
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(User user)
+        {
+            dbContext.Users.Remove(user);
+
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

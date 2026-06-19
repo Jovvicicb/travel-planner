@@ -100,6 +100,15 @@ namespace TravelPlanner.AuthService
             return await authManager.UpdateUserRoleAsync(userId, role);
         }
 
+        public async Task<ServiceResultDto> DeleteUserAsync(int userId)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
+
+            return await authManager.DeleteUserAsync(userId);
+        }
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();

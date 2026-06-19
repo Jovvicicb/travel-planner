@@ -18,5 +18,7 @@ namespace TravelPlanner.Contracts.Interfaces
         Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId);
 
         Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role);
+
+        Task<ServiceResultDto> DeleteUserAsync(int userId);
     }
 }

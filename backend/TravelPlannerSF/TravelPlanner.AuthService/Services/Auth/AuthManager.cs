@@ -1,4 +1,5 @@
-﻿using TravelPlanner.AuthService.Entities;
+﻿using Microsoft.ServiceFabric.Services.Remoting.Client;
+using TravelPlanner.AuthService.Entities;
 using TravelPlanner.AuthService.Mapping.Auth;
 using TravelPlanner.AuthService.Repositories;
 using TravelPlanner.AuthService.Services.Tokens;
@@ -6,6 +7,7 @@ using TravelPlanner.AuthService.Validation.Auth;
 using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.Enums;
+using TravelPlanner.Contracts.Interfaces.Trips;
 
 namespace TravelPlanner.AuthService.Services.Auth
 {
@@ -169,6 +171,39 @@ namespace TravelPlanner.AuthService.Services.Auth
                 AuthMapper.ToAdminUserResponse(user),
                 "User role updated successfully."
             );
+        }
+
+        public async Task<ServiceResultDto> DeleteUserAsync(int userId)
+        {
+            if (userId <= 0)
+            {
+                return ServiceResultDto.Fail("User id is not valid.");
+            }
+
+            var user = await userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                return ServiceResultDto.Fail("User not found.", 404);
+            }
+
+            var tripService = ServiceProxy.Create<ITripService>(
+                new Uri("fabric:/TravelPlannerSF/TravelPlanner.TripService")
+            );
+
+            var deletePlansResult = await tripService.DeleteTravelPlansByOwnerAsync(userId);
+
+            if (!deletePlansResult.Success)
+            {
+                return ServiceResultDto.Fail(
+                    deletePlansResult.Message,
+                    deletePlansResult.StatusCode
+                );
+            }
+
+            await userRepository.DeleteAsync(user);
+
+            return ServiceResultDto.Ok("User deleted successfully.");
         }
     }
 }

@@ -48,5 +48,13 @@ namespace TravelPlanner.Api.Controllers
 
             return ResponseHelper.Send(this, result);
         }
+
+        [HttpDelete("{userId:int}")]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            var result = await authService.DeleteUserAsync(userId);
+
+            return ResponseHelper.Send(this, result);
+        }
     }
 }

@@ -16,5 +16,7 @@ namespace TravelPlanner.AuthService.Repositories
         Task<User> CreateAsync(User user);
 
         Task UpdateAsync(User user);
+
+        Task DeleteAsync(User user);
     }
 }
