@@ -57,5 +57,12 @@ namespace TravelPlanner.TripService.Repositories.Collaborators
                 .OrderByDescending(collaborator => collaborator.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task DeleteAsync(TravelPlanCollaborator collaborator)
+        {
+            context.TravelPlanCollaborators.Remove(collaborator);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

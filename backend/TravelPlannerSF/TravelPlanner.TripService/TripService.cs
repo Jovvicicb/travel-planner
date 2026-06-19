@@ -357,6 +357,15 @@ namespace TravelPlanner.TripService
             return await manager.GetCollaboratorsAsync(travelPlanId, requestUserId,isAdmin);
         }
 
+        public async Task<ServiceResultDto> RemoveCollaboratorAsync(int travelPlanId, int collaboratorUserId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
+
+            return await manager.RemoveCollaboratorAsync(travelPlanId, collaboratorUserId, requestUserId, isAdmin);
+        }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

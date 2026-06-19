@@ -438,5 +438,60 @@ namespace TravelPlanner.TripService.Services.Shares
                 "Collaborators fetched successfully."
             );
         }
+
+        public async Task<ServiceResultDto> RemoveCollaboratorAsync(int travelPlanId, int collaboratorUserId, int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (collaboratorUserId <= 0)
+            {
+                return ServiceResultDto.Fail("Collaborator user id is not valid.");
+            }
+
+            var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);
+
+            if (travelPlan == null)
+            {
+                return ServiceResultDto.Fail("Travel plan not found.", 404);
+            }
+
+            if (!isAdmin && travelPlan.OwnerUserId != requestUserId)
+            {
+                return ServiceResultDto.Fail(
+                    "You do not have permission to remove collaborators from this travel plan.",
+                    403
+                );
+            }
+
+            if (travelPlan.OwnerUserId == collaboratorUserId)
+            {
+                return ServiceResultDto.Fail(
+                    "Travel plan owner cannot be removed as collaborator.",
+                    400
+                );
+            }
+
+            var collaborator = await collaboratorRepository.GetByPlanAndUserAsync(
+                travelPlanId,
+                collaboratorUserId
+            );
+
+            if (collaborator == null)
+            {
+                return ServiceResultDto.Fail("Collaborator not found.", 404);
+            }
+
+            await collaboratorRepository.DeleteAsync(collaborator);
+
+            return ServiceResultDto.Ok("Collaborator removed successfully.");
+        }
     }
 }

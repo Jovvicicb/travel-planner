@@ -15,5 +15,7 @@ namespace TravelPlanner.TripService.Repositories.Collaborators
 
 
         Task<List<TravelPlanCollaborator>> GetByTravelPlanIdAsync(int travelPlanId);
+
+        Task DeleteAsync(TravelPlanCollaborator collaborator);
     }
 }
