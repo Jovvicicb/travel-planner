@@ -1,5 +1,6 @@
 ﻿namespace TravelPlanner.Contracts.DTOs.Common
 {
+    // Standard response wrapper used by services and API controllers.
     public class ServiceResultDto<T>
     {
         public bool Success { get; set; }
@@ -9,6 +10,7 @@
         public string Message { get; set; } = string.Empty;
 
         public T? Data { get; set; }
+
 
         public static ServiceResultDto<T> Ok(T data, string message = "Operation successful.")
         {
@@ -43,6 +45,8 @@
         }
     }
 
+
+    // Standard response wrapper for operations that do not return data.
     public class ServiceResultDto
     {
         public bool Success { get; set; }
@@ -50,6 +54,7 @@
         public int StatusCode { get; set; }
 
         public string Message { get; set; } = string.Empty;
+
 
         public static ServiceResultDto Ok(string message = "Operation successful.")
         {

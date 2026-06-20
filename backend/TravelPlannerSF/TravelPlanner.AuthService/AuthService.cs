@@ -13,7 +13,7 @@ using TravelPlanner.AuthService.Services.Tokens;
 using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.Enums;
-using TravelPlanner.Contracts.Interfaces;
+using TravelPlanner.Contracts.Interfaces.Auth;
 
 
 namespace TravelPlanner.AuthService

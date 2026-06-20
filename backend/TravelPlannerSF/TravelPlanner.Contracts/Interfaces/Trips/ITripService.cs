@@ -10,9 +10,10 @@ using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
 
 namespace TravelPlanner.Contracts.Interfaces.Trips
 {
+    // Service Fabric Remoting contract for trip planning and sharing operations.
     public interface ITripService : IService
     {
-        //TravelPlan
+        // Travel plans
         Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command);
 
         Task<ServiceResultDto<List<TravelPlanListItemDto>>> GetTravelPlansAsync(int requestUserId, bool isAdmin);
@@ -24,7 +25,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto> DeleteTravelPlanAsync(int planId, int requestUserId, bool isAdmin);
 
 
-        //Destination
+        // Destinations
         Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command);
 
         Task<ServiceResultDto<List<DestinationResponseDto>>> GetDestinationsAsync(int travelPlanId, int requestUserId, bool isAdmin);
@@ -34,7 +35,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto> DeleteDestinationAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin);
 
 
-        //Activity
+        // Activities
         Task<ServiceResultDto<ActivityResponseDto>> CreateActivityAsync(CreateActivityCommandDto command);
 
         Task<ServiceResultDto<List<ActivityResponseDto>>> GetActivitiesAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin);
@@ -46,7 +47,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto> DeleteActivityAsync(int travelPlanId, int destinationId, int activityId, int requestUserId, bool isAdmin);
 
 
-        //Expense
+        // Expenses and budget
         Task<ServiceResultDto<ExpenseResponseDto>> CreateExpenseAsync(CreateExpenseCommandDto command);
 
         Task<ServiceResultDto<List<ExpenseResponseDto>>> GetExpensesAsync(int travelPlanId, int requestUserId, bool isAdmin);
@@ -58,7 +59,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto<BudgetSummaryDto>> GetBudgetSummaryAsync(int travelPlanId, int requestUserId, bool isAdmin);
 
 
-        //ChecklistIt
+        // Checklist
         Task<ServiceResultDto<ChecklistItemResponseDto>> CreateChecklistItemAsync(CreateChecklistItemCommandDto command);
 
         Task<ServiceResultDto<List<ChecklistItemResponseDto>>> GetChecklistItemsAsync(int travelPlanId, int requestUserId, bool isAdmin);
@@ -70,7 +71,7 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
         Task<ServiceResultDto> DeleteChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin);
 
 
-        //Share
+        // Sharing and collaborators
         Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command);
 
         Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token);
@@ -79,13 +80,14 @@ namespace TravelPlanner.Contracts.Interfaces.Trips
 
         Task<ServiceResultDto> DeactivateShareAsync(int travelPlanId, int shareId, int requestUserId, bool isAdmin);
 
-
         Task<ServiceResultDto<ClaimShareResponseDto>> ClaimEditShareAsync(string token, int requestUserId);
 
         Task<ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>> GetCollaboratorsAsync(int travelPlanId, int requestUserId, bool isAdmin);
 
         Task<ServiceResultDto> RemoveCollaboratorAsync(int travelPlanId, int collaboratorUserId, int requestUserId, bool isAdmin);
 
+
+        // Admin cleanup
         Task<ServiceResultDto> DeleteTravelPlansByOwnerAsync(int ownerUserId);
     }
 }

@@ -5,7 +5,7 @@ using System.Security.Claims;
 using TravelPlanner.Api.Helpers;
 using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
-using TravelPlanner.Contracts.Interfaces;
+using TravelPlanner.Contracts.Interfaces.Auth;
 
 namespace TravelPlanner.Api.Controllers
 {
