@@ -17,6 +17,7 @@ namespace TravelPlanner.AuthService.Services.Tokens
             jwtSettings = jwtOptions.Value;
         }
 
+        // Creates a signed JWT containing user identity and role claims.
         public string GenerateToken(User user)
         {
             var claims = new List<Claim>

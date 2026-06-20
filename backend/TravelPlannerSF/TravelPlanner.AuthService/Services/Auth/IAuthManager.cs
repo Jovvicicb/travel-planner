@@ -6,12 +6,15 @@ namespace TravelPlanner.AuthService.Services.Auth
 {
     public interface IAuthManager
     {
+        // Authentication
         Task<ServiceResultDto<AuthResponseDto>> RegisterAsync(RegisterRequestDto request);
 
         Task<ServiceResultDto<AuthResponseDto>> LoginAsync(LoginRequestDto request);
 
         Task<ServiceResultDto<CurrentUserDto>> GetCurrentUserAsync(int userId);
 
+
+        // Admin user management
         Task<ServiceResultDto<List<AdminUserResponseDto>>> GetUsersAsync();
 
         Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId);

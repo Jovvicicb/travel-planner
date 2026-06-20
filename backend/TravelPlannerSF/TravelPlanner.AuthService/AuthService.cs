@@ -31,6 +31,7 @@ namespace TravelPlanner.AuthService
                 .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
                 .Build();
 
+            // Configure dependencies used inside remoting request scopes.
             var services = new ServiceCollection();
 
             services.AddDbContext<AuthDbContext>(options =>
@@ -46,6 +47,7 @@ namespace TravelPlanner.AuthService
             this.serviceProvider = services.BuildServiceProvider();
         }
 
+        // Authentication
         public async Task<ServiceResultDto<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
         {
             using var scope = serviceProvider.CreateScope();
@@ -73,6 +75,8 @@ namespace TravelPlanner.AuthService
             return await authManager.GetCurrentUserAsync(userId);
         }
 
+
+        // Admin user management
         public async Task<ServiceResultDto<List<AdminUserResponseDto>>> GetUsersAsync()
         {
             using var scope = serviceProvider.CreateScope();
@@ -108,6 +112,7 @@ namespace TravelPlanner.AuthService
 
             return await authManager.DeleteUserAsync(userId);
         }
+
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

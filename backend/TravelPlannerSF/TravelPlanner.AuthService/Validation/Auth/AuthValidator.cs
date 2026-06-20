@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using TravelPlanner.Contracts.DTOs.Auth;
 using TravelPlanner.Contracts.DTOs.Common;
+using TravelPlanner.Contracts.Enums;
 
 namespace TravelPlanner.AuthService.Validation.Auth
 {
@@ -60,6 +61,33 @@ namespace TravelPlanner.AuthService.Validation.Auth
             return ValidationResultDto.Success();
         }
 
+        public static ValidationResultDto ValidateUserId(int userId)
+        {
+            if (userId <= 0)
+            {
+                return ValidationResultDto.Fail("User id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateUpdateRole(int userId, UserRole role)
+        {
+            var userIdValidation = ValidateUserId(userId);
+
+            if (!userIdValidation.IsValid)
+            {
+                return userIdValidation;
+            }
+
+            if (!Enum.IsDefined(typeof(UserRole), role))
+            {
+                return ValidationResultDto.Fail("User role is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
         private static ValidationResultDto ValidateEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -113,5 +141,5 @@ namespace TravelPlanner.AuthService.Validation.Auth
 
             return ValidationResultDto.Success();
         }
-    }
+  }
 }

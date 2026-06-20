@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TravelPlanner.AuthService.Data
 {
+    // Provides AuthDbContext creation for EF Core migrations outside Service Fabric runtime.
     public class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
     {
         public AuthDbContext CreateDbContext(string[] args)

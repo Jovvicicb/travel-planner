@@ -126,9 +126,11 @@ namespace TravelPlanner.AuthService.Services.Auth
 
         public async Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId)
         {
-            if (userId <= 0)
+            var validation = AuthValidator.ValidateUserId(userId);
+
+            if (!validation.IsValid)
             {
-                return ServiceResultDto<AdminUserResponseDto>.Fail("User id is not valid.");
+                return ServiceResultDto<AdminUserResponseDto>.Fail(validation.Message);
             }
 
             var user = await userRepository.GetByIdAsync(userId);
@@ -146,14 +148,11 @@ namespace TravelPlanner.AuthService.Services.Auth
 
         public async Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role)
         {
-            if (userId <= 0)
-            {
-                return ServiceResultDto<AdminUserResponseDto>.Fail("User id is not valid.");
-            }
+            var validation = AuthValidator.ValidateUpdateRole(userId, role);
 
-            if (!Enum.IsDefined(typeof(UserRole), role))
+            if (!validation.IsValid)
             {
-                return ServiceResultDto<AdminUserResponseDto>.Fail("User role is not valid.");
+                return ServiceResultDto<AdminUserResponseDto>.Fail(validation.Message);
             }
 
             var user = await userRepository.GetByIdAsync(userId);
@@ -175,9 +174,11 @@ namespace TravelPlanner.AuthService.Services.Auth
 
         public async Task<ServiceResultDto> DeleteUserAsync(int userId)
         {
-            if (userId <= 0)
+            var validation = AuthValidator.ValidateUserId(userId);
+
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("User id is not valid.");
+                return ServiceResultDto.Fail(validation.Message);
             }
 
             var user = await userRepository.GetByIdAsync(userId);
@@ -187,6 +188,7 @@ namespace TravelPlanner.AuthService.Services.Auth
                 return ServiceResultDto.Fail("User not found.", 404);
             }
 
+            // User-owned travel plans are deleted through TripService to keep service databases separated.
             var tripService = ServiceProxy.Create<ITripService>(
                 new Uri("fabric:/TravelPlannerSF/TravelPlanner.TripService")
             );

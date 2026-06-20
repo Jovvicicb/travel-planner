@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using TravelPlanner.AuthService.Entities;
+﻿using TravelPlanner.AuthService.Entities;
 
 namespace TravelPlanner.AuthService.Repositories
 {
