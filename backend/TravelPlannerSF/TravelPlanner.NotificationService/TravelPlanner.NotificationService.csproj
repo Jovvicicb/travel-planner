@@ -43,10 +43,6 @@
 
   <ItemGroup>
     <Folder Include="Configuration\" />
-    <Folder Include="Mapping\Notifications\" />
-    <Folder Include="Repositories\Notifications\" />
-    <Folder Include="Services\Notifications\" />
-    <Folder Include="Validation\Notifications\" />
   </ItemGroup>
 
 
