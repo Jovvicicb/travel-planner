@@ -7,21 +7,25 @@
 
         public string Message { get; set; } = string.Empty;
 
+        public int StatusCode { get; set; } = 400;
+
 
         public static ValidationResultDto Success()
         {
             return new ValidationResultDto
             {
-                IsValid = true
+                IsValid = true,
+                StatusCode = 200
             };
         }
 
-        public static ValidationResultDto Fail(string message)
+        public static ValidationResultDto Fail(string message, int statusCode = 400)
         {
             return new ValidationResultDto
             {
                 IsValid = false,
-                Message = message
+                Message = message,
+                StatusCode = statusCode
             };
         }
     }

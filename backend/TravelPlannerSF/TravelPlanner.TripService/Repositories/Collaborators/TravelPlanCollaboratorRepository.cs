@@ -31,7 +31,6 @@ namespace TravelPlanner.TripService.Repositories.Collaborators
             return collaborator;
         }
 
-
         public async Task<bool> HasEditAccessAsync(int travelPlanId, int userId)
         {
             return await context.TravelPlanCollaborators
@@ -48,7 +47,6 @@ namespace TravelPlanner.TripService.Repositories.Collaborators
                 .Select(collaborator => collaborator.TravelPlanId)
                 .ToListAsync();
         }
-
 
         public async Task<List<TravelPlanCollaborator>> GetByTravelPlanIdAsync(int travelPlanId)
         {

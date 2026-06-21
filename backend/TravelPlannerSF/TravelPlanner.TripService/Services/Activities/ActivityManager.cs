@@ -74,7 +74,10 @@ namespace TravelPlanner.TripService.Services.Activities
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<ActivityResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<ActivityResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var activity = new Activity
@@ -101,25 +104,13 @@ namespace TravelPlanner.TripService.Services.Activities
 
         public async Task<ServiceResultDto<List<ActivityResponseDto>>> GetActivitiesAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = ActivityValidator.ValidateGet(travelPlanId, destinationId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<ActivityResponseDto>>.Fail(
-                    "Travel plan id is not valid."
-                );
-            }
-
-            if (destinationId <= 0)
-            {
-                return ServiceResultDto<List<ActivityResponseDto>>.Fail(
-                    "Destination id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -175,18 +166,13 @@ namespace TravelPlanner.TripService.Services.Activities
 
         public async Task<ServiceResultDto<List<CalendarDayDto>>> GetCalendarAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<CalendarDayDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = ActivityValidator.ValidateCalendar(travelPlanId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<CalendarDayDto>>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -289,7 +275,10 @@ namespace TravelPlanner.TripService.Services.Activities
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<ActivityResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<ActivityResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             activity.Title = command.Title.Trim();
@@ -312,24 +301,14 @@ namespace TravelPlanner.TripService.Services.Activities
 
         public async Task<ServiceResultDto> DeleteActivityAsync(int travelPlanId, int destinationId, int activityId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Authenticated user is required.", 401);
-            }
+            var validation = ActivityValidator.ValidateDelete(travelPlanId, destinationId, activityId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Travel plan id is not valid.");
-            }
-
-            if (destinationId <= 0)
-            {
-                return ServiceResultDto.Fail("Destination id is not valid.");
-            }
-
-            if (activityId <= 0)
-            {
-                return ServiceResultDto.Fail("Activity id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var activity = await activityRepository.GetByIdAsync(activityId);

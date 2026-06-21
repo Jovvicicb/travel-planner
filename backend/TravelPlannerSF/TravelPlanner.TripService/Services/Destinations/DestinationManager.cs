@@ -27,6 +27,11 @@ namespace TravelPlanner.TripService.Services.Destinations
 
         public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command)
         {
+            if (command == null)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail("Destination data is required.");
+            }
+
             var travelPlan = await travelPlanRepository.GetByIdAsync(command.TravelPlanId);
 
             if (travelPlan == null)
@@ -37,7 +42,7 @@ namespace TravelPlanner.TripService.Services.Destinations
                 );
             }
 
-            var canEdit = await permissionService.CanEditAsync( travelPlan, command.RequestUserId, command.IsAdmin);
+            var canEdit = await permissionService.CanEditAsync(travelPlan, command.RequestUserId, command.IsAdmin);
 
             if (!canEdit)
             {
@@ -51,7 +56,10 @@ namespace TravelPlanner.TripService.Services.Destinations
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<DestinationResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var destination = new Destination
@@ -75,18 +83,13 @@ namespace TravelPlanner.TripService.Services.Destinations
 
         public async Task<ServiceResultDto<List<DestinationResponseDto>>> GetDestinationsAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<DestinationResponseDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = DestinationValidator.ValidateGetAll(travelPlanId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<DestinationResponseDto>>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -173,7 +176,10 @@ namespace TravelPlanner.TripService.Services.Destinations
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<DestinationResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             destination.Name = command.Name.Trim();
@@ -193,19 +199,14 @@ namespace TravelPlanner.TripService.Services.Destinations
 
         public async Task<ServiceResultDto> DeleteDestinationAsync(int travelPlanId, int destinationId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Authenticated user is required.", 401);
-            }
+            var validation = DestinationValidator.ValidateDelete(travelPlanId, destinationId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Travel plan id is not valid.");
-            }
-
-            if (destinationId <= 0)
-            {
-                return ServiceResultDto.Fail("Destination id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var destination = await destinationRepository.GetByIdAsync(destinationId);

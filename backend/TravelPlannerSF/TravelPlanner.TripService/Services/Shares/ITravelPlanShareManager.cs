@@ -5,6 +5,7 @@ namespace TravelPlanner.TripService.Services.Shares
 {
     public interface ITravelPlanShareManager
     {
+        // Sharing
         Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command);
 
         Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token);
@@ -14,7 +15,7 @@ namespace TravelPlanner.TripService.Services.Shares
         Task<ServiceResultDto> DeactivateShareAsync(int travelPlanId, int shareId, int requestUserId, bool isAdmin);
 
 
-        
+        // Collaborators
         Task<ServiceResultDto<ClaimShareResponseDto>> ClaimEditShareAsync(string token, int requestUserId);
 
         Task<ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>> GetCollaboratorsAsync(int travelPlanId, int requestUserId, bool isAdmin);

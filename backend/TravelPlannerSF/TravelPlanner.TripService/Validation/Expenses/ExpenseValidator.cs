@@ -20,41 +20,16 @@ namespace TravelPlanner.TripService.Validation.Expenses
 
             if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Title))
-            {
-                return ValidationResultDto.Fail("Expense title is required.");
-            }
-
-            if (command.Title.Trim().Length > 120)
-            {
-                return ValidationResultDto.Fail("Expense title cannot exceed 120 characters.");
-            }
-
-            if (!Enum.IsDefined(typeof(ExpenseCategory), command.Category))
-            {
-                return ValidationResultDto.Fail("Expense category is not valid.");
-            }
-
-            if (command.Amount <= 0)
-            {
-                return ValidationResultDto.Fail("Expense amount must be greater than zero.");
-            }
-
-            if (command.ExpenseDate == default)
-            {
-                return ValidationResultDto.Fail("Expense date is required.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(command.Description) &&
-                command.Description.Trim().Length > 1000)
-            {
-                return ValidationResultDto.Fail("Expense description cannot exceed 1000 characters.");
-            }
-
-            return ValidationResultDto.Success();
+            return ValidateCommon(
+                command.Title,
+                command.Category,
+                command.Amount,
+                command.ExpenseDate,
+                command.Description
+            );
         }
 
         public static ValidationResultDto ValidateUpdate(UpdateExpenseCommandDto command)
@@ -76,36 +51,92 @@ namespace TravelPlanner.TripService.Validation.Expenses
 
             if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Title))
+            return ValidateCommon(
+                command.Title,
+                command.Category,
+                command.Amount,
+                command.ExpenseDate,
+                command.Description
+            );
+        }
+
+        public static ValidationResultDto ValidateGet(int travelPlanId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateDelete(int travelPlanId, int expenseId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (expenseId <= 0)
+            {
+                return ValidationResultDto.Fail("Expense id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateBudgetSummary(int travelPlanId, int requestUserId)
+        {
+            return ValidateGet(travelPlanId, requestUserId);
+        }
+
+        private static ValidationResultDto ValidateCommon(
+            string title,
+            ExpenseCategory category,
+            decimal amount,
+            DateTime expenseDate,
+            string? description)
+        {
+            if (string.IsNullOrWhiteSpace(title))
             {
                 return ValidationResultDto.Fail("Expense title is required.");
             }
 
-            if (command.Title.Trim().Length > 120)
+            if (title.Trim().Length > 120)
             {
                 return ValidationResultDto.Fail("Expense title cannot exceed 120 characters.");
             }
 
-            if (!Enum.IsDefined(typeof(ExpenseCategory), command.Category))
+            if (!Enum.IsDefined(typeof(ExpenseCategory), category))
             {
                 return ValidationResultDto.Fail("Expense category is not valid.");
             }
 
-            if (command.Amount <= 0)
+            if (amount <= 0)
             {
                 return ValidationResultDto.Fail("Expense amount must be greater than zero.");
             }
 
-            if (command.ExpenseDate == default)
+            if (expenseDate == default)
             {
                 return ValidationResultDto.Fail("Expense date is required.");
             }
 
-            if (!string.IsNullOrWhiteSpace(command.Description) &&
-                command.Description.Trim().Length > 1000)
+            if (!string.IsNullOrWhiteSpace(description) &&
+                description.Trim().Length > 1000)
             {
                 return ValidationResultDto.Fail("Expense description cannot exceed 1000 characters.");
             }

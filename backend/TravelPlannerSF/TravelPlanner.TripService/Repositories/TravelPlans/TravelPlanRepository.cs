@@ -39,6 +39,11 @@ namespace TravelPlanner.TripService.Repositories.TravelPlans
 
         public async Task<List<TravelPlan>> GetByIdsAsync(List<int> planIds)
         {
+            if (planIds.Count == 0)
+            {
+                return new List<TravelPlan>();
+            }
+
             return await context.TravelPlans
                 .Where(plan => planIds.Contains(plan.Id))
                 .OrderByDescending(plan => plan.CreatedAt)

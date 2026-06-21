@@ -44,6 +44,7 @@ namespace TravelPlanner.TripService
                 .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
                 .Build();
 
+            // Configure dependencies used inside remoting request scopes.
             var services = new ServiceCollection();
 
             services.AddDbContext<TripDbContext>(options =>
@@ -75,7 +76,7 @@ namespace TravelPlanner.TripService
             this.serviceProvider = services.BuildServiceProvider();
         }
 
-        //TravelPlan
+        // Travel plans
         public async Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command)
         {
             using var scope = serviceProvider.CreateScope();
@@ -122,7 +123,7 @@ namespace TravelPlanner.TripService
         }
 
 
-        //Destination
+        // Destinations
         public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command)
         {
             using var scope = serviceProvider.CreateScope();
@@ -160,7 +161,7 @@ namespace TravelPlanner.TripService
         }
 
 
-        //Activity
+        // Activities
         public async Task<ServiceResultDto<ActivityResponseDto>> CreateActivityAsync(CreateActivityCommandDto command)
         {
             using var scope = serviceProvider.CreateScope();
@@ -203,11 +204,11 @@ namespace TravelPlanner.TripService
 
             var manager = scope.ServiceProvider.GetRequiredService<IActivityManager>();
 
-            return await manager.DeleteActivityAsync( travelPlanId, destinationId, activityId, requestUserId, isAdmin);
+            return await manager.DeleteActivityAsync(travelPlanId, destinationId, activityId, requestUserId, isAdmin);
         }
 
 
-        //Expense
+        // Expenses and budget
         public async Task<ServiceResultDto<ExpenseResponseDto>> CreateExpenseAsync(CreateExpenseCommandDto command)
         {
             using var scope = serviceProvider.CreateScope();
@@ -250,11 +251,11 @@ namespace TravelPlanner.TripService
 
             var manager = scope.ServiceProvider.GetRequiredService<IExpenseManager>();
 
-            return await manager.GetBudgetSummaryAsync(travelPlanId, requestUserId,isAdmin);
+            return await manager.GetBudgetSummaryAsync(travelPlanId, requestUserId, isAdmin);
         }
 
 
-        //Checklist
+        // Checklist
         public async Task<ServiceResultDto<ChecklistItemResponseDto>> CreateChecklistItemAsync(CreateChecklistItemCommandDto command)
         {
             using var scope = serviceProvider.CreateScope();
@@ -301,7 +302,7 @@ namespace TravelPlanner.TripService
         }
 
 
-        //Share
+        // Sharing and collaborators
         public async Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command)
         {
             using var scope = serviceProvider.CreateScope();
@@ -354,7 +355,7 @@ namespace TravelPlanner.TripService
 
             var manager = scope.ServiceProvider.GetRequiredService<ITravelPlanShareManager>();
 
-            return await manager.GetCollaboratorsAsync(travelPlanId, requestUserId,isAdmin);
+            return await manager.GetCollaboratorsAsync(travelPlanId, requestUserId, isAdmin);
         }
 
         public async Task<ServiceResultDto> RemoveCollaboratorAsync(int travelPlanId, int collaboratorUserId, int requestUserId, bool isAdmin)
@@ -366,6 +367,8 @@ namespace TravelPlanner.TripService
             return await manager.RemoveCollaboratorAsync(travelPlanId, collaboratorUserId, requestUserId, isAdmin);
         }
 
+
+        // Admin cleanup
         public async Task<ServiceResultDto> DeleteTravelPlansByOwnerAsync(int ownerUserId)
         {
             using var scope = serviceProvider.CreateScope();

@@ -61,7 +61,10 @@ namespace TravelPlanner.TripService.Services.Expenses
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<ExpenseResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<ExpenseResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var expense = new Expense
@@ -85,18 +88,13 @@ namespace TravelPlanner.TripService.Services.Expenses
 
         public async Task<ServiceResultDto<List<ExpenseResponseDto>>> GetExpensesAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<ExpenseResponseDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = ExpenseValidator.ValidateGet(travelPlanId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<ExpenseResponseDto>>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -175,7 +173,10 @@ namespace TravelPlanner.TripService.Services.Expenses
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<ExpenseResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<ExpenseResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             expense.Title = command.Title.Trim();
@@ -195,19 +196,14 @@ namespace TravelPlanner.TripService.Services.Expenses
 
         public async Task<ServiceResultDto> DeleteExpenseAsync(int travelPlanId, int expenseId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Authenticated user is required.", 401);
-            }
+            var validation = ExpenseValidator.ValidateDelete(travelPlanId, expenseId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Travel plan id is not valid.");
-            }
-
-            if (expenseId <= 0)
-            {
-                return ServiceResultDto.Fail("Expense id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var expense = await expenseRepository.GetByIdAsync(expenseId);
@@ -249,18 +245,13 @@ namespace TravelPlanner.TripService.Services.Expenses
 
         public async Task<ServiceResultDto<BudgetSummaryDto>> GetBudgetSummaryAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<BudgetSummaryDto>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = ExpenseValidator.ValidateBudgetSummary(travelPlanId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<BudgetSummaryDto>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -283,7 +274,7 @@ namespace TravelPlanner.TripService.Services.Expenses
                     403
                 );
             }
-
+            // Budget summary combines manually recorded expenses and estimated activity costs.
             var totalRecordedExpenses = await expenseRepository.GetTotalAmountByTravelPlanIdAsync(travelPlanId);
             var totalActivityEstimatedCosts = await activityRepository.GetTotalEstimatedCostByTravelPlanIdAsync(travelPlanId);
             var totalExpenses = totalRecordedExpenses + totalActivityEstimatedCosts;

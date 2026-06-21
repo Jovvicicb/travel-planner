@@ -14,52 +14,17 @@ namespace TravelPlanner.TripService.Validation.TravelPlans
 
             if (command.OwnerUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Title))
-            {
-                return ValidationResultDto.Fail("Title is required.");
-            }
-
-            if (command.Title.Trim().Length > 120)
-            {
-                return ValidationResultDto.Fail("Title cannot exceed 120 characters.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(command.Description) &&
-                command.Description.Trim().Length > 1000)
-            {
-                return ValidationResultDto.Fail("Description cannot exceed 1000 characters.");
-            }
-
-            if (command.StartDate == default)
-            {
-                return ValidationResultDto.Fail("Start date is required.");
-            }
-
-            if (command.EndDate == default)
-            {
-                return ValidationResultDto.Fail("End date is required.");
-            }
-
-            if (command.StartDate.Date > command.EndDate.Date)
-            {
-                return ValidationResultDto.Fail("End date cannot be before start date.");
-            }
-
-            if (command.Budget < 0)
-            {
-                return ValidationResultDto.Fail("Budget cannot be negative.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(command.Notes) &&
-                command.Notes.Trim().Length > 2000)
-            {
-                return ValidationResultDto.Fail("Notes cannot exceed 2000 characters.");
-            }
-
-            return ValidationResultDto.Success();
+            return ValidateCommon(
+                command.Title,
+                command.Description,
+                command.StartDate,
+                command.EndDate,
+                command.Budget,
+                command.Notes
+            );
         }
 
         public static ValidationResultDto ValidateUpdate(UpdateTravelPlanCommandDto command)
@@ -76,47 +41,115 @@ namespace TravelPlanner.TripService.Validation.TravelPlans
 
             if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Title))
+            return ValidateCommon(
+                command.Title,
+                command.Description,
+                command.StartDate,
+                command.EndDate,
+                command.Budget,
+                command.Notes
+            );
+        }
+
+        public static ValidationResultDto ValidateGetAll(int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateGetById(int planId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (planId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateDelete(int planId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (planId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateDeleteByOwner(int ownerUserId)
+        {
+            if (ownerUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Owner user id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        private static ValidationResultDto ValidateCommon(
+            string title,
+            string? description,
+            DateTime startDate,
+            DateTime endDate,
+            decimal budget,
+            string? notes)
+        {
+            if (string.IsNullOrWhiteSpace(title))
             {
                 return ValidationResultDto.Fail("Title is required.");
             }
 
-            if (command.Title.Trim().Length > 120)
+            if (title.Trim().Length > 120)
             {
                 return ValidationResultDto.Fail("Title cannot exceed 120 characters.");
             }
 
-            if (!string.IsNullOrWhiteSpace(command.Description) &&
-                command.Description.Trim().Length > 1000)
+            if (!string.IsNullOrWhiteSpace(description) &&
+                description.Trim().Length > 1000)
             {
                 return ValidationResultDto.Fail("Description cannot exceed 1000 characters.");
             }
 
-            if (command.StartDate == default)
+            if (startDate == default)
             {
                 return ValidationResultDto.Fail("Start date is required.");
             }
 
-            if (command.EndDate == default)
+            if (endDate == default)
             {
                 return ValidationResultDto.Fail("End date is required.");
             }
 
-            if (command.StartDate.Date > command.EndDate.Date)
+            if (startDate.Date > endDate.Date)
             {
                 return ValidationResultDto.Fail("End date cannot be before start date.");
             }
 
-            if (command.Budget < 0)
+            if (budget < 0)
             {
                 return ValidationResultDto.Fail("Budget cannot be negative.");
             }
 
-            if (!string.IsNullOrWhiteSpace(command.Notes) &&
-                command.Notes.Trim().Length > 2000)
+            if (!string.IsNullOrWhiteSpace(notes) &&
+                notes.Trim().Length > 2000)
             {
                 return ValidationResultDto.Fail("Notes cannot exceed 2000 characters.");
             }

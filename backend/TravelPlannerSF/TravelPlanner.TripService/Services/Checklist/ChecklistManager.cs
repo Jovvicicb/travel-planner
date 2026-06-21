@@ -59,7 +59,10 @@ namespace TravelPlanner.TripService.Services.Checklist
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<ChecklistItemResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                   validation.Message,
+                   validation.StatusCode
+                );
             }
 
             var item = new ChecklistItem
@@ -80,18 +83,13 @@ namespace TravelPlanner.TripService.Services.Checklist
 
         public async Task<ServiceResultDto<List<ChecklistItemResponseDto>>> GetChecklistItemsAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<ChecklistItemResponseDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = ChecklistValidator.ValidateGet(travelPlanId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<ChecklistItemResponseDto>>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -178,7 +176,10 @@ namespace TravelPlanner.TripService.Services.Checklist
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<ChecklistItemResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             item.Title = command.Title.Trim();
@@ -195,25 +196,13 @@ namespace TravelPlanner.TripService.Services.Checklist
 
         public async Task<ServiceResultDto<ChecklistItemResponseDto>> ToggleChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = ChecklistValidator.ValidateItemAction(travelPlanId, itemId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<ChecklistItemResponseDto>.Fail(
-                    "Travel plan id is not valid."
-                );
-            }
-
-            if (itemId <= 0)
-            {
-                return ServiceResultDto<ChecklistItemResponseDto>.Fail(
-                    "Checklist item id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -268,19 +257,14 @@ namespace TravelPlanner.TripService.Services.Checklist
 
         public async Task<ServiceResultDto> DeleteChecklistItemAsync(int travelPlanId, int itemId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Authenticated user is required.", 401);
-            }
+            var validation = ChecklistValidator.ValidateItemAction(travelPlanId, itemId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Travel plan id is not valid.");
-            }
-
-            if (itemId <= 0)
-            {
-                return ServiceResultDto.Fail("Checklist item id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var item = await checklistRepository.GetByIdAsync(itemId);

@@ -13,11 +13,6 @@ namespace TravelPlanner.TripService.Validation.Destinations
                 return ValidationResultDto.Fail("Destination data is required.");
             }
 
-            if (travelPlan == null)
-            {
-                return ValidationResultDto.Fail("Travel plan not found.");
-            }
-
             if (command.TravelPlanId <= 0)
             {
                 return ValidationResultDto.Fail("Travel plan id is not valid.");
@@ -25,61 +20,17 @@ namespace TravelPlanner.TripService.Validation.Destinations
 
             if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Name))
-            {
-                return ValidationResultDto.Fail("Destination name is required.");
-            }
-
-            if (command.Name.Trim().Length > 120)
-            {
-                return ValidationResultDto.Fail("Destination name cannot exceed 120 characters.");
-            }
-
-            if (string.IsNullOrWhiteSpace(command.Location))
-            {
-                return ValidationResultDto.Fail("Location is required.");
-            }
-
-            if (command.Location.Trim().Length > 200)
-            {
-                return ValidationResultDto.Fail("Location cannot exceed 200 characters.");
-            }
-
-            if (command.StartDate == default)
-            {
-                return ValidationResultDto.Fail("Start date is required.");
-            }
-
-            if (command.EndDate == default)
-            {
-                return ValidationResultDto.Fail("End date is required.");
-            }
-
-            if (command.StartDate.Date > command.EndDate.Date)
-            {
-                return ValidationResultDto.Fail("End date cannot be before start date.");
-            }
-
-            if (command.StartDate.Date < travelPlan.StartDate.Date)
-            {
-                return ValidationResultDto.Fail("Destination start date cannot be before travel plan start date.");
-            }
-
-            if (command.EndDate.Date > travelPlan.EndDate.Date)
-            {
-                return ValidationResultDto.Fail("Destination end date cannot be after travel plan end date.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(command.Notes) &&
-                command.Notes.Trim().Length > 2000)
-            {
-                return ValidationResultDto.Fail("Notes cannot exceed 2000 characters.");
-            }
-
-            return ValidationResultDto.Success();
+            return ValidateCommon(
+                command.Name,
+                command.Location,
+                command.StartDate,
+                command.EndDate,
+                command.Notes,
+                travelPlan
+            );
         }
 
         public static ValidationResultDto ValidateUpdate(UpdateDestinationCommandDto command, TravelPlan travelPlan)
@@ -101,61 +52,109 @@ namespace TravelPlanner.TripService.Validation.Destinations
 
             if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (travelPlan == null)
+            return ValidateCommon(
+                command.Name,
+                command.Location,
+                command.StartDate,
+                command.EndDate,
+                command.Notes,
+                travelPlan
+            );
+        }
+
+        public static ValidationResultDto ValidateGetAll(int travelPlanId, int requestUserId)
+        {
+            if (requestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Travel plan not found.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Name))
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateDelete(int travelPlanId, int destinationId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (destinationId <= 0)
+            {
+                return ValidationResultDto.Fail("Destination id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        private static ValidationResultDto ValidateCommon(
+            string name,
+            string location,
+            DateTime startDate,
+            DateTime endDate,
+            string? notes,
+            TravelPlan travelPlan)
+        {
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return ValidationResultDto.Fail("Destination name is required.");
             }
 
-            if (command.Name.Trim().Length > 120)
+            if (name.Trim().Length > 120)
             {
                 return ValidationResultDto.Fail("Destination name cannot exceed 120 characters.");
             }
 
-            if (string.IsNullOrWhiteSpace(command.Location))
+            if (string.IsNullOrWhiteSpace(location))
             {
                 return ValidationResultDto.Fail("Location is required.");
             }
 
-            if (command.Location.Trim().Length > 200)
+            if (location.Trim().Length > 200)
             {
                 return ValidationResultDto.Fail("Location cannot exceed 200 characters.");
             }
 
-            if (command.StartDate == default)
+            if (startDate == default)
             {
                 return ValidationResultDto.Fail("Start date is required.");
             }
 
-            if (command.EndDate == default)
+            if (endDate == default)
             {
                 return ValidationResultDto.Fail("End date is required.");
             }
 
-            if (command.StartDate.Date > command.EndDate.Date)
+            if (startDate.Date > endDate.Date)
             {
                 return ValidationResultDto.Fail("End date cannot be before start date.");
             }
 
-            if (command.StartDate.Date < travelPlan.StartDate.Date)
+            if (startDate.Date < travelPlan.StartDate.Date)
             {
                 return ValidationResultDto.Fail("Destination start date cannot be before travel plan start date.");
             }
 
-            if (command.EndDate.Date > travelPlan.EndDate.Date)
+            if (endDate.Date > travelPlan.EndDate.Date)
             {
                 return ValidationResultDto.Fail("Destination end date cannot be after travel plan end date.");
             }
 
-            if (!string.IsNullOrWhiteSpace(command.Notes) &&
-                command.Notes.Trim().Length > 2000)
+            if (!string.IsNullOrWhiteSpace(notes) &&
+                notes.Trim().Length > 2000)
             {
                 return ValidationResultDto.Fail("Notes cannot exceed 2000 characters.");
             }

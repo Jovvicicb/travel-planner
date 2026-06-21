@@ -53,12 +53,16 @@ namespace TravelPlanner.TripService.Services.Shares
             this.collaboratorRepository = collaboratorRepository;
         }
 
+        // Sharing
         public async Task<ServiceResultDto<TravelPlanShareResponseDto>> CreateShareAsync(CreateTravelPlanShareCommandDto command)
         {
-            if (command == null)
+            var validation = TravelPlanShareValidator.ValidateCreate(command);
+
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<TravelPlanShareResponseDto>.Fail(
-                    "Share data is required."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -78,13 +82,6 @@ namespace TravelPlanner.TripService.Services.Shares
                     "You do not have permission to share this travel plan.",
                     403
                 );
-            }
-
-            var validation = TravelPlanShareValidator.ValidateCreate(command);
-
-            if (!validation.IsValid)
-            {
-                return ServiceResultDto<TravelPlanShareResponseDto>.Fail(validation.Message);
             }
 
             var share = new TravelPlanShare
@@ -107,9 +104,14 @@ namespace TravelPlanner.TripService.Services.Shares
 
         public async Task<ServiceResultDto<SharedTravelPlanViewDto>> GetSharedTravelPlanAsync(string token)
         {
-            if (string.IsNullOrWhiteSpace(token))
+            var validation = TravelPlanShareValidator.ValidateToken(token);
+
+            if (!validation.IsValid)
             {
-                return ServiceResultDto<SharedTravelPlanViewDto>.Fail("Share token is required.");
+                return ServiceResultDto<SharedTravelPlanViewDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var share = await shareRepository.GetByTokenAsync(token.Trim());
@@ -187,18 +189,13 @@ namespace TravelPlanner.TripService.Services.Shares
 
         public async Task<ServiceResultDto<List<TravelPlanShareResponseDto>>> GetSharesAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<TravelPlanShareResponseDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = TravelPlanShareValidator.ValidateGetShares(travelPlanId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<TravelPlanShareResponseDto>>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -232,21 +229,16 @@ namespace TravelPlanner.TripService.Services.Shares
             );
         }
 
-        public async Task<ServiceResultDto> DeactivateShareAsync(int travelPlanId,int shareId,int requestUserId,bool isAdmin)
+        public async Task<ServiceResultDto> DeactivateShareAsync(int travelPlanId, int shareId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Authenticated user is required.", 401);
-            }
+            var validation = TravelPlanShareValidator.ValidateDeactivate(travelPlanId, shareId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Travel plan id is not valid.");
-            }
-
-            if (shareId <= 0)
-            {
-                return ServiceResultDto.Fail("Share link id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var share = await shareRepository.GetByIdAsync(shareId);
@@ -286,18 +278,17 @@ namespace TravelPlanner.TripService.Services.Shares
             return ServiceResultDto.Ok("Share link deactivated successfully.");
         }
 
+
+        // Collaborators
         public async Task<ServiceResultDto<ClaimShareResponseDto>> ClaimEditShareAsync(string token, int requestUserId)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return ServiceResultDto<ClaimShareResponseDto>.Fail("Share token is required.");
-            }
+            var validation = TravelPlanShareValidator.ValidateClaim(token, requestUserId);
 
-            if (requestUserId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<ClaimShareResponseDto>.Fail(
-                    "Authenticated user is required.",
-                    401
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -394,18 +385,13 @@ namespace TravelPlanner.TripService.Services.Shares
 
         public async Task<ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>> GetCollaboratorsAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = TravelPlanShareValidator.ValidateCollaborators(travelPlanId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -441,19 +427,14 @@ namespace TravelPlanner.TripService.Services.Shares
 
         public async Task<ServiceResultDto> RemoveCollaboratorAsync(int travelPlanId, int collaboratorUserId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Authenticated user is required.", 401);
-            }
+            var validation = TravelPlanShareValidator.ValidateRemoveCollaborator(travelPlanId, collaboratorUserId, requestUserId);
 
-            if (travelPlanId <= 0)
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Travel plan id is not valid.");
-            }
-
-            if (collaboratorUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Collaborator user id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var travelPlan = await travelPlanRepository.GetByIdAsync(travelPlanId);

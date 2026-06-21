@@ -26,76 +26,20 @@ namespace TravelPlanner.TripService.Validation.Activities
 
             if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Title))
-            {
-                return ValidationResultDto.Fail("Activity title is required.");
-            }
-
-            if (command.Title.Trim().Length > 120)
-            {
-                return ValidationResultDto.Fail("Activity title cannot exceed 120 characters.");
-            }
-
-            if (command.ActivityDate == default)
-            {
-                return ValidationResultDto.Fail("Activity date is required.");
-            }
-
-            if (command.ActivityDate.Date < destination.StartDate.Date)
-            {
-                return ValidationResultDto.Fail("Activity date cannot be before destination start date.");
-            }
-
-            if (command.ActivityDate.Date > destination.EndDate.Date)
-            {
-                return ValidationResultDto.Fail("Activity date cannot be after destination end date.");
-            }
-
-            if (command.StartTime == default)
-            {
-                return ValidationResultDto.Fail("Start time is required.");
-            }
-
-            if (command.EndTime == default)
-            {
-                return ValidationResultDto.Fail("End time is required.");
-            }
-
-            if (command.StartTime >= command.EndTime)
-            {
-                return ValidationResultDto.Fail("End time must be after start time.");
-            }
-
-            if (string.IsNullOrWhiteSpace(command.Location))
-            {
-                return ValidationResultDto.Fail("Activity location is required.");
-            }
-
-            if (command.Location.Trim().Length > 200)
-            {
-                return ValidationResultDto.Fail("Activity location cannot exceed 200 characters.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(command.Description) &&
-                command.Description.Trim().Length > 1000)
-            {
-                return ValidationResultDto.Fail("Activity description cannot exceed 1000 characters.");
-            }
-
-            if (command.EstimatedCost < 0)
-            {
-                return ValidationResultDto.Fail("Estimated cost cannot be negative.");
-            }
-
-            if (!Enum.IsDefined(typeof(ActivityStatus), command.Status))
-            {
-                return ValidationResultDto.Fail("Activity status is not valid.");
-            }
-
-            return ValidationResultDto.Success();
+            return ValidateCommon(
+                command.Title,
+                command.ActivityDate,
+                command.StartTime,
+                command.EndTime,
+                command.Location,
+                command.Description,
+                command.EstimatedCost,
+                command.Status,
+                destination
+            );
         }
 
         public static ValidationResultDto ValidateUpdate(UpdateActivityCommandDto command, Destination destination)
@@ -122,71 +66,155 @@ namespace TravelPlanner.TripService.Validation.Activities
 
             if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Authenticated user is required.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Title))
+            return ValidateCommon(
+                command.Title,
+                command.ActivityDate,
+                command.StartTime,
+                command.EndTime,
+                command.Location,
+                command.Description,
+                command.EstimatedCost,
+                command.Status,
+                destination
+            );
+        }
+
+        public static ValidationResultDto ValidateGet(int travelPlanId, int destinationId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (destinationId <= 0)
+            {
+                return ValidationResultDto.Fail("Destination id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateCalendar(int travelPlanId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateDelete(int travelPlanId, int destinationId, int activityId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            if (destinationId <= 0)
+            {
+                return ValidationResultDto.Fail("Destination id is not valid.");
+            }
+
+            if (activityId <= 0)
+            {
+                return ValidationResultDto.Fail("Activity id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        private static ValidationResultDto ValidateCommon(
+            string title,
+            DateTime activityDate,
+            TimeSpan startTime,
+            TimeSpan endTime,
+            string location,
+            string? description,
+            decimal estimatedCost,
+            ActivityStatus status,
+            Destination destination)
+        {
+            if (string.IsNullOrWhiteSpace(title))
             {
                 return ValidationResultDto.Fail("Activity title is required.");
             }
 
-            if (command.Title.Trim().Length > 120)
+            if (title.Trim().Length > 120)
             {
                 return ValidationResultDto.Fail("Activity title cannot exceed 120 characters.");
             }
 
-            if (command.ActivityDate == default)
+            if (activityDate == default)
             {
                 return ValidationResultDto.Fail("Activity date is required.");
             }
 
-            if (command.ActivityDate.Date < destination.StartDate.Date)
+            if (activityDate.Date < destination.StartDate.Date)
             {
                 return ValidationResultDto.Fail("Activity date cannot be before destination start date.");
             }
 
-            if (command.ActivityDate.Date > destination.EndDate.Date)
+            if (activityDate.Date > destination.EndDate.Date)
             {
                 return ValidationResultDto.Fail("Activity date cannot be after destination end date.");
             }
 
-            if (command.StartTime == default)
+            if (startTime == default)
             {
                 return ValidationResultDto.Fail("Start time is required.");
             }
 
-            if (command.EndTime == default)
+            if (endTime == default)
             {
                 return ValidationResultDto.Fail("End time is required.");
             }
 
-            if (command.StartTime >= command.EndTime)
+            if (startTime >= endTime)
             {
                 return ValidationResultDto.Fail("End time must be after start time.");
             }
 
-            if (string.IsNullOrWhiteSpace(command.Location))
+            if (string.IsNullOrWhiteSpace(location))
             {
                 return ValidationResultDto.Fail("Activity location is required.");
             }
 
-            if (command.Location.Trim().Length > 200)
+            if (location.Trim().Length > 200)
             {
                 return ValidationResultDto.Fail("Activity location cannot exceed 200 characters.");
             }
 
-            if (!string.IsNullOrWhiteSpace(command.Description) &&
-                command.Description.Trim().Length > 1000)
+            if (!string.IsNullOrWhiteSpace(description) &&
+                description.Trim().Length > 1000)
             {
                 return ValidationResultDto.Fail("Activity description cannot exceed 1000 characters.");
             }
 
-            if (command.EstimatedCost < 0)
+            if (estimatedCost < 0)
             {
                 return ValidationResultDto.Fail("Estimated cost cannot be negative.");
             }
 
-            if (!Enum.IsDefined(typeof(ActivityStatus), command.Status))
+            if (!Enum.IsDefined(typeof(ActivityStatus), status))
             {
                 return ValidationResultDto.Fail("Activity status is not valid.");
             }

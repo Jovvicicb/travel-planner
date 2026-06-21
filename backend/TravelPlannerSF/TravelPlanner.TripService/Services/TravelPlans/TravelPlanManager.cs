@@ -33,7 +33,10 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<TravelPlanResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var plan = new TravelPlan
@@ -58,11 +61,13 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
         public async Task<ServiceResultDto<List<TravelPlanListItemDto>>> GetTravelPlansAsync(int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
+            var validation = TravelPlanValidator.ValidateGetAll(requestUserId);
+
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<List<TravelPlanListItemDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -72,6 +77,7 @@ namespace TravelPlanner.TripService.Services.TravelPlans
             {
                 plans = await travelPlanRepository.GetAllAsync();
             }
+            // Regular users see their own plans and plans shared with edit access.
             else
             {
                 var ownerPlans = await travelPlanRepository.GetByOwnerIdAsync(requestUserId);
@@ -102,18 +108,13 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
         public async Task<ServiceResultDto<TravelPlanResponseDto>> GetTravelPlanByIdAsync(int planId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<TravelPlanResponseDto>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
+            var validation = TravelPlanValidator.ValidateGetById(planId, requestUserId);
 
-            if (planId <= 0)
+            if (!validation.IsValid)
             {
                 return ServiceResultDto<TravelPlanResponseDto>.Fail(
-                    "Travel plan id is not valid."
+                    validation.Message,
+                    validation.StatusCode
                 );
             }
 
@@ -149,7 +150,10 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<TravelPlanResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var plan = await travelPlanRepository.GetByIdAsync(command.PlanId);
@@ -190,14 +194,14 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
         public async Task<ServiceResultDto> DeleteTravelPlanAsync(int planId, int requestUserId, bool isAdmin)
         {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto.Fail("Authenticated user is required.", 401);
-            }
+            var validation = TravelPlanValidator.ValidateDelete(planId, requestUserId);
 
-            if (planId <= 0)
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Travel plan id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var plan = await travelPlanRepository.GetByIdAsync(planId);
@@ -222,11 +226,17 @@ namespace TravelPlanner.TripService.Services.TravelPlans
             return ServiceResultDto.Ok("Travel plan deleted successfully.");
         }
 
+        // Used by AuthService when an admin deletes a user account.
         public async Task<ServiceResultDto> DeleteTravelPlansByOwnerAsync(int ownerUserId)
         {
-            if (ownerUserId <= 0)
+            var validation = TravelPlanValidator.ValidateDeleteByOwner(ownerUserId);
+
+            if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail("Owner user id is not valid.");
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var travelPlans = await travelPlanRepository.GetByOwnerIdAsync(ownerUserId);
