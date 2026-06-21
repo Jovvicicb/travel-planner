@@ -43,5 +43,12 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
 
             await context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(Reminder reminder)
+        {
+            context.Reminders.Remove(reminder);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

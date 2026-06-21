@@ -87,6 +87,15 @@ namespace TravelPlanner.NotificationService
             return await manager.CompleteReminderAsync(reminderId, requestUserId, isAdmin);
         }
 
+        public async Task<ServiceResultDto> DeleteReminderAsync(Guid reminderId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
+
+            return await manager.DeleteReminderAsync(reminderId, requestUserId, isAdmin);
+        }
+
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {

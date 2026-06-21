@@ -11,5 +11,7 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
         Task<List<Reminder>> GetByTravelPlanIdAsync(int travelPlanId);
 
         Task UpdateAsync(Reminder reminder);
+
+        Task DeleteAsync(Reminder reminder);
     }
 }

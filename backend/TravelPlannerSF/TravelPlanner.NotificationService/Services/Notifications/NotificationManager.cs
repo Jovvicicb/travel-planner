@@ -244,5 +244,43 @@ namespace TravelPlanner.NotificationService.Services.Notifications
                 "Reminder completed successfully."
             );
         }
+
+        public async Task<ServiceResultDto> DeleteReminderAsync(Guid reminderId, int requestUserId, bool isAdmin)
+        {
+            var validation = ReminderValidator.ValidateReminderAction(reminderId, requestUserId);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
+            }
+
+            var reminder = await reminderRepository.GetByIdAsync(reminderId);
+
+            if (reminder == null)
+            {
+                return ServiceResultDto.Fail("Reminder not found.", 404);
+            }
+
+            var travelPlanResult = await tripService.GetTravelPlanByIdAsync(
+                reminder.TravelPlanId,
+                requestUserId,
+                isAdmin
+            );
+
+            if (!travelPlanResult.Success)
+            {
+                return ServiceResultDto.Fail(
+                    travelPlanResult.Message,
+                    travelPlanResult.StatusCode
+                );
+            }
+
+            await reminderRepository.DeleteAsync(reminder);
+
+            return ServiceResultDto.Ok("Reminder deleted successfully.");
+        }
     }
 }

@@ -3,7 +3,6 @@
     public enum ReminderStatus
     {
         Pending = 0,
-        Completed = 1,
-        Cancelled = 2
+        Completed = 1
     }
 }
