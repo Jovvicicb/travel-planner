@@ -96,6 +96,50 @@ namespace TravelPlanner.Api.Controllers
             return ResponseHelper.Send(this, result);
         }
 
+        [HttpGet("trip/{tripId:int}/active")]
+        public async Task<IActionResult> GetActiveByTravelPlan(int tripId)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await notificationService.GetActiveRemindersByTravelPlanAsync(
+                tripId,
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
+
+        [HttpGet("trip/{tripId:int}/completed")]
+        public async Task<IActionResult> GetCompletedByTravelPlan(int tripId)
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await notificationService.GetCompletedRemindersByTravelPlanAsync(
+                tripId,
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
+
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReminderRequestDto request)
         {

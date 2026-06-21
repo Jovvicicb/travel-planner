@@ -1,4 +1,5 @@
-﻿using TravelPlanner.NotificationService.Entities.Notifications;
+﻿using TravelPlanner.Contracts.Enums;
+using TravelPlanner.NotificationService.Entities.Notifications;
 
 namespace TravelPlanner.NotificationService.Repositories.Notifications
 {
@@ -9,6 +10,8 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
         Task<Reminder?> GetByIdAsync(Guid reminderId);
 
         Task<List<Reminder>> GetByTravelPlanIdAsync(int travelPlanId);
+
+        Task<List<Reminder>> GetByTravelPlanIdAndStatusAsync(int travelPlanId, ReminderStatus status);
 
         Task UpdateAsync(Reminder reminder);
 

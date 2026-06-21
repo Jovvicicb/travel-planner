@@ -11,7 +11,6 @@ using TravelPlanner.Contracts.Interfaces.Notifications;
 using TravelPlanner.NotificationService.Data;
 using TravelPlanner.NotificationService.Repositories.Notifications;
 using TravelPlanner.NotificationService.Services.Notifications;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TravelPlanner.NotificationService
 {
@@ -67,6 +66,24 @@ namespace TravelPlanner.NotificationService
             var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
 
             return await manager.GetRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
+        }
+
+        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetActiveRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
+
+            return await manager.GetActiveRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
+        }
+
+        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetCompletedRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
+
+            return await manager.GetCompletedRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
         }
 
         public async Task<ServiceResultDto<ReminderResponseDto>> UpdateReminderAsync(UpdateReminderCommandDto command)

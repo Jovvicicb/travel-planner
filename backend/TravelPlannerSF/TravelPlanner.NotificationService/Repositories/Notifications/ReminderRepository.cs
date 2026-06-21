@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.Contracts.Enums;
 using TravelPlanner.NotificationService.Data;
 using TravelPlanner.NotificationService.Entities.Notifications;
 
@@ -32,6 +33,17 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
         {
             return await context.Reminders
                 .Where(reminder => reminder.TravelPlanId == travelPlanId)
+                .OrderBy(reminder => reminder.ReminderAt)
+                .ThenByDescending(reminder => reminder.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<Reminder>> GetByTravelPlanIdAndStatusAsync(int travelPlanId, ReminderStatus status)
+        {
+            return await context.Reminders
+                .Where(reminder =>
+                    reminder.TravelPlanId == travelPlanId &&
+                    reminder.Status == status)
                 .OrderBy(reminder => reminder.ReminderAt)
                 .ThenByDescending(reminder => reminder.CreatedAt)
                 .ToListAsync();
