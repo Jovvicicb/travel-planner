@@ -24,13 +24,17 @@ namespace TravelPlanner.AuthService.Services.Auth
             this.jwtTokenGenerator = jwtTokenGenerator;
         }
 
+        // Authentication
         public async Task<ServiceResultDto<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)
         {
             var validation = AuthValidator.ValidateRegister(request);
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<AuthResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<AuthResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var normalizedEmail = request.Email.Trim().ToLower();
@@ -67,7 +71,10 @@ namespace TravelPlanner.AuthService.Services.Auth
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<AuthResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<AuthResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var normalizedEmail = request.Email.Trim().ToLower();
@@ -110,6 +117,8 @@ namespace TravelPlanner.AuthService.Services.Auth
             );
         }
 
+
+        // Admin user management
         public async Task<ServiceResultDto<List<AdminUserResponseDto>>> GetUsersAsync()
         {
             var users = await userRepository.GetAllAsync();
@@ -130,7 +139,10 @@ namespace TravelPlanner.AuthService.Services.Auth
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<AdminUserResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<AdminUserResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var user = await userRepository.GetByIdAsync(userId);
@@ -152,7 +164,10 @@ namespace TravelPlanner.AuthService.Services.Auth
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto<AdminUserResponseDto>.Fail(validation.Message);
+                return ServiceResultDto<AdminUserResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var user = await userRepository.GetByIdAsync(userId);
@@ -178,7 +193,10 @@ namespace TravelPlanner.AuthService.Services.Auth
 
             if (!validation.IsValid)
             {
-                return ServiceResultDto.Fail(validation.Message);
+                return ServiceResultDto.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
             }
 
             var user = await userRepository.GetByIdAsync(userId);

@@ -141,5 +141,5 @@ namespace TravelPlanner.AuthService.Validation.Auth
 
             return ValidationResultDto.Success();
         }
-  }
+    }
 }
