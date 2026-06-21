@@ -11,6 +11,7 @@ using TravelPlanner.Contracts.Interfaces.Notifications;
 using TravelPlanner.NotificationService.Data;
 using TravelPlanner.NotificationService.Repositories.Notifications;
 using TravelPlanner.NotificationService.Services.Notifications;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TravelPlanner.NotificationService
 {
@@ -76,6 +77,16 @@ namespace TravelPlanner.NotificationService
 
             return await manager.UpdateReminderAsync(command);
         }
+
+        public async Task<ServiceResultDto<ReminderResponseDto>> CompleteReminderAsync(Guid reminderId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
+
+            return await manager.CompleteReminderAsync(reminderId, requestUserId, isAdmin);
+        }
+
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {

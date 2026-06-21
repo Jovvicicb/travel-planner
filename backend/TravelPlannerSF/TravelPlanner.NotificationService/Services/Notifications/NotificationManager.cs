@@ -192,5 +192,57 @@ namespace TravelPlanner.NotificationService.Services.Notifications
                 "Reminder updated successfully."
             );
         }
+
+        public async Task<ServiceResultDto<ReminderResponseDto>> CompleteReminderAsync(Guid reminderId, int requestUserId, bool isAdmin)
+        {
+            var validation = ReminderValidator.ValidateReminderAction(reminderId, requestUserId);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
+            }
+
+            var reminder = await reminderRepository.GetByIdAsync(reminderId);
+
+            if (reminder == null)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail("Reminder not found.", 404);
+            }
+
+            var travelPlanResult = await tripService.GetTravelPlanByIdAsync(
+                reminder.TravelPlanId,
+                requestUserId,
+                isAdmin
+            );
+
+            if (!travelPlanResult.Success)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail(
+                    travelPlanResult.Message,
+                    travelPlanResult.StatusCode
+                );
+            }
+
+            if (reminder.Status == ReminderStatus.Completed)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Ok(
+                    ReminderMapper.ToResponse(reminder),
+                    "Reminder is already completed."
+                );
+            }
+
+            reminder.Status = ReminderStatus.Completed;
+            reminder.CompletedAt = DateTime.UtcNow;
+
+            await reminderRepository.UpdateAsync(reminder);
+
+            return ServiceResultDto<ReminderResponseDto>.Ok(
+                ReminderMapper.ToResponse(reminder),
+                "Reminder completed successfully."
+            );
+        }
     }
 }

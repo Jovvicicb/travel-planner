@@ -113,5 +113,20 @@ namespace TravelPlanner.NotificationService.Validation.Notifications
 
             return ValidationResultDto.Success();
         }
+
+        public static ValidationResultDto ValidateReminderAction(Guid reminderId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (reminderId == Guid.Empty)
+            {
+                return ValidationResultDto.Fail("Reminder id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
     }
 }
