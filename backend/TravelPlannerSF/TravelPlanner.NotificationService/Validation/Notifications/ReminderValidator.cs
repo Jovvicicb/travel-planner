@@ -22,33 +22,35 @@ namespace TravelPlanner.NotificationService.Validation.Notifications
                 return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (string.IsNullOrWhiteSpace(command.Title))
+            return ValidateReminderData(
+                command.Title,
+                command.Description,
+                command.ReminderAt
+            );
+        }
+
+        public static ValidationResultDto ValidateUpdate(UpdateReminderCommandDto command)
+        {
+            if (command == null)
             {
-                return ValidationResultDto.Fail("Reminder title is required.");
+                return ValidationResultDto.Fail("Reminder data is required.");
             }
 
-            if (command.Title.Trim().Length > 150)
+            if (command.ReminderId == Guid.Empty)
             {
-                return ValidationResultDto.Fail("Reminder title cannot exceed 150 characters.");
+                return ValidationResultDto.Fail("Reminder id is not valid.");
             }
 
-            if (!string.IsNullOrWhiteSpace(command.Description) &&
-                command.Description.Trim().Length > 1000)
+            if (command.RequestUserId <= 0)
             {
-                return ValidationResultDto.Fail("Reminder description cannot exceed 1000 characters.");
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
             }
 
-            if (command.ReminderAt == default)
-            {
-                return ValidationResultDto.Fail("Reminder date is required.");
-            }
-
-            if (command.ReminderAt <= DateTime.UtcNow)
-            {
-                return ValidationResultDto.Fail("Reminder date must be in the future.");
-            }
-
-            return ValidationResultDto.Success();
+            return ValidateReminderData(
+                command.Title,
+                command.Description,
+                command.ReminderAt
+            );
         }
 
         public static ValidationResultDto ValidateGet(Guid reminderId, int requestUserId)
@@ -76,6 +78,37 @@ namespace TravelPlanner.NotificationService.Validation.Notifications
             if (travelPlanId <= 0)
             {
                 return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        private static ValidationResultDto ValidateReminderData(string title, string? description, DateTime reminderAt)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                return ValidationResultDto.Fail("Reminder title is required.");
+            }
+
+            if (title.Trim().Length > 150)
+            {
+                return ValidationResultDto.Fail("Reminder title cannot exceed 150 characters.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(description) &&
+                description.Trim().Length > 1000)
+            {
+                return ValidationResultDto.Fail("Reminder description cannot exceed 1000 characters.");
+            }
+
+            if (reminderAt == default)
+            {
+                return ValidationResultDto.Fail("Reminder date is required.");
+            }
+
+            if (reminderAt <= DateTime.UtcNow)
+            {
+                return ValidationResultDto.Fail("Reminder date must be in the future.");
             }
 
             return ValidationResultDto.Success();

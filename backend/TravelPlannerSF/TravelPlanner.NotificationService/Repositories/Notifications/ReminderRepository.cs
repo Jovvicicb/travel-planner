@@ -36,5 +36,12 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
                 .ThenByDescending(reminder => reminder.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task UpdateAsync(Reminder reminder)
+        {
+            context.Reminders.Update(reminder);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

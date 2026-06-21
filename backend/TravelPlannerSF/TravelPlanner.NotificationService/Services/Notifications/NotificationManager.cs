@@ -148,5 +148,49 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             );
         }
 
+        public async Task<ServiceResultDto<ReminderResponseDto>> UpdateReminderAsync(UpdateReminderCommandDto command)
+        {
+            var validation = ReminderValidator.ValidateUpdate(command);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
+            }
+
+            var reminder = await reminderRepository.GetByIdAsync(command.ReminderId);
+
+            if (reminder == null)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail("Reminder not found.", 404);
+            }
+
+            var travelPlanResult = await tripService.GetTravelPlanByIdAsync(
+                reminder.TravelPlanId,
+                command.RequestUserId,
+                command.IsAdmin
+            );
+
+            if (!travelPlanResult.Success)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail(
+                    travelPlanResult.Message,
+                    travelPlanResult.StatusCode
+                );
+            }
+
+            reminder.Title = command.Title.Trim();
+            reminder.Description = command.Description?.Trim();
+            reminder.ReminderAt = command.ReminderAt;
+
+            await reminderRepository.UpdateAsync(reminder);
+
+            return ServiceResultDto<ReminderResponseDto>.Ok(
+                ReminderMapper.ToResponse(reminder),
+                "Reminder updated successfully."
+            );
+        }
     }
 }
