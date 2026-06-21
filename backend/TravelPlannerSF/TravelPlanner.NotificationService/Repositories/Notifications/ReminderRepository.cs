@@ -1,4 +1,5 @@
-﻿using TravelPlanner.NotificationService.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TravelPlanner.NotificationService.Data;
 using TravelPlanner.NotificationService.Entities.Notifications;
 
 namespace TravelPlanner.NotificationService.Repositories.Notifications
@@ -19,6 +20,21 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
             await context.SaveChangesAsync();
 
             return reminder;
+        }
+
+        public async Task<Reminder?> GetByIdAsync(Guid reminderId)
+        {
+            return await context.Reminders
+                .FirstOrDefaultAsync(reminder => reminder.Id == reminderId);
+        }
+
+        public async Task<List<Reminder>> GetByTravelPlanIdAsync(int travelPlanId)
+        {
+            return await context.Reminders
+                .Where(reminder => reminder.TravelPlanId == travelPlanId)
+                .OrderBy(reminder => reminder.ReminderAt)
+                .ThenByDescending(reminder => reminder.CreatedAt)
+                .ToListAsync();
         }
     }
 }

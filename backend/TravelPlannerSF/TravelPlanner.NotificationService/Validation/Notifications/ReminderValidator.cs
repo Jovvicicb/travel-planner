@@ -50,5 +50,35 @@ namespace TravelPlanner.NotificationService.Validation.Notifications
 
             return ValidationResultDto.Success();
         }
+
+        public static ValidationResultDto ValidateGet(Guid reminderId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (reminderId == Guid.Empty)
+            {
+                return ValidationResultDto.Fail("Reminder id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
+        public static ValidationResultDto ValidateGetByTravelPlan(int travelPlanId, int requestUserId)
+        {
+            if (requestUserId <= 0)
+            {
+                return ValidationResultDto.Fail("Authenticated user is required.", 401);
+            }
+
+            if (travelPlanId <= 0)
+            {
+                return ValidationResultDto.Fail("Travel plan id is not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
     }
 }

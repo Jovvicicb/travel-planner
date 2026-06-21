@@ -50,6 +50,24 @@ namespace TravelPlanner.NotificationService
             return await manager.CreateReminderAsync(command);
         }
 
+        public async Task<ServiceResultDto<ReminderResponseDto>> GetReminderAsync(Guid reminderId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
+
+            return await manager.GetReminderAsync(reminderId, requestUserId, isAdmin);
+        }
+
+        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
+
+            return await manager.GetRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
+        }
+
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             return this.CreateServiceRemotingReplicaListeners();

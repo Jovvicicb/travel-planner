@@ -70,5 +70,83 @@ namespace TravelPlanner.NotificationService.Services.Notifications
                 "Reminder created successfully."
             );
         }
+
+        public async Task<ServiceResultDto<ReminderResponseDto>> GetReminderAsync(Guid reminderId, int requestUserId, bool isAdmin)
+        {
+            var validation = ReminderValidator.ValidateGet(reminderId, requestUserId);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
+            }
+
+            var reminder = await reminderRepository.GetByIdAsync(reminderId);
+
+            if (reminder == null)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail("Reminder not found.", 404);
+            }
+
+            var travelPlanResult = await tripService.GetTravelPlanByIdAsync(
+                reminder.TravelPlanId,
+                requestUserId,
+                isAdmin
+            );
+
+            if (!travelPlanResult.Success)
+            {
+                return ServiceResultDto<ReminderResponseDto>.Fail(
+                    travelPlanResult.Message,
+                    travelPlanResult.StatusCode
+                );
+            }
+
+            return ServiceResultDto<ReminderResponseDto>.Ok(
+                ReminderMapper.ToResponse(reminder),
+                "Reminder fetched successfully."
+            );
+        }
+
+        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        {
+            var validation = ReminderValidator.ValidateGetByTravelPlan(travelPlanId, requestUserId);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<List<ReminderResponseDto>>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
+            }
+
+            var travelPlanResult = await tripService.GetTravelPlanByIdAsync(
+                travelPlanId,
+                requestUserId,
+                isAdmin
+            );
+
+            if (!travelPlanResult.Success)
+            {
+                return ServiceResultDto<List<ReminderResponseDto>>.Fail(
+                    travelPlanResult.Message,
+                    travelPlanResult.StatusCode
+                );
+            }
+
+            var reminders = await reminderRepository.GetByTravelPlanIdAsync(travelPlanId);
+
+            var response = reminders
+                .Select(ReminderMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<ReminderResponseDto>>.Ok(
+                response,
+                "Reminders fetched successfully."
+            );
+        }
+
     }
 }

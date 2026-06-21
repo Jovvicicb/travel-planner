@@ -8,5 +8,9 @@ namespace TravelPlanner.Contracts.Interfaces.Notifications
     public interface INotificationService : IService
     {
         Task<ServiceResultDto<ReminderResponseDto>> CreateReminderAsync(CreateReminderCommandDto command);
+
+        Task<ServiceResultDto<ReminderResponseDto>> GetReminderAsync(Guid reminderId, int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto<List<ReminderResponseDto>>> GetRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin);
     }
 }
