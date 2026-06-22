@@ -6,6 +6,7 @@ using TravelPlanner.Contracts.Interfaces.Trips;
 using TravelPlanner.NotificationService.Entities.Notifications;
 using TravelPlanner.NotificationService.Mapping.Notifications;
 using TravelPlanner.NotificationService.Repositories.Notifications;
+using TravelPlanner.NotificationService.Services.State;
 using TravelPlanner.NotificationService.Validation.Notifications;
 
 namespace TravelPlanner.NotificationService.Services.Notifications
@@ -16,9 +17,12 @@ namespace TravelPlanner.NotificationService.Services.Notifications
 
         private readonly ITripService tripService;
 
-        public NotificationManager(IReminderRepository reminderRepository)
+        private readonly IReminderStateStore reminderStateStore;
+
+        public NotificationManager(IReminderRepository reminderRepository, IReminderStateStore reminderStateStore)
         {
             this.reminderRepository = reminderRepository;
+            this.reminderStateStore = reminderStateStore;
 
             this.tripService = ServiceProxy.Create<ITripService>(
                 new Uri("fabric:/TravelPlannerSF/TravelPlanner.TripService")
@@ -64,6 +68,8 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             };
 
             var createdReminder = await reminderRepository.CreateAsync(reminder);
+
+            await reminderStateStore.UpsertAsync(ReminderMapper.ToState(createdReminder));
 
             return ServiceResultDto<ReminderResponseDto>.Created(
                 ReminderMapper.ToResponse(createdReminder),
@@ -250,6 +256,13 @@ namespace TravelPlanner.NotificationService.Services.Notifications
 
             await reminderRepository.UpdateAsync(reminder);
 
+            if (reminder.Status == ReminderStatus.Pending)
+            {
+                await reminderStateStore.UpsertAsync(
+                    ReminderMapper.ToState(reminder)
+                );
+            }
+
             return ServiceResultDto<ReminderResponseDto>.Ok(
                 ReminderMapper.ToResponse(reminder),
                 "Reminder updated successfully."
@@ -302,6 +315,8 @@ namespace TravelPlanner.NotificationService.Services.Notifications
 
             await reminderRepository.UpdateAsync(reminder);
 
+            await reminderStateStore.RemoveAsync(reminder.Id);
+
             return ServiceResultDto<ReminderResponseDto>.Ok(
                 ReminderMapper.ToResponse(reminder),
                 "Reminder completed successfully."
@@ -342,6 +357,8 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             }
 
             await reminderRepository.DeleteAsync(reminder);
+
+            await reminderStateStore.RemoveAsync(reminder.Id);
 
             return ServiceResultDto.Ok("Reminder deleted successfully.");
         }

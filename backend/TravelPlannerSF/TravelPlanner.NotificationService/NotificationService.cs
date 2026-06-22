@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
@@ -11,6 +12,7 @@ using TravelPlanner.Contracts.Interfaces.Notifications;
 using TravelPlanner.NotificationService.Data;
 using TravelPlanner.NotificationService.Repositories.Notifications;
 using TravelPlanner.NotificationService.Services.Notifications;
+using TravelPlanner.NotificationService.Services.State;
 
 namespace TravelPlanner.NotificationService
 {
@@ -36,6 +38,8 @@ namespace TravelPlanner.NotificationService
             });
 
             services.AddScoped<IReminderRepository, ReminderRepository>();
+            services.AddSingleton<IReliableStateManager>(this.StateManager);
+            services.AddScoped<IReminderStateStore, ReminderStateStore>();
             services.AddScoped<INotificationManager, NotificationManager>();
 
             this.serviceProvider = services.BuildServiceProvider();
