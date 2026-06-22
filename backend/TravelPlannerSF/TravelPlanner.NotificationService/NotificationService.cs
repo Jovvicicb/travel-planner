@@ -12,6 +12,7 @@ using TravelPlanner.Contracts.Interfaces.Notifications;
 using TravelPlanner.NotificationService.Data;
 using TravelPlanner.NotificationService.Repositories.Notifications;
 using TravelPlanner.NotificationService.Services.Notifications;
+using TravelPlanner.NotificationService.Services.Processing;
 using TravelPlanner.NotificationService.Services.State;
 
 namespace TravelPlanner.NotificationService
@@ -41,6 +42,7 @@ namespace TravelPlanner.NotificationService
             services.AddSingleton<IReliableStateManager>(this.StateManager);
             services.AddScoped<IReminderStateStore, ReminderStateStore>();
             services.AddScoped<INotificationManager, NotificationManager>();
+            services.AddScoped<IReminderProcessor, ReminderProcessor>();
 
             this.serviceProvider = services.BuildServiceProvider();
         }
@@ -130,6 +132,20 @@ namespace TravelPlanner.NotificationService
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             return this.CreateServiceRemotingReplicaListeners();
+        }
+
+        protected override async Task RunAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                using var scope = serviceProvider.CreateScope();
+
+                var reminderProcessor = scope.ServiceProvider.GetRequiredService<IReminderProcessor>();
+
+                await reminderProcessor.ProcessDueRemindersAsync();
+
+                await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+            }
         }
     }
 }
