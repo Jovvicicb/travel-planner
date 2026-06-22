@@ -13,6 +13,8 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
 
         Task<List<Reminder>> GetByTravelPlanIdAndStatusAsync(int travelPlanId, ReminderStatus status);
 
+        Task<List<Reminder>> GetByStatusAsync(ReminderStatus status);
+
         Task UpdateAsync(Reminder reminder);
 
         Task DeleteAsync(Reminder reminder);

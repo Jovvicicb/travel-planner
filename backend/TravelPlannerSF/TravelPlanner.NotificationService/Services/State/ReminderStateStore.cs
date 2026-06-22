@@ -76,5 +76,17 @@ namespace TravelPlanner.NotificationService.Services.State
                 .OrderBy(reminder => reminder.ReminderAt)
                 .ToList();
         }
+
+        public async Task ClearAsync()
+        {
+            var dictionary = await stateManager.GetOrAddAsync<IReliableDictionary<Guid, ReminderState>>(
+                RemindersDictionaryName
+            );
+
+            await dictionary.ClearAsync(
+                TimeSpan.FromSeconds(10),
+                CancellationToken.None
+            );
+        }
     }
 }

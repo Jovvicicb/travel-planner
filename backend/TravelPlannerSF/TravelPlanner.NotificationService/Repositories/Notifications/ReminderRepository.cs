@@ -49,6 +49,14 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
                 .ToListAsync();
         }
 
+        public async Task<List<Reminder>> GetByStatusAsync(ReminderStatus status)
+        {
+            return await context.Reminders
+                .Where(reminder => reminder.Status == status)
+                .OrderBy(reminder => reminder.ReminderAt)
+                .ToListAsync();
+        }
+
         public async Task UpdateAsync(Reminder reminder)
         {
             context.Reminders.Update(reminder);

@@ -13,6 +13,7 @@ using TravelPlanner.NotificationService.Data;
 using TravelPlanner.NotificationService.Repositories.Notifications;
 using TravelPlanner.NotificationService.Services.Notifications;
 using TravelPlanner.NotificationService.Services.Processing;
+using TravelPlanner.NotificationService.Services.Recovery;
 using TravelPlanner.NotificationService.Services.State;
 
 namespace TravelPlanner.NotificationService
@@ -20,6 +21,7 @@ namespace TravelPlanner.NotificationService
     internal sealed class NotificationService : StatefulService, INotificationService
     {
         private readonly IServiceProvider serviceProvider;
+        private bool stateRecovered;
 
         public NotificationService(StatefulServiceContext context)
             : base(context)
@@ -43,6 +45,7 @@ namespace TravelPlanner.NotificationService
             services.AddScoped<IReminderStateStore, ReminderStateStore>();
             services.AddScoped<INotificationManager, NotificationManager>();
             services.AddScoped<IReminderProcessor, ReminderProcessor>();
+            services.AddScoped<IReminderStateRecoveryService, ReminderStateRecoveryService>();
 
             this.serviceProvider = services.BuildServiceProvider();
         }
@@ -136,6 +139,17 @@ namespace TravelPlanner.NotificationService
 
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
+            if (!stateRecovered)
+            {
+                using var recoveryScope = serviceProvider.CreateScope();
+
+                var recoveryService = recoveryScope.ServiceProvider.GetRequiredService<IReminderStateRecoveryService>();
+
+                await recoveryService.RecoverAsync();
+
+                stateRecovered = true;
+            }
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 using var scope = serviceProvider.CreateScope();
