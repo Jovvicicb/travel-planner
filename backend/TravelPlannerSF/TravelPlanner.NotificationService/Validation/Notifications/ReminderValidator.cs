@@ -106,7 +106,7 @@ namespace TravelPlanner.NotificationService.Validation.Notifications
                 return ValidationResultDto.Fail("Reminder date is required.");
             }
 
-            if (reminderAt <= DateTime.UtcNow)
+            if (reminderAt <= DateTime.Now)
             {
                 return ValidationResultDto.Fail("Reminder date must be in the future.");
             }

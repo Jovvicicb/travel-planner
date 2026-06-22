@@ -20,5 +20,7 @@ namespace TravelPlanner.NotificationService.Services.Notifications
         Task<ServiceResultDto<ReminderResponseDto>> CompleteReminderAsync(Guid reminderId, int requestUserId, bool isAdmin);
 
         Task<ServiceResultDto> DeleteReminderAsync(Guid reminderId, int requestUserId, bool isAdmin);
+
+        Task<ServiceResultDto<List<ReminderResponseDto>>> GetDueRemindersAsync(int requestUserId, bool isAdmin);
     }
 }

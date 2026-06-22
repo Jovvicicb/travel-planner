@@ -7,5 +7,7 @@ namespace TravelPlanner.NotificationService.Services.State
         Task UpsertAsync(ReminderState reminder);
 
         Task RemoveAsync(Guid reminderId);
+
+        Task<List<ReminderState>> GetDueAsync(DateTime currentTime);
     }
 }

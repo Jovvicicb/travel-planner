@@ -1,5 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
+using TravelPlanner.Contracts.Enums;
 using TravelPlanner.NotificationService.State;
 
 namespace TravelPlanner.NotificationService.Services.State
@@ -44,6 +45,36 @@ namespace TravelPlanner.NotificationService.Services.State
             await dictionary.TryRemoveAsync(transaction, reminderId);
 
             await transaction.CommitAsync();
+        }
+
+        public async Task<List<ReminderState>> GetDueAsync(DateTime currentTime)
+        {
+            var dictionary = await stateManager.GetOrAddAsync<IReliableDictionary<Guid, ReminderState>>(
+                RemindersDictionaryName
+            );
+
+            using var transaction = stateManager.CreateTransaction();
+
+            var enumerable = await dictionary.CreateEnumerableAsync(transaction);
+
+            var enumerator = enumerable.GetAsyncEnumerator();
+
+            var dueReminders = new List<ReminderState>();
+
+            while (await enumerator.MoveNextAsync(CancellationToken.None))
+            {
+                var reminder = enumerator.Current.Value;
+
+                if (reminder.Status == ReminderStatus.Pending &&
+                    reminder.ReminderAt <= currentTime)
+                {
+                    dueReminders.Add(reminder);
+                }
+            }
+
+            return dueReminders
+                .OrderBy(reminder => reminder.ReminderAt)
+                .ToList();
         }
     }
 }

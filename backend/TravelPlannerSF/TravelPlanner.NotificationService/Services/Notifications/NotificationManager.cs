@@ -362,5 +362,28 @@ namespace TravelPlanner.NotificationService.Services.Notifications
 
             return ServiceResultDto.Ok("Reminder deleted successfully.");
         }
+
+        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetDueRemindersAsync(int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<ReminderResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            var dueReminders = await reminderStateStore.GetDueAsync(DateTime.Now);
+
+            var response = dueReminders
+                .Where(reminder => isAdmin || reminder.UserId == requestUserId)
+                .Select(ReminderMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<ReminderResponseDto>>.Ok(
+                response,
+                "Due reminders fetched successfully."
+            );
+        }
     }
 }
