@@ -8,7 +8,7 @@ namespace TravelPlanner.NotificationService.Services.State
 
         Task RemoveAsync(Guid reminderId);
 
-        Task<List<ReminderState>> GetDueAsync(DateTime currentTime);
+        Task<List<ReminderState>> GetReadyToTriggerAsync(DateTime currentTime);
 
         Task ClearAsync();
     }

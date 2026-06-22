@@ -47,7 +47,7 @@ namespace TravelPlanner.NotificationService.Services.State
             await transaction.CommitAsync();
         }
 
-        public async Task<List<ReminderState>> GetDueAsync(DateTime currentTime)
+        public async Task<List<ReminderState>> GetReadyToTriggerAsync(DateTime currentTime)
         {
             var dictionary = await stateManager.GetOrAddAsync<IReliableDictionary<Guid, ReminderState>>(
                 RemindersDictionaryName

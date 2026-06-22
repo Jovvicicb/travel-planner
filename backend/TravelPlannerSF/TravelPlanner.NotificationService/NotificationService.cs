@@ -86,6 +86,15 @@ namespace TravelPlanner.NotificationService
             return await manager.GetActiveRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
         }
 
+        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetTriggeredRemindersAsync(int requestUserId, bool isAdmin)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
+
+            return await manager.GetTriggeredRemindersAsync(requestUserId, isAdmin);
+        }
+
         public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetCompletedRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
             using var scope = serviceProvider.CreateScope();
@@ -121,16 +130,6 @@ namespace TravelPlanner.NotificationService
 
             return await manager.DeleteReminderAsync(reminderId, requestUserId, isAdmin);
         }
-
-        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetDueRemindersAsync(int requestUserId, bool isAdmin)
-        {
-            using var scope = serviceProvider.CreateScope();
-
-            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
-
-            return await manager.GetDueRemindersAsync(requestUserId, isAdmin);
-        }
-
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {

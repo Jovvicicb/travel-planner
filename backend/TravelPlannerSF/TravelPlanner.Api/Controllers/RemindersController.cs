@@ -118,6 +118,27 @@ namespace TravelPlanner.Api.Controllers
             return ResponseHelper.Send(this, result);
         }
 
+        [HttpGet("triggered")]
+        public async Task<IActionResult> GetTriggered()
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await notificationService.GetTriggeredRemindersAsync(
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
+
         [HttpGet("trip/{tripId:int}/completed")]
         public async Task<IActionResult> GetCompletedByTravelPlan(int tripId)
         {
@@ -205,27 +226,6 @@ namespace TravelPlanner.Api.Controllers
 
             var result = await notificationService.DeleteReminderAsync(
                 id,
-                userContext.Value.UserId,
-                userContext.Value.IsAdmin
-            );
-
-            return ResponseHelper.Send(this, result);
-        }
-
-        [HttpGet("due")]
-        public async Task<IActionResult> GetDue()
-        {
-            var userContext = UserContextHelper.GetUserContext(User);
-
-            if (userContext == null)
-            {
-                return ResponseHelper.Send(
-                    this,
-                    ServiceResultDto.Fail("Invalid authentication token.", 401)
-                );
-            }
-
-            var result = await notificationService.GetDueRemindersAsync(
                 userContext.Value.UserId,
                 userContext.Value.IsAdmin
             );

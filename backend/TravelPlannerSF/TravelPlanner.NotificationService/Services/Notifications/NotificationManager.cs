@@ -165,6 +165,29 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             );
         }
 
+        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetTriggeredRemindersAsync(int requestUserId, bool isAdmin)
+        {
+            if (requestUserId <= 0)
+            {
+                return ServiceResultDto<List<ReminderResponseDto>>.Fail(
+                    "Authenticated user is required.",
+                    401
+                );
+            }
+
+            var reminders = await reminderRepository.GetByStatusAsync(ReminderStatus.Triggered);
+
+            var response = reminders
+                .Where(reminder => isAdmin || reminder.UserId == requestUserId)
+                .Select(ReminderMapper.ToResponse)
+                .ToList();
+
+            return ServiceResultDto<List<ReminderResponseDto>>.Ok(
+                response,
+                "Triggered reminders fetched successfully."
+            );
+        }
+
         public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetCompletedRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
         {
             return await GetRemindersByStatusAsync(
@@ -253,15 +276,12 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             reminder.Title = command.Title.Trim();
             reminder.Description = command.Description?.Trim();
             reminder.ReminderAt = command.ReminderAt;
+            reminder.Status = ReminderStatus.Pending;
+            reminder.CompletedAt = null;
 
             await reminderRepository.UpdateAsync(reminder);
 
-            if (reminder.Status == ReminderStatus.Pending)
-            {
-                await reminderStateStore.UpsertAsync(
-                    ReminderMapper.ToState(reminder)
-                );
-            }
+            await reminderStateStore.UpsertAsync(ReminderMapper.ToState(reminder));
 
             return ServiceResultDto<ReminderResponseDto>.Ok(
                 ReminderMapper.ToResponse(reminder),
@@ -361,29 +381,6 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             await reminderStateStore.RemoveAsync(reminder.Id);
 
             return ServiceResultDto.Ok("Reminder deleted successfully.");
-        }
-
-        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetDueRemindersAsync(int requestUserId, bool isAdmin)
-        {
-            if (requestUserId <= 0)
-            {
-                return ServiceResultDto<List<ReminderResponseDto>>.Fail(
-                    "Authenticated user is required.",
-                    401
-                );
-            }
-
-            var dueReminders = await reminderStateStore.GetDueAsync(DateTime.Now);
-
-            var response = dueReminders
-                .Where(reminder => isAdmin || reminder.UserId == requestUserId)
-                .Select(ReminderMapper.ToResponse)
-                .ToList();
-
-            return ServiceResultDto<List<ReminderResponseDto>>.Ok(
-                response,
-                "Due reminders fetched successfully."
-            );
         }
     }
 }

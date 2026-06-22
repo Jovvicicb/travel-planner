@@ -19,9 +19,9 @@ namespace TravelPlanner.NotificationService.Services.Processing
 
         public async Task ProcessDueRemindersAsync()
         {
-            var dueReminders = await reminderStateStore.GetDueAsync(DateTime.Now);
+            var remindersToTrigger = await reminderStateStore.GetReadyToTriggerAsync(DateTime.Now);
 
-            foreach (var reminderState in dueReminders)
+            foreach (var reminderState in remindersToTrigger)
             {
                 var reminder = await reminderRepository.GetByIdAsync(reminderState.Id);
 
@@ -37,8 +37,8 @@ namespace TravelPlanner.NotificationService.Services.Processing
                     continue;
                 }
 
-                reminder.Status = ReminderStatus.Completed;
-                reminder.CompletedAt = DateTime.UtcNow;
+                reminder.Status = ReminderStatus.Triggered;
+                reminder.CompletedAt = null;
 
                 await reminderRepository.UpdateAsync(reminder);
                 await reminderStateStore.RemoveAsync(reminder.Id);
