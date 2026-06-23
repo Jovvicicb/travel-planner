@@ -1,4 +1,4 @@
-export function createRegisterRequest() {
+export function createRegisterFormModel() {
   return {
     fullName: "",
     email: "",

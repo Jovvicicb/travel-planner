@@ -80,7 +80,20 @@ export function AuthProvider({ children }) {
     setAuthError("");
 
     try {
-      return await authService.register(data);
+      const result = await authService.register(data);
+
+      const receivedToken = result.data?.token;
+      const currentUser = result.data?.user;
+
+      if (!receivedToken || !currentUser) {
+        throw new Error("Registration response does not contain token or user data.");
+      }
+
+      saveAccessToken(receivedToken);
+      setToken(receivedToken);
+      setUser(currentUser);
+
+      return currentUser;
     } catch (error) {
       setAuthError(error.message);
       throw error;

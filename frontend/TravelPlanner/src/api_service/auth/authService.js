@@ -4,15 +4,15 @@ import { API_ROUTES } from "../apiRoutes";
 export const authService = {
   register(data) {
     return apiClient.post(API_ROUTES.auth.register, {
-      fullName: data.fullName,
-      email: data.email,
+      fullName: data.fullName.trim(),
+      email: data.email.trim(),
       password: data.password,
     });
   },
 
   login(data) {
     return apiClient.post(API_ROUTES.auth.login, {
-      email: data.email,
+      email: data.email.trim(),
       password: data.password,
     });
   },

@@ -35,6 +35,20 @@ namespace TravelPlanner.Api
                                     .UseUrls(url);
                         builder.Services.AddControllers();
 
+                        builder.Services.AddCors(options =>
+                        {
+                            options.AddPolicy("ReactClient", policy =>
+                            {
+                                policy
+                                    .WithOrigins(
+                                        "http://localhost:5173",
+                                        "http://localhost:5174"
+                                    )
+                                    .AllowAnyHeader()
+                                    .AllowAnyMethod();
+                            });
+                        });
+
                         builder.Configuration
                             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                             .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
@@ -100,6 +114,9 @@ namespace TravelPlanner.Api
                             app.UseSwagger();
                             app.UseSwaggerUI();
                         }
+
+                        app.UseCors("ReactClient");
+
 
                         app.UseAuthentication();
                         app.UseAuthorization();
