@@ -1,10 +1,27 @@
-import './App.css'
+import { useAuth } from "./hooks/auth/useAuth";
 
-function App() {
+export default function App() {
+  const { user, initializing, isAuthenticated, isAdmin, logout } = useAuth();
+
+  if (initializing) {
+    return <p>Loading application...</p>;
+  }
 
   return (
-    <h1>TravelPlanner App</h1>
-  )
-}
+    <main>
+      <h1>Travel Planner</h1>
 
-export default App
+      {isAuthenticated ? (
+        <>
+          <p>Signed in as: {user.fullName}</p>
+          <p>Email: {user.email}</p>
+          <p>Admin: {isAdmin ? "Yes" : "No"}</p>
+
+          <button onClick={logout}>Logout</button>
+        </>
+      ) : (
+        <p>User is not authenticated.</p>
+      )}
+    </main>
+  );
+}
