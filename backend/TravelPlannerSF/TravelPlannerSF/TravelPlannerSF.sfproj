@@ -41,6 +41,7 @@
     </ProjectReference>
     <ProjectReference Include="..\TravelPlanner.AuthService\TravelPlanner.AuthService.csproj" />
     <ProjectReference Include="..\TravelPlanner.NotificationService\TravelPlanner.NotificationService.csproj" />
+    <ProjectReference Include="..\TravelPlanner.ReportService\TravelPlanner.ReportService.csproj" />
     <ProjectReference Include="..\TravelPlanner.TripService\TravelPlanner.TripService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
