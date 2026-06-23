@@ -1,0 +1,30 @@
+﻿using TravelPlanner.Contracts.DTOs.Notifications;
+using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
+using TravelPlanner.Contracts.DTOs.Trips.Checklist;
+using TravelPlanner.Contracts.DTOs.Trips.Destinations;
+using TravelPlanner.Contracts.DTOs.Trips.Expenses;
+using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
+
+namespace TravelPlanner.ReportService.Models.Reports
+{
+    public class TravelPlanReportData
+    {
+        public TravelPlanResponseDto TravelPlan { get; set; } = new();
+
+        public List<DestinationResponseDto> Destinations { get; set; } = new();
+
+        public List<CalendarDayDto> CalendarDays { get; set; } = new();
+
+        public List<ExpenseResponseDto> Expenses { get; set; } = new();
+
+        public BudgetSummaryDto? BudgetSummary { get; set; }
+
+        public List<ChecklistItemResponseDto> ChecklistItems { get; set; } = new();
+
+        public List<ReminderResponseDto> ActiveReminders { get; set; } = new();
+
+        public List<ReminderResponseDto> TriggeredReminders { get; set; } = new();
+
+        public List<ReminderResponseDto> CompletedReminders { get; set; } = new();
+    }
+}

@@ -1,12 +1,13 @@
 ﻿using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using TravelPlanner.ReportService.Models.Reports;
 
 namespace TravelPlanner.ReportService.Generation.Reports
 {
     public class TravelPlanReportGenerator : ITravelPlanReportGenerator
     {
-        public byte[] Generate()
+        public byte[] Generate(TravelPlanReportData reportData)
         {
             QuestPDF.Settings.License = LicenseType.Community;
 
@@ -14,7 +15,7 @@ namespace TravelPlanner.ReportService.Generation.Reports
             {
                 container.Page(page =>
                 {
-                    page.Margin(40);
+                    page.Margin(35);
 
                     page.Header()
                         .Text("Travel Plan Report")
@@ -22,13 +23,17 @@ namespace TravelPlanner.ReportService.Generation.Reports
                         .Bold();
 
                     page.Content()
-                        .PaddingVertical(20)
+                        .PaddingVertical(15)
                         .Column(column =>
                         {
-                            column.Spacing(10);
+                            column.Spacing(14);
 
-                            column.Item().Text("Report generation is connected successfully.");
-                            column.Item().Text("Real travel plan data will be added in the next step.");
+                            AddTripInfo(column, reportData);
+                            AddDestinations(column, reportData);
+                            AddActivities(column, reportData);
+                            AddExpenses(column, reportData);
+                            AddChecklist(column, reportData);
+                            AddReminders(column, reportData);
                         });
 
                     page.Footer()
@@ -39,6 +44,124 @@ namespace TravelPlanner.ReportService.Generation.Reports
                         });
                 });
             }).GeneratePdf();
+        }
+
+        private static void AddTripInfo(ColumnDescriptor column, TravelPlanReportData reportData)
+        {
+            var plan = reportData.TravelPlan;
+
+            column.Item().Text(plan.Title).FontSize(18).Bold();
+            column.Item().Text($"Period: {plan.StartDate:dd.MM.yyyy} - {plan.EndDate:dd.MM.yyyy}");
+            column.Item().Text($"Budget: {plan.Budget:N2}");
+            column.Item().Text($"Description: {plan.Description ?? "-"}");
+            column.Item().Text($"Notes: {plan.Notes ?? "-"}");
+
+            if (reportData.BudgetSummary != null)
+            {
+                column.Item().Text("Budget Summary").FontSize(14).Bold();
+                column.Item().Text($"Planned budget: {reportData.BudgetSummary.PlannedBudget:N2}");
+                column.Item().Text($"Total expenses: {reportData.BudgetSummary.TotalExpenses:N2}");
+                column.Item().Text($"Remaining budget: {reportData.BudgetSummary.RemainingBudget:N2}");
+                column.Item().Text($"Over budget: {(reportData.BudgetSummary.IsOverBudget ? "Yes" : "No")}");
+            }
+        }
+
+        private static void AddDestinations(ColumnDescriptor column, TravelPlanReportData reportData)
+        {
+            column.Item().Text("Destinations").FontSize(16).Bold();
+
+            if (reportData.Destinations.Count == 0)
+            {
+                column.Item().Text("No destinations added.");
+                return;
+            }
+
+            foreach (var destination in reportData.Destinations)
+            {
+                column.Item().Text($"{destination.Name} - {destination.Location}").Bold();
+                column.Item().Text($"{destination.StartDate:dd.MM.yyyy} - {destination.EndDate:dd.MM.yyyy}");
+                column.Item().Text(destination.Notes ?? "-");
+            }
+        }
+
+        private static void AddActivities(ColumnDescriptor column, TravelPlanReportData reportData)
+        {
+            column.Item().Text("Activities").FontSize(16).Bold();
+
+            if (reportData.CalendarDays.Count == 0)
+            {
+                column.Item().Text("No activities added.");
+                return;
+            }
+
+            foreach (var day in reportData.CalendarDays)
+            {
+                column.Item().Text($"{day.Date:dd.MM.yyyy}").Bold();
+
+                foreach (var activity in day.Activities)
+                {
+                    column.Item().Text($"{activity.StartTime} - {activity.EndTime} | {activity.Title} | {activity.Location}");
+                }
+            }
+        }
+
+        private static void AddExpenses(ColumnDescriptor column, TravelPlanReportData reportData)
+        {
+            column.Item().Text("Expenses").FontSize(16).Bold();
+
+            if (reportData.Expenses.Count == 0)
+            {
+                column.Item().Text("No expenses added.");
+                return;
+            }
+
+            foreach (var expense in reportData.Expenses)
+            {
+                column.Item().Text($"{expense.ExpenseDate:dd.MM.yyyy} | {expense.Title} | {expense.Category} | {expense.Amount:N2}");
+            }
+        }
+
+        private static void AddChecklist(ColumnDescriptor column, TravelPlanReportData reportData)
+        {
+            column.Item().Text("Checklist").FontSize(16).Bold();
+
+            if (reportData.ChecklistItems.Count == 0)
+            {
+                column.Item().Text("No checklist items added.");
+                return;
+            }
+
+            foreach (var item in reportData.ChecklistItems)
+            {
+                column.Item().Text($"{(item.IsCompleted ? "✓" : "□")} {item.Title}");
+            }
+        }
+
+        private static void AddReminders(ColumnDescriptor column, TravelPlanReportData reportData)
+        {
+            column.Item().Text("Reminders").FontSize(16).Bold();
+
+            AddReminderGroup(column, "Active", reportData.ActiveReminders);
+            AddReminderGroup(column, "Triggered", reportData.TriggeredReminders);
+            AddReminderGroup(column, "Completed", reportData.CompletedReminders);
+        }
+
+        private static void AddReminderGroup(ColumnDescriptor column, string title, IEnumerable<dynamic> reminders)
+        {
+            var reminderList = reminders.ToList();
+
+            column.Item().Text(title).Bold();
+
+            if (reminderList.Count == 0)
+            {
+                column.Item().Text("No reminders.");
+                return;
+            }
+
+            foreach (var reminder in reminderList)
+            {
+                column.Item().Text($"{reminder.ReminderAt:dd.MM.yyyy HH:mm} | {reminder.Title}");
+            }
         }
     }
 }

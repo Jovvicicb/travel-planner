@@ -1,9 +1,9 @@
-﻿using TravelPlanner.Contracts.DTOs.Reports;
+﻿using TravelPlanner.ReportService.Models.Reports;
 
 namespace TravelPlanner.ReportService.Generation.Reports
 {
     public interface ITravelPlanReportGenerator
     {
-        byte[] Generate();
+        byte[] Generate(TravelPlanReportData reportData);
     }
 }
