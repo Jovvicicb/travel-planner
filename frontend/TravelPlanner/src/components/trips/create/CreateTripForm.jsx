@@ -1,3 +1,6 @@
+import { Button } from "../../ui/Button";
+import { FieldError } from "../../ui/FieldError";
+
 export function CreateTripForm({
   formData,
   errors,
@@ -10,10 +13,7 @@ export function CreateTripForm({
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       <div className="grid gap-5 lg:grid-cols-2">
         <div className="space-y-2 lg:col-span-2">
-          <label
-            htmlFor="title"
-            className="text-sm font-black text-[#2f2924]"
-          >
+          <label htmlFor="title" className="text-sm font-black text-[#2f2924]">
             Title
           </label>
 
@@ -27,11 +27,7 @@ export function CreateTripForm({
             className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
           />
 
-          {errors.title && (
-            <p className="text-sm font-semibold text-red-600">
-              {errors.title}
-            </p>
-          )}
+          <FieldError message={errors.title} />
         </div>
 
         <div className="space-y-2">
@@ -52,11 +48,7 @@ export function CreateTripForm({
             className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
           />
 
-          {errors.startDate && (
-            <p className="text-sm font-semibold text-red-600">
-              {errors.startDate}
-            </p>
-          )}
+          <FieldError message={errors.startDate} />
         </div>
 
         <div className="space-y-2">
@@ -77,18 +69,11 @@ export function CreateTripForm({
             className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
           />
 
-          {errors.endDate && (
-            <p className="text-sm font-semibold text-red-600">
-              {errors.endDate}
-            </p>
-          )}
+          <FieldError message={errors.endDate} />
         </div>
 
         <div className="space-y-2 lg:col-span-2">
-          <label
-            htmlFor="budget"
-            className="text-sm font-black text-[#2f2924]"
-          >
+          <label htmlFor="budget" className="text-sm font-black text-[#2f2924]">
             Budget
           </label>
 
@@ -103,11 +88,7 @@ export function CreateTripForm({
             className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
           />
 
-          {errors.budget && (
-            <p className="text-sm font-semibold text-red-600">
-              {errors.budget}
-            </p>
-          )}
+          <FieldError message={errors.budget} />
         </div>
 
         <div className="space-y-2 lg:col-span-2">
@@ -129,18 +110,11 @@ export function CreateTripForm({
             className="w-full resize-none rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
           />
 
-          {errors.description && (
-            <p className="text-sm font-semibold text-red-600">
-              {errors.description}
-            </p>
-          )}
+          <FieldError message={errors.description} />
         </div>
 
         <div className="space-y-2 lg:col-span-2">
-          <label
-            htmlFor="notes"
-            className="text-sm font-black text-[#2f2924]"
-          >
+          <label htmlFor="notes" className="text-sm font-black text-[#2f2924]">
             Notes
           </label>
 
@@ -155,31 +129,23 @@ export function CreateTripForm({
             className="w-full resize-none rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
           />
 
-          {errors.notes && (
-            <p className="text-sm font-semibold text-red-600">
-              {errors.notes}
-            </p>
-          )}
+          <FieldError message={errors.notes} />
         </div>
       </div>
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-        <button
+        <Button
           type="button"
+          variant="secondary"
           disabled={submitting}
           onClick={onCancel}
-          className="rounded-2xl border border-[#d6c8b8] bg-[#f8f3ec] px-5 py-3 text-sm font-black text-[#4b4036] transition hover:bg-[#eee6dc] disabled:cursor-not-allowed disabled:opacity-70"
         >
           Cancel
-        </button>
+        </Button>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-2xl bg-[#4b4036] px-5 py-3 text-sm font-black text-[#f8f3ec] shadow-lg shadow-[#2f2924]/10 transition hover:bg-[#5a4d41] disabled:cursor-not-allowed disabled:opacity-70"
-        >
+        <Button type="submit" disabled={submitting}>
           {submitting ? "Saving..." : "Create travel plan"}
-        </button>
+        </Button>
       </div>
     </form>
   );

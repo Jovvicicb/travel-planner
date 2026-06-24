@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const variants = {
   primary:
     "border-transparent bg-[#4b4036] text-[#f8f3ec] shadow-lg shadow-[#2f2924]/10 hover:bg-[#5a4d41]",
@@ -12,34 +14,25 @@ const sizes = {
   md: "px-5 py-3 text-sm",
 };
 
-export function Button({
+export function ButtonLink({
   children,
-  type = "button",
+  to,
   variant = "primary",
   size = "md",
-  disabled = false,
-  fullWidth = false,
-  onClick,
   className = "",
 }) {
-  const buttonClassName = [
-    "inline-flex items-center justify-center gap-2 rounded-2xl border font-black transition disabled:cursor-not-allowed disabled:opacity-70",
+  const linkClassName = [
+    "inline-flex items-center justify-center gap-2 rounded-2xl border font-black transition",
     variants[variant] || variants.primary,
     sizes[size] || sizes.md,
-    fullWidth ? "w-full" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <button
-      type={type}
-      className={buttonClassName}
-      disabled={disabled}
-      onClick={onClick}
-    >
+    <Link to={to} className={linkClassName}>
       {children}
-    </button>
+    </Link>
   );
 }

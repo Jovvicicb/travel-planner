@@ -11,7 +11,9 @@ import { AuthContext } from "./authContext";
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => getAccessToken());
   const [user, setUser] = useState(null);
-  const [initializing, setInitializing] = useState(() => Boolean(getAccessToken()));
+  const [initializing, setInitializing] = useState(() =>
+    Boolean(getAccessToken()),
+  );
   const [authError, setAuthError] = useState("");
 
   const isAuthenticated = Boolean(user && token);
@@ -86,7 +88,9 @@ export function AuthProvider({ children }) {
       const currentUser = result.data?.user;
 
       if (!receivedToken || !currentUser) {
-        throw new Error("Registration response does not contain token or user data.");
+        throw new Error(
+          "Registration response does not contain token or user data.",
+        );
       }
 
       saveAccessToken(receivedToken);
@@ -119,7 +123,7 @@ export function AuthProvider({ children }) {
       register,
       logout,
     }),
-    [user, token, initializing, authError, isAuthenticated, isAdmin]
+    [user, token, initializing, authError, isAuthenticated, isAdmin],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

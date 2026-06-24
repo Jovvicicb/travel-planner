@@ -34,5 +34,5 @@ apiClient.interceptors.response.use(
       "An error occurred while communicating with the server.";
 
     return Promise.reject(new Error(message));
-  }
+  },
 );

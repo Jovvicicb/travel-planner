@@ -6,6 +6,7 @@ import { CreateTripForm } from "../../components/trips/create/CreateTripForm";
 import { useCreateTrip } from "../../hooks/trips/create/useCreateTrip";
 import { createTripFormModel } from "../../models/trips/create/createTripFormModel";
 import { validateCreateTripForm } from "../../validation/trips/create/tripCreateValidation";
+import { ErrorBox } from "../../components/ui/ErrorBox";
 
 export function CreateTripPage() {
   const navigate = useNavigate();
@@ -50,14 +51,14 @@ export function CreateTripPage() {
         description="Add the basic information for your new trip."
         backTo="/trips"
         backLabel="Back to travel plans"
-        />
+      />
 
       <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8">
         <div className="mx-auto w-full max-w-4xl">
           <Card>
             {createError && (
-              <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                {createError}
+              <div className="mb-5">
+                <ErrorBox message={createError} />
               </div>
             )}
 

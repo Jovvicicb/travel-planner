@@ -5,7 +5,11 @@ export function AdminRoute() {
   const { initializing, isAuthenticated, isAdmin } = useAuth();
 
   if (initializing) {
-    return <p className="p-6 text-sm font-semibold text-slate-500">Loading application...</p>;
+    return (
+      <p className="p-6 text-sm font-semibold text-slate-500">
+        Loading application...
+      </p>
+    );
   }
 
   if (!isAuthenticated) {

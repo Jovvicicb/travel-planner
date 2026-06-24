@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { ButtonLink } from "../ui/ButtonLink";
 
 export function AppHeader({
   title,
@@ -29,13 +29,10 @@ export function AppHeader({
         {(backTo || action) && (
           <div className="flex shrink-0 items-center gap-3">
             {backTo && (
-              <Link
-                to={backTo}
-                className="inline-flex items-center gap-2 rounded-2xl border border-[#d6c8b8] bg-[#f8f3ec] px-5 py-3 text-sm font-black text-[#4b4036] transition hover:bg-[#eee6dc]"
-              >
+              <ButtonLink to={backTo} variant="secondary">
                 <span aria-hidden="true">←</span>
                 {backLabel}
-              </Link>
+              </ButtonLink>
             )}
 
             {action}

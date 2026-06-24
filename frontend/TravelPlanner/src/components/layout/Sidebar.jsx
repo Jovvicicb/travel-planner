@@ -7,17 +7,17 @@ export function Sidebar() {
 
   return (
     <aside className="hidden w-72 shrink-0 border-r border-[#867463] bg-[#5a4d41] px-4 py-5 text-[#f8f3ec] shadow-xl shadow-[#2f2924]/15 lg:flex lg:flex-col">
-    <div className="mb-8 px-2">
+      <div className="mb-8 px-2">
         <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#f8f3ec] text-base font-black text-[#5a4d41] shadow-md shadow-[#2f2924]/15">
+          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#f8f3ec] text-base font-black text-[#5a4d41] shadow-md shadow-[#2f2924]/15">
             TP
-            </div>
+          </div>
 
-            <h2 className="text-base font-black tracking-tight text-[#fffaf3]">
+          <h2 className="text-base font-black tracking-tight text-[#fffaf3]">
             Travel Planner
-            </h2>
+          </h2>
         </div>
-    </div>
+      </div>
 
       <nav className="flex flex-1 flex-col gap-1">
         <SidebarLink to="/trips" label="Travel plans" icon="🧭" />
