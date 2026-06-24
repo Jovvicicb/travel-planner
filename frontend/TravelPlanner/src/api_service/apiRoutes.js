@@ -6,6 +6,7 @@ export const API_ROUTES = {
   },
 
   trips: {
+    list: "/trips",
     create: "/trips",
   },
 };
