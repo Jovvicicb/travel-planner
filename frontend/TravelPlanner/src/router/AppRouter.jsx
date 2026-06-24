@@ -3,6 +3,8 @@ import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
 import { TripsPage } from "../pages/trips/TripsPage";
 import { AdminUsersPage } from "../pages/admin/AdminUsersPage";
+import { CreateTripPage } from "../pages/trips/CreateTripPage";
+import { TripDetailsPage } from "../pages/trips/TripDetailsPage";
 import { AppLayout } from "../components/layout/AppLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
@@ -21,6 +23,8 @@ export function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/trips" element={<TripsPage />} />
+          <Route path="/trips/create" element={<CreateTripPage />} />
+          <Route path="/trips/:tripId" element={<TripDetailsPage />} />
         </Route>
       </Route>
 

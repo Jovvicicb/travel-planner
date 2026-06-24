@@ -4,4 +4,8 @@ export const API_ROUTES = {
     login: "/auth/login",
     me: "/auth/me",
   },
+
+  trips: {
+    create: "/trips",
+  },
 };

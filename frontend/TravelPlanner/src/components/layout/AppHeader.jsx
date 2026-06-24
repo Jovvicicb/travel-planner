@@ -1,4 +1,12 @@
-export function AppHeader({ title, description, action }) {
+import { Link } from "react-router-dom";
+
+export function AppHeader({
+  title,
+  description,
+  action,
+  backTo,
+  backLabel = "Back",
+}) {
   return (
     <header className="border-b border-[#d6c8b8] bg-[#f8f3ec] px-6 py-5 shadow-sm shadow-[#2f2924]/5 lg:px-8">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -18,7 +26,21 @@ export function AppHeader({ title, description, action }) {
           )}
         </div>
 
-        {action && <div className="shrink-0">{action}</div>}
+        {(backTo || action) && (
+          <div className="flex shrink-0 items-center gap-3">
+            {backTo && (
+              <Link
+                to={backTo}
+                className="inline-flex items-center gap-2 rounded-2xl border border-[#d6c8b8] bg-[#f8f3ec] px-5 py-3 text-sm font-black text-[#4b4036] transition hover:bg-[#eee6dc]"
+              >
+                <span aria-hidden="true">←</span>
+                {backLabel}
+              </Link>
+            )}
+
+            {action}
+          </div>
+        )}
       </div>
     </header>
   );
