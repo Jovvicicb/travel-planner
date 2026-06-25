@@ -2,6 +2,7 @@ import { toTripDetailsDisplayModel } from "../../../../mappers/trips/details/tri
 import { Card } from "../../../ui/Card";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { TripInfoItem } from "../TripInfoItem";
+import { ButtonLink } from "../../../ui/ButtonLink";
 
 export function TripOverviewTab({ trip }) {
   const displayTrip = toTripDetailsDisplayModel(trip);
@@ -9,8 +10,13 @@ export function TripOverviewTab({ trip }) {
   return (
     <Card>
       <SectionHeader
-        title="Overview"
+        title={displayTrip.title}
         description="Review the main information about this travel plan."
+        action={
+          <ButtonLink to={`/trips/${displayTrip.id}/edit`} size="sm">
+            Edit travel plan
+          </ButtonLink>
+        }
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

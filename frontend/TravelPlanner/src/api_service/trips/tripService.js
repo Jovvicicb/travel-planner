@@ -1,6 +1,7 @@
 import { apiClient } from "../apiClient";
 import { API_ROUTES } from "../apiRoutes";
 import { toCreateTravelPlanRequest } from "../../mappers/trips/create/createTripRequestMapper";
+import { toUpdateTravelPlanRequest } from "../../mappers/trips/update/updateTripRequestMapper";
 
 export const tripService = {
   getTravelPlans() {
@@ -15,6 +16,13 @@ export const tripService = {
     return apiClient.post(
       API_ROUTES.trips.create,
       toCreateTravelPlanRequest(data),
+    );
+  },
+
+  updateTravelPlan(id, data) {
+    return apiClient.put(
+      API_ROUTES.trips.update(id),
+      toUpdateTravelPlanRequest(data),
     );
   },
 };

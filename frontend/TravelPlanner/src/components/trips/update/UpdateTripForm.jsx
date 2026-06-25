@@ -1,6 +1,6 @@
 import { TravelPlanForm } from "../form/TravelPlanForm";
 
-export function CreateTripForm({
+export function UpdateTripForm({
   formData,
   errors,
   submitting,
@@ -13,7 +13,7 @@ export function CreateTripForm({
       formData={formData}
       errors={errors}
       submitting={submitting}
-      submitLabel="Create travel plan"
+      submitLabel="Update travel plan"
       onChange={onChange}
       onSubmit={onSubmit}
       onCancel={onCancel}
