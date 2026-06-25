@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Tabs } from "../../../ui/Tabs";
 import { TripDestinationsTab } from "./TripDestinationsTab";
 import { TripOverviewTab } from "./TripOverviewTab";
+import { TripActivitiesTab } from "./TripActivitiesTab";
 
 const TRIP_DETAILS_TABS = [
   {
@@ -12,6 +13,10 @@ const TRIP_DETAILS_TABS = [
   {
     id: "destinations",
     label: "Destinations",
+  },
+  {
+    id: "activities",
+    label: "Activities",
   },
 ];
 
@@ -37,6 +42,8 @@ export function TripDetailsTabs({ trip }) {
         {activeTab === "overview" && <TripOverviewTab trip={trip} />}
 
         {activeTab === "destinations" && <TripDestinationsTab trip={trip} />}
+
+        {activeTab === "activities" && <TripActivitiesTab trip={trip} />}
       </section>
     </>
   );

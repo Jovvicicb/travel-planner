@@ -18,5 +18,8 @@ export const API_ROUTES = {
       `/trips/${tripId}/destinations/${destinationId}`,
     destinationsDelete: (tripId, destinationId) =>
       `/trips/${tripId}/destinations/${destinationId}`,
+
+    activitiesCreate: (tripId, destinationId) =>
+      `/trips/${tripId}/destinations/${destinationId}/activities`,
   },
 };
