@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toTripDetailsDisplayModel } from "../../../../mappers/trips/details/tripDetailsDisplayMapper";
 import { useDeleteTrip } from "../../../../hooks/trips/delete/useDeleteTrip";
 import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { Card } from "../../../ui/Card";
+import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { TripInfoItem } from "../TripInfoItem";
@@ -12,26 +14,28 @@ export function TripOverviewTab({ trip }) {
   const navigate = useNavigate();
   const displayTrip = toTripDetailsDisplayModel(trip);
   const { deleting, deleteError, deleteTrip } = useDeleteTrip();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this travel plan?",
-    );
+  function handleDeleteClick() {
+    setShowDeleteDialog(true);
+  }
 
-    if (!confirmed) {
-      return;
-    }
+  function handleCancelDelete() {
+    setShowDeleteDialog(false);
+  }
 
+  async function handleConfirmDelete() {
     await deleteTrip(displayTrip.id);
 
+    setShowDeleteDialog(false);
     navigate("/trips");
   }
 
   return (
     <Card>
       <SectionHeader
-        title="Overview"
-        description="Review the main information about this travel plan."
+        title={displayTrip.title}
+        description="Review the main travel plan information, update trip details or delete this plan if it is no longer needed."
         action={
           <div className="flex flex-wrap items-center gap-3">
             <ButtonLink to={`/trips/${displayTrip.id}/edit`} size="sm">
@@ -43,7 +47,7 @@ export function TripOverviewTab({ trip }) {
               variant="danger"
               size="sm"
               disabled={deleting}
-              onClick={handleDelete}
+              onClick={handleDeleteClick}
             >
               {deleting ? "Deleting..." : "Delete"}
             </Button>
@@ -86,6 +90,17 @@ export function TripOverviewTab({ trip }) {
         <TripInfoItem label="Created at" value={displayTrip.createdAt} />
         <TripInfoItem label="Updated at" value={displayTrip.updatedAt} />
       </div>
+
+      <ConfirmDialog
+        open={showDeleteDialog}
+        title="Delete travel plan?"
+        description="This action will permanently delete this travel plan and all related information. This cannot be undone."
+        confirmLabel="Delete plan"
+        cancelLabel="Cancel"
+        confirming={deleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </Card>
   );
 }
