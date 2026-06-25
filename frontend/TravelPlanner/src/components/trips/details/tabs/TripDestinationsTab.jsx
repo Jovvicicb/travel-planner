@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useCreateDestination } from "../../../../hooks/trips/destinations/create/useCreateDestination";
+import { useDeleteDestination } from "../../../../hooks/trips/destinations/delete/useDeleteDestination";
 import { useDestinations } from "../../../../hooks/trips/destinations/list/useDestinations";
 import { createDestinationFormModel } from "../../../../models/trips/destinations/create/createDestinationFormModel";
 import { validateCreateDestinationForm } from "../../../../validation/trips/destinations/create/destinationCreateValidation";
 import { CreateDestinationForm } from "../../destinations/create/CreateDestinationForm";
 import { DestinationList } from "../../destinations/list/DestinationList";
+import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
@@ -15,6 +17,7 @@ export function TripDestinationsTab({ trip }) {
   const [formData, setFormData] = useState(() => createDestinationFormModel());
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [destinationToDelete, setDestinationToDelete] = useState(null);
 
   const {
     destinations,
@@ -25,6 +28,9 @@ export function TripDestinationsTab({ trip }) {
 
   const { creatingDestination, createDestinationError, createDestination } =
     useCreateDestination();
+
+  const { deletingDestination, deleteDestinationError, deleteDestination } =
+    useDeleteDestination();
 
   useEffect(() => {
     if (!successMessage) {
@@ -83,6 +89,32 @@ export function TripDestinationsTab({ trip }) {
     setSuccessMessage("");
   }
 
+  function handleDeleteClick(destination) {
+    setDestinationToDelete(destination);
+    setSuccessMessage("");
+  }
+
+  function handleCancelDelete() {
+    setDestinationToDelete(null);
+  }
+
+  async function handleConfirmDelete() {
+    if (!destinationToDelete) {
+      return;
+    }
+
+    await deleteDestination(trip.id, destinationToDelete.id);
+
+    const deletedDestinationName = destinationToDelete.name;
+
+    setDestinationToDelete(null);
+    setSuccessMessage(
+      `Destination "${deletedDestinationName}" deleted successfully.`,
+    );
+
+    await reloadDestinations();
+  }
+
   return (
     <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
@@ -99,6 +131,12 @@ export function TripDestinationsTab({ trip }) {
       {createDestinationError && (
         <div className="mb-5">
           <ErrorBox message={createDestinationError} />
+        </div>
+      )}
+
+      {deleteDestinationError && (
+        <div className="mb-5">
+          <ErrorBox message={deleteDestinationError} />
         </div>
       )}
 
@@ -138,9 +176,27 @@ export function TripDestinationsTab({ trip }) {
         {!loadingDestinations &&
           !destinationsError &&
           destinations.length > 0 && (
-            <DestinationList destinations={destinations} />
+            <DestinationList
+              destinations={destinations}
+              onDelete={handleDeleteClick}
+            />
           )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(destinationToDelete)}
+        title="Delete destination?"
+        description={
+          destinationToDelete
+            ? `This action will permanently delete "${destinationToDelete.name}" from this travel plan. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete destination"
+        cancelLabel="Cancel"
+        confirming={deletingDestination}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 }

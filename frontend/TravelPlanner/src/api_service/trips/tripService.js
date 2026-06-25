@@ -51,4 +51,10 @@ export const tripService = {
       toUpdateDestinationRequest(data),
     );
   },
+
+  deleteDestination(tripId, destinationId) {
+    return apiClient.delete(
+      API_ROUTES.trips.destinationsDelete(tripId, destinationId),
+    );
+  },
 };

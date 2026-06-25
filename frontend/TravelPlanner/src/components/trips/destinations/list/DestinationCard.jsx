@@ -1,7 +1,8 @@
+import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { toDestinationListItemDisplayModel } from "../../../../mappers/trips/destinations/list/destinationListItemDisplayMapper";
 
-export function DestinationCard({ destination }) {
+export function DestinationCard({ destination, onDelete }) {
   const displayDestination = toDestinationListItemDisplayModel(destination);
 
   return (
@@ -20,13 +21,24 @@ export function DestinationCard({ destination }) {
           </p>
         </div>
 
-        <ButtonLink
-          to={`/trips/${displayDestination.travelPlanId}/destinations/${displayDestination.id}/edit`}
-          variant="secondary"
-          size="sm"
-        >
-          Edit
-        </ButtonLink>
+        <div className="flex shrink-0 items-center gap-2">
+          <ButtonLink
+            to={`/trips/${displayDestination.travelPlanId}/destinations/${displayDestination.id}/edit`}
+            variant="secondary"
+            size="sm"
+          >
+            Edit
+          </ButtonLink>
+
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={() => onDelete(destination)}
+          >
+            Delete
+          </Button>
+        </div>
       </div>
 
       <div className="my-4 h-px bg-[#d6c8b8]" />
