@@ -25,4 +25,8 @@ export const tripService = {
       toUpdateTravelPlanRequest(data),
     );
   },
+
+  deleteTravelPlan(id) {
+    return apiClient.delete(API_ROUTES.trips.delete(id));
+  },
 };

@@ -1,23 +1,61 @@
+import { useNavigate } from "react-router-dom";
 import { toTripDetailsDisplayModel } from "../../../../mappers/trips/details/tripDetailsDisplayMapper";
+import { useDeleteTrip } from "../../../../hooks/trips/delete/useDeleteTrip";
+import { Button } from "../../../ui/Button";
+import { ButtonLink } from "../../../ui/ButtonLink";
 import { Card } from "../../../ui/Card";
+import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { TripInfoItem } from "../TripInfoItem";
-import { ButtonLink } from "../../../ui/ButtonLink";
 
 export function TripOverviewTab({ trip }) {
+  const navigate = useNavigate();
   const displayTrip = toTripDetailsDisplayModel(trip);
+  const { deleting, deleteError, deleteTrip } = useDeleteTrip();
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this travel plan?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteTrip(displayTrip.id);
+
+    navigate("/trips");
+  }
 
   return (
     <Card>
       <SectionHeader
-        title={displayTrip.title}
+        title="Overview"
         description="Review the main information about this travel plan."
         action={
-          <ButtonLink to={`/trips/${displayTrip.id}/edit`} size="sm">
-            Edit travel plan
-          </ButtonLink>
+          <div className="flex flex-wrap items-center gap-3">
+            <ButtonLink to={`/trips/${displayTrip.id}/edit`} size="sm">
+              Edit travel plan
+            </ButtonLink>
+
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              disabled={deleting}
+              onClick={handleDelete}
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
         }
       />
+
+      {deleteError && (
+        <div className="mb-5">
+          <ErrorBox message={deleteError} />
+        </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <TripInfoItem label="Start date" value={displayTrip.startDate} />

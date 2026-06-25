@@ -10,5 +10,6 @@ export const API_ROUTES = {
     create: "/trips",
     details: (id) => `/trips/${id}`,
     update: (id) => `/trips/${id}`,
+    delete: (id) => `/trips/${id}`,
   },
 };

@@ -3,7 +3,7 @@ const variants = {
     "border-transparent bg-[#4b4036] text-[#f8f3ec] shadow-lg shadow-[#2f2924]/10 hover:bg-[#5a4d41]",
   secondary: "border-[#d6c8b8] bg-[#f8f3ec] text-[#4b4036] hover:bg-[#eee6dc]",
   danger:
-    "border-transparent bg-red-600 text-white shadow-lg shadow-red-900/10 hover:bg-red-700",
+    "bg-[#7f2f2f] text-[#fffaf3] shadow-sm shadow-[#2f2924]/10 hover:bg-[#6f2929] focus:ring-[#7f2f2f]/20",
   ghost: "border-transparent bg-transparent text-[#6f5f48] hover:bg-[#eee6dc]",
 };
 
