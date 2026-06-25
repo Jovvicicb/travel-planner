@@ -10,6 +10,9 @@ export function TravelPlanForm({
   onSubmit,
   onCancel,
 }) {
+  const today = new Date().toISOString().split("T")[0];
+  const minimumEndDate = formData.startDate || today;
+
   return (
     <form
       noValidate
@@ -64,6 +67,7 @@ export function TravelPlanForm({
               name="startDate"
               value={formData.startDate}
               onChange={onChange}
+              min={today}
               className="mt-2 w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10"
             />
 
@@ -82,6 +86,7 @@ export function TravelPlanForm({
               name="endDate"
               value={formData.endDate}
               onChange={onChange}
+              min={minimumEndDate}
               className="mt-2 w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10"
             />
 

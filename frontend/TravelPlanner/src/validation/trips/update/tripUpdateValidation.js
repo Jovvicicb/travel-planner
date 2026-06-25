@@ -10,6 +10,14 @@ function isNegativeNumber(value) {
   return Number(value) < 0;
 }
 
+function getTodayDateOnly() {
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  return today;
+}
+
 export function validateUpdateTripForm(data) {
   const errors = {};
 
@@ -29,6 +37,13 @@ export function validateUpdateTripForm(data) {
 
   if (isEmpty(data.startDate)) {
     errors.startDate = "Start date is required.";
+  } else {
+    const startDate = new Date(data.startDate);
+    const today = getTodayDateOnly();
+
+    if (startDate < today) {
+      errors.startDate = "Start date cannot be in the past.";
+    }
   }
 
   if (isEmpty(data.endDate)) {

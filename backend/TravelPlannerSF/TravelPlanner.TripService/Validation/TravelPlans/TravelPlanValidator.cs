@@ -138,6 +138,11 @@ namespace TravelPlanner.TripService.Validation.TravelPlans
                 return ValidationResultDto.Fail("End date is required.");
             }
 
+            if (startDate.Date < DateTime.UtcNow.Date)
+            {
+                return ValidationResultDto.Fail("Start date cannot be in the past.");
+            }
+
             if (startDate.Date > endDate.Date)
             {
                 return ValidationResultDto.Fail("End date cannot be before start date.");
