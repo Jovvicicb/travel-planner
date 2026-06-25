@@ -26,6 +26,20 @@ export function TripDestinationsTab({ trip }) {
   const { creatingDestination, createDestinationError, createDestination } =
     useCreateDestination();
 
+  useEffect(() => {
+    if (!successMessage) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [successMessage]);
+
   function handleChange(event) {
     const { name, value } = event.target;
 
@@ -69,22 +83,8 @@ export function TripDestinationsTab({ trip }) {
     setSuccessMessage("");
   }
 
-  useEffect(() => {
-    if (!successMessage) {
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [successMessage]);
-
   return (
-    <>
+    <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
         title="Destinations"
         description="Add and review destinations that belong to this travel plan. Destination dates must stay inside the travel plan date range."
@@ -141,6 +141,6 @@ export function TripDestinationsTab({ trip }) {
             <DestinationList destinations={destinations} />
           )}
       </div>
-    </>
+    </div>
   );
 }

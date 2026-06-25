@@ -1,6 +1,7 @@
+import { ButtonLink } from "../../../ui/ButtonLink";
 import { toDestinationListItemDisplayModel } from "../../../../mappers/trips/destinations/list/destinationListItemDisplayMapper";
 
-export function DestinationCard({ destination, action }) {
+export function DestinationCard({ destination }) {
   const displayDestination = toDestinationListItemDisplayModel(destination);
 
   return (
@@ -19,7 +20,13 @@ export function DestinationCard({ destination, action }) {
           </p>
         </div>
 
-        {action && <div className="shrink-0">{action}</div>}
+        <ButtonLink
+          to={`/trips/${displayDestination.travelPlanId}/destinations/${displayDestination.id}/edit`}
+          variant="secondary"
+          size="sm"
+        >
+          Edit
+        </ButtonLink>
       </div>
 
       <div className="my-4 h-px bg-[#d6c8b8]" />

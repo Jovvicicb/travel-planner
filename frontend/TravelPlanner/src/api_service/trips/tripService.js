@@ -3,6 +3,7 @@ import { API_ROUTES } from "../apiRoutes";
 import { toCreateTravelPlanRequest } from "../../mappers/trips/create/createTripRequestMapper";
 import { toUpdateTravelPlanRequest } from "../../mappers/trips/update/updateTripRequestMapper";
 import { toCreateDestinationRequest } from "../../mappers/trips/destinations/create/createDestinationRequestMapper";
+import { toUpdateDestinationRequest } from "../../mappers/trips/destinations/update/updateDestinationRequestMapper";
 
 export const tripService = {
   // Travel plans
@@ -41,6 +42,13 @@ export const tripService = {
     return apiClient.post(
       API_ROUTES.trips.destinationsCreate(tripId),
       toCreateDestinationRequest(data),
+    );
+  },
+
+  updateDestination(tripId, destinationId, data) {
+    return apiClient.put(
+      API_ROUTES.trips.destinationsUpdate(tripId, destinationId),
+      toUpdateDestinationRequest(data),
     );
   },
 };

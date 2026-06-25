@@ -14,5 +14,7 @@ export const API_ROUTES = {
 
     destinationsList: (tripId) => `/trips/${tripId}/destinations`,
     destinationsCreate: (tripId) => `/trips/${tripId}/destinations`,
+    destinationsUpdate: (tripId, destinationId) =>
+      `/trips/${tripId}/destinations/${destinationId}`,
   },
 };
