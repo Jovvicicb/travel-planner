@@ -22,26 +22,16 @@ function toDateOnly(value) {
   return date;
 }
 
-function findSelectedDestination(destinations, destinationId) {
-  return destinations.find(
-    (destination) => destination.id === Number(destinationId),
-  );
-}
-
-export function validateCreateActivityForm(data, destinations) {
+export function validateCreateActivityForm(data, destination) {
   const errors = {};
-
-  const selectedDestination = findSelectedDestination(
-    destinations,
-    data.destinationId,
-  );
 
   const title = data.title?.trim() || "";
   const location = data.location?.trim() || "";
   const description = data.description?.trim() || "";
+  const status = Number(data.status);
 
-  if (isEmpty(data.destinationId)) {
-    errors.destinationId = "Destination is required.";
+  if (!destination) {
+    errors.destination = "Destination is required.";
   }
 
   if (isEmpty(title)) {
@@ -52,10 +42,10 @@ export function validateCreateActivityForm(data, destinations) {
 
   if (isEmpty(data.activityDate)) {
     errors.activityDate = "Activity date is required.";
-  } else if (selectedDestination) {
+  } else if (destination) {
     const activityDate = toDateOnly(data.activityDate);
-    const destinationStartDate = toDateOnly(selectedDestination.startDate);
-    const destinationEndDate = toDateOnly(selectedDestination.endDate);
+    const destinationStartDate = toDateOnly(destination.startDate);
+    const destinationEndDate = toDateOnly(destination.endDate);
 
     if (destinationStartDate && activityDate < destinationStartDate) {
       errors.activityDate =
@@ -93,8 +83,6 @@ export function validateCreateActivityForm(data, destinations) {
   if (isNegativeNumber(data.estimatedCost)) {
     errors.estimatedCost = "Estimated cost cannot be negative.";
   }
-
-  const status = Number(data.status);
 
   if (
     data.status === "" ||

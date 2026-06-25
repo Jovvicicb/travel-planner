@@ -1,7 +1,5 @@
 function formatDate(value) {
-  if (!value) {
-    return "";
-  }
+  if (!value) return "";
 
   return new Intl.DateTimeFormat("en", {
     year: "numeric",
@@ -20,5 +18,8 @@ export function toDestinationListItemDisplayModel(destination) {
     dateRange: `${formatDate(destination.startDate)} - ${formatDate(
       destination.endDate,
     )}`,
+    selectLabel: `${destination.name} #${destination.id} · ${formatDate(
+      destination.startDate,
+    )} - ${formatDate(destination.endDate)}`,
   };
 }

@@ -9,33 +9,22 @@ function toDateInputValue(value) {
   return value.split("T")[0];
 }
 
-function getSelectedDestination(destinations, destinationId) {
-  return destinations.find(
-    (destination) => destination.id === Number(destinationId),
-  );
-}
-
 export function ActivityForm({
   formData,
   errors,
-  destinations,
+  destination,
   submitting,
   submitLabel,
   onChange,
   onSubmit,
   onCancel,
 }) {
-  const selectedDestination = getSelectedDestination(
-    destinations,
-    formData.destinationId,
-  );
-
-  const minActivityDate = selectedDestination
-    ? toDateInputValue(selectedDestination.startDate)
+  const minActivityDate = destination
+    ? toDateInputValue(destination.startDate)
     : "";
 
-  const maxActivityDate = selectedDestination
-    ? toDateInputValue(selectedDestination.endDate)
+  const maxActivityDate = destination
+    ? toDateInputValue(destination.endDate)
     : "";
 
   return (
@@ -44,39 +33,14 @@ export function ActivityForm({
       onSubmit={onSubmit}
       className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4 shadow-sm shadow-[#2f2924]/5"
     >
-      <div className="mb-3 border-b border-[#d6c8b8] pb-3">
-        <h3 className="text-sm font-black text-[#2f2924]">Add activity</h3>
+      <div className="mb-4 border-b border-[#d6c8b8] pb-3">
+        <h3 className="text-sm font-black text-[#2f2924]">Activity details</h3>
         <p className="mt-0.5 text-xs font-semibold text-[#7b6b5d]">
-          Choose a destination first, then add activity details inside its date
-          range.
+          Add activity information inside the selected destination date range.
         </p>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-4">
-        <div>
-          <label className="text-xs font-black text-[#2f2924]">
-            Destination
-          </label>
-
-          <select
-            name="destinationId"
-            value={formData.destinationId}
-            onChange={onChange}
-            className="mt-1.5 w-full rounded-xl border border-[#d6c8b8] bg-[#f8f3ec] px-3 py-2 text-sm font-semibold text-[#2f2924] outline-none transition focus:border-[#746454] focus:ring-2 focus:ring-[#746454]/10"
-          >
-            <option value="">Select destination</option>
-            {destinations.map((destination) => (
-              <option key={destination.id} value={destination.id}>
-                {destination.name}
-              </option>
-            ))}
-          </select>
-
-          <div className="mt-1">
-            <FieldError message={errors.destinationId} />
-          </div>
-        </div>
-
+      <div className="grid gap-3 xl:grid-cols-3">
         <div>
           <label className="text-xs font-black text-[#2f2924]">Title</label>
 
@@ -106,8 +70,7 @@ export function ActivityForm({
             onChange={onChange}
             min={minActivityDate}
             max={maxActivityDate}
-            disabled={!formData.destinationId}
-            className="mt-1.5 w-full rounded-xl border border-[#d6c8b8] bg-[#f8f3ec] px-3 py-2 text-sm font-semibold text-[#2f2924] outline-none transition disabled:cursor-not-allowed disabled:opacity-60 focus:border-[#746454] focus:ring-2 focus:ring-[#746454]/10"
+            className="mt-1.5 w-full rounded-xl border border-[#d6c8b8] bg-[#f8f3ec] px-3 py-2 text-sm font-semibold text-[#2f2924] outline-none transition focus:border-[#746454] focus:ring-2 focus:ring-[#746454]/10"
           />
 
           <div className="mt-1">

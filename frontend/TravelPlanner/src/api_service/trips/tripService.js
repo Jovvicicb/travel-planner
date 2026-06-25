@@ -66,4 +66,10 @@ export const tripService = {
       toCreateActivityRequest(data),
     );
   },
+
+  getActivities(tripId, destinationId) {
+    return apiClient.get(
+      API_ROUTES.trips.activitiesList(tripId, destinationId),
+    );
+  },
 };

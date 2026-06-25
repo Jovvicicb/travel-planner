@@ -3,7 +3,7 @@ import { ActivityForm } from "../form/ActivityForm";
 export function CreateActivityForm({
   formData,
   errors,
-  destinations,
+  destination,
   submitting,
   onChange,
   onSubmit,
@@ -13,7 +13,7 @@ export function CreateActivityForm({
     <ActivityForm
       formData={formData}
       errors={errors}
-      destinations={destinations}
+      destination={destination}
       submitting={submitting}
       submitLabel="Add activity"
       onChange={onChange}

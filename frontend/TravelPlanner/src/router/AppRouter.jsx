@@ -11,6 +11,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
 import { AdminRoute } from "./AdminRoute";
 import { EditDestinationPage } from "../pages/trips/EditDestinationPage";
+import { CreateActivityPage } from "../pages/trips/CreateActivityPage";
 
 export function AppRouter() {
   return (
@@ -30,6 +31,10 @@ export function AppRouter() {
           <Route
             path="/trips/:tripId/destinations/:destinationId/edit"
             element={<EditDestinationPage />}
+          />
+          <Route
+            path="/trips/:tripId/destinations/:destinationId/activities/create"
+            element={<CreateActivityPage />}
           />
           <Route path="/trips/:tripId" element={<TripDetailsPage />} />
         </Route>

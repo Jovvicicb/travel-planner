@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs } from "../../../ui/Tabs";
+import { TripActivitiesTab } from "./TripActivitiesTab";
 import { TripDestinationsTab } from "./TripDestinationsTab";
 import { TripOverviewTab } from "./TripOverviewTab";
-import { TripActivitiesTab } from "./TripActivitiesTab";
 
 const TRIP_DETAILS_TABS = [
   {

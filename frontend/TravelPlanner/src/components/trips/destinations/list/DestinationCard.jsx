@@ -9,9 +9,15 @@ export function DestinationCard({ destination, onDelete }) {
     <article className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4 shadow-sm shadow-[#2f2924]/5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="text-base font-bold tracking-tight text-[#2f2924]">
-            {displayDestination.name}
-          </h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-base font-bold tracking-tight text-[#2f2924]">
+              {displayDestination.name}
+            </h3>
+
+            <span className="rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-2.5 py-0.5 text-[11px] font-black uppercase tracking-[0.12em] text-[#7b6b5d]">
+              #{displayDestination.id}
+            </span>
+          </div>
 
           <p className="mt-1 text-sm font-semibold text-[#4b4036]">
             <span className="text-xs font-black uppercase tracking-[0.12em] text-[#9a8b7b]">
@@ -21,7 +27,15 @@ export function DestinationCard({ destination, onDelete }) {
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <ButtonLink
+            to={`/trips/${displayDestination.travelPlanId}/destinations/${displayDestination.id}/activities/create`}
+            variant="primary"
+            size="sm"
+          >
+            Add activity
+          </ButtonLink>
+
           <ButtonLink
             to={`/trips/${displayDestination.travelPlanId}/destinations/${displayDestination.id}/edit`}
             variant="secondary"

@@ -1,6 +1,5 @@
 export function createActivityFormModel() {
   return {
-    destinationId: "",
     title: "",
     activityDate: "",
     startTime: "",
