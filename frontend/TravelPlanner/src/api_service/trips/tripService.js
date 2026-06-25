@@ -33,6 +33,10 @@ export const tripService = {
   },
 
   // Destinations
+  getDestinations(tripId) {
+    return apiClient.get(API_ROUTES.trips.destinationsList(tripId));
+  },
+
   createDestination(tripId, data) {
     return apiClient.post(
       API_ROUTES.trips.destinationsCreate(tripId),
