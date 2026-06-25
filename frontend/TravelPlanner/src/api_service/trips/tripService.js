@@ -7,6 +7,10 @@ export const tripService = {
     return apiClient.get(API_ROUTES.trips.list);
   },
 
+  getTravelPlanById(id) {
+    return apiClient.get(API_ROUTES.trips.details(id));
+  },
+
   createTravelPlan(data) {
     return apiClient.post(
       API_ROUTES.trips.create,

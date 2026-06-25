@@ -8,5 +8,6 @@ export const API_ROUTES = {
   trips: {
     list: "/trips",
     create: "/trips",
+    details: (id) => `/trips/${id}`,
   },
 };
