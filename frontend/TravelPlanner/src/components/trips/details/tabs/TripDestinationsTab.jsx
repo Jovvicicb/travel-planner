@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCreateDestination } from "../../../../hooks/trips/destinations/create/useCreateDestination";
 import { useDestinations } from "../../../../hooks/trips/destinations/list/useDestinations";
 import { createDestinationFormModel } from "../../../../models/trips/destinations/create/createDestinationFormModel";
@@ -9,6 +9,7 @@ import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
+import { SuccessBox } from "../../../ui/SuccessBox";
 
 export function TripDestinationsTab({ trip }) {
   const [formData, setFormData] = useState(() => createDestinationFormModel());
@@ -68,16 +69,30 @@ export function TripDestinationsTab({ trip }) {
     setSuccessMessage("");
   }
 
+  useEffect(() => {
+    if (!successMessage) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [successMessage]);
+
   return (
-    <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+    <>
       <SectionHeader
         title="Destinations"
         description="Add and review destinations that belong to this travel plan. Destination dates must stay inside the travel plan date range."
       />
 
       {successMessage && (
-        <div className="mb-5 rounded-2xl border border-[#b8a692] bg-[#fffaf3] px-4 py-3 text-sm font-bold text-[#4b4036]">
-          {successMessage}
+        <div className="mb-5">
+          <SuccessBox message={successMessage} />
         </div>
       )}
 
@@ -126,6 +141,6 @@ export function TripDestinationsTab({ trip }) {
             <DestinationList destinations={destinations} />
           )}
       </div>
-    </div>
+    </>
   );
 }

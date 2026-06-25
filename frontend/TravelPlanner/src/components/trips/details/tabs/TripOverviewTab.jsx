@@ -4,7 +4,6 @@ import { toTripDetailsDisplayModel } from "../../../../mappers/trips/details/tri
 import { useDeleteTrip } from "../../../../hooks/trips/delete/useDeleteTrip";
 import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
-import { Card } from "../../../ui/Card";
 import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
@@ -32,7 +31,7 @@ export function TripOverviewTab({ trip }) {
   }
 
   return (
-    <Card>
+    <>
       <SectionHeader
         title={displayTrip.title}
         description="Review the main travel plan information, update trip details or delete this plan if it is no longer needed."
@@ -101,6 +100,6 @@ export function TripOverviewTab({ trip }) {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />
-    </Card>
+    </>
   );
 }
