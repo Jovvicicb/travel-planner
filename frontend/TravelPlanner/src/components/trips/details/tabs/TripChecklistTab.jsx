@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useCreateChecklistItem } from "../../../../hooks/trips/checklist/create/useCreateChecklistItem";
+import { useChecklistItems } from "../../../../hooks/trips/checklist/list/useChecklistItems";
 import { createChecklistItemFormModel } from "../../../../models/trips/checklist/create/createChecklistItemFormModel";
 import { validateCreateChecklistItemForm } from "../../../../validation/trips/checklist/create/checklistItemCreateValidation";
 import { CreateChecklistItemForm } from "../../checklist/create/CreateChecklistItemForm";
+import { ChecklistItemList } from "../../checklist/list/ChecklistItemList";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
+import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
 
@@ -14,6 +17,13 @@ export function TripChecklistTab({ trip }) {
   );
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+
+  const {
+    checklistItems,
+    loadingChecklistItems,
+    checklistItemsError,
+    reloadChecklistItems,
+  } = useChecklistItems(trip.id);
 
   const {
     creatingChecklistItem,
@@ -68,6 +78,8 @@ export function TripChecklistTab({ trip }) {
     setSuccessMessage(
       `Checklist item "${createdItem.title}" created successfully.`,
     );
+
+    await reloadChecklistItems();
   }
 
   function handleCancel() {
@@ -107,13 +119,31 @@ export function TripChecklistTab({ trip }) {
       <div className="mt-6 border-t-2 border-[#b8a692] pt-5">
         <SectionHeader
           title="Checklist items"
-          description="Checklist list will be displayed here after the list endpoint is connected."
+          description="Review preparation tasks connected to this travel plan."
         />
 
-        <EmptyState
-          title="Checklist list is not loaded yet"
-          description="Create checklist item is connected. Checklist list, complete status, update and delete will be added when the backend endpoints are available."
-        />
+        {loadingChecklistItems && (
+          <LoadingState message="Loading checklist items..." />
+        )}
+
+        {!loadingChecklistItems && checklistItemsError && (
+          <ErrorBox message={checklistItemsError} />
+        )}
+
+        {!loadingChecklistItems &&
+          !checklistItemsError &&
+          checklistItems.length === 0 && (
+            <EmptyState
+              title="No checklist items yet"
+              description="Add the first checklist item to start organizing trip tasks."
+            />
+          )}
+
+        {!loadingChecklistItems &&
+          !checklistItemsError &&
+          checklistItems.length > 0 && (
+            <ChecklistItemList items={checklistItems} />
+          )}
       </div>
     </div>
   );

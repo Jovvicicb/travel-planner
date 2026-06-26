@@ -128,4 +128,8 @@ export const tripService = {
       toCreateChecklistItemRequest(data),
     );
   },
+
+  getChecklistItems(tripId) {
+    return apiClient.get(API_ROUTES.trips.checklistList(tripId));
+  },
 };
