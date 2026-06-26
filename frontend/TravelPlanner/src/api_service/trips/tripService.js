@@ -72,4 +72,8 @@ export const tripService = {
       API_ROUTES.trips.activitiesList(tripId, destinationId),
     );
   },
+
+  getActivityCalendar(tripId) {
+    return apiClient.get(API_ROUTES.trips.activitiesCalendar(tripId));
+  },
 };
