@@ -99,4 +99,8 @@ export const tripService = {
       toCreateExpenseRequest(data),
     );
   },
+
+  getExpenses(tripId) {
+    return apiClient.get(API_ROUTES.trips.expensesList(tripId));
+  },
 };

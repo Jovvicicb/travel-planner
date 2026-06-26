@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useCreateExpense } from "../../../../hooks/trips/expenses/create/useCreateExpense";
+import { useExpenses } from "../../../../hooks/trips/expenses/list/useExpenses";
 import { createExpenseFormModel } from "../../../../models/trips/expenses/create/createExpenseFormModel";
 import { validateCreateExpenseForm } from "../../../../validation/trips/expenses/create/expenseCreateValidation";
 import { CreateExpenseForm } from "../../expenses/create/CreateExpenseForm";
+import { ExpenseList } from "../../expenses/list/ExpenseList";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
+import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
 
@@ -12,6 +15,9 @@ export function TripExpensesTab({ trip }) {
   const [formData, setFormData] = useState(() => createExpenseFormModel());
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+
+  const { expenses, loadingExpenses, expensesError, reloadExpenses } =
+    useExpenses(trip.id);
 
   const { creatingExpense, createExpenseError, createExpense } =
     useCreateExpense();
@@ -63,6 +69,8 @@ export function TripExpensesTab({ trip }) {
     setSuccessMessage(
       `Expense "${createdExpense.title}" created successfully.`,
     );
+
+    await reloadExpenses();
   }
 
   function handleCancel() {
@@ -75,7 +83,7 @@ export function TripExpensesTab({ trip }) {
     <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
         title="Expenses"
-        description="Record travel expenses and categorize them for budget tracking."
+        description="Record travel expenses and review all costs connected to this travel plan."
       />
 
       {successMessage && (
@@ -102,13 +110,25 @@ export function TripExpensesTab({ trip }) {
       <div className="mt-6 border-t-2 border-[#b8a692] pt-5">
         <SectionHeader
           title="Expense list"
-          description="Expense list and budget summary will be displayed here after the list endpoint is connected."
+          description="Review all recorded expenses for this travel plan."
         />
 
-        <EmptyState
-          title="Expense list is not loaded yet"
-          description="Create expense is connected. Expense list and budget calculation will be added when the backend list or summary endpoint is available."
-        />
+        {loadingExpenses && <LoadingState message="Loading expenses..." />}
+
+        {!loadingExpenses && expensesError && (
+          <ErrorBox message={expensesError} />
+        )}
+
+        {!loadingExpenses && !expensesError && expenses.length === 0 && (
+          <EmptyState
+            title="No expenses yet"
+            description="Add the first expense to start tracking travel costs."
+          />
+        )}
+
+        {!loadingExpenses && !expensesError && expenses.length > 0 && (
+          <ExpenseList expenses={expenses} />
+        )}
       </div>
     </div>
   );
