@@ -140,4 +140,8 @@ export const tripService = {
       toUpdateChecklistItemRequest(data),
     );
   },
+
+  toggleChecklistItem(tripId, itemId) {
+    return apiClient.patch(API_ROUTES.trips.checklistToggle(tripId, itemId));
+  },
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useCreateChecklistItem } from "../../../../hooks/trips/checklist/create/useCreateChecklistItem";
 import { useChecklistItems } from "../../../../hooks/trips/checklist/list/useChecklistItems";
+import { useToggleChecklistItem } from "../../../../hooks/trips/checklist/toggle/useToggleChecklistItem";
 import { createChecklistItemFormModel } from "../../../../models/trips/checklist/create/createChecklistItemFormModel";
 import { validateCreateChecklistItemForm } from "../../../../validation/trips/checklist/create/checklistItemCreateValidation";
 import { CreateChecklistItemForm } from "../../checklist/create/CreateChecklistItemForm";
@@ -30,6 +31,12 @@ export function TripChecklistTab({ trip }) {
     createChecklistItemError,
     createChecklistItem,
   } = useCreateChecklistItem();
+
+  const {
+    togglingChecklistItem,
+    toggleChecklistItemError,
+    toggleChecklistItem,
+  } = useToggleChecklistItem();
 
   useEffect(() => {
     if (!successMessage) {
@@ -88,6 +95,18 @@ export function TripChecklistTab({ trip }) {
     setSuccessMessage("");
   }
 
+  async function handleToggle(item) {
+    const updatedItem = await toggleChecklistItem(trip.id, item.id);
+
+    setSuccessMessage(
+      updatedItem.isCompleted
+        ? `Checklist item "${updatedItem.title}" marked as completed.`
+        : `Checklist item "${updatedItem.title}" marked as pending.`,
+    );
+
+    await reloadChecklistItems();
+  }
+
   return (
     <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
@@ -104,6 +123,12 @@ export function TripChecklistTab({ trip }) {
       {createChecklistItemError && (
         <div className="mb-5">
           <ErrorBox message={createChecklistItemError} />
+        </div>
+      )}
+
+      {toggleChecklistItemError && (
+        <div className="mb-5">
+          <ErrorBox message={toggleChecklistItemError} />
         </div>
       )}
 
@@ -142,7 +167,12 @@ export function TripChecklistTab({ trip }) {
         {!loadingChecklistItems &&
           !checklistItemsError &&
           checklistItems.length > 0 && (
-            <ChecklistItemList items={checklistItems} tripId={trip.id} />
+            <ChecklistItemList
+              items={checklistItems}
+              tripId={trip.id}
+              toggling={togglingChecklistItem}
+              onToggle={handleToggle}
+            />
           )}
       </div>
     </div>

@@ -52,5 +52,8 @@ export const API_ROUTES = {
     checklistList: (tripId) => `/trips/${tripId}/checklist`,
 
     checklistUpdate: (tripId, itemId) => `/trips/${tripId}/checklist/${itemId}`,
+
+    checklistToggle: (tripId, itemId) =>
+      `/trips/${tripId}/checklist/${itemId}/toggle`,
   },
 };

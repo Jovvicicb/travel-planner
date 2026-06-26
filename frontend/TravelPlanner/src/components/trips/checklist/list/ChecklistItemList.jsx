@@ -1,10 +1,16 @@
 import { ChecklistItemCard } from "./ChecklistItemCard";
 
-export function ChecklistItemList({ items, tripId }) {
+export function ChecklistItemList({ items, tripId, toggling, onToggle }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid gap-4">
       {items.map((item) => (
-        <ChecklistItemCard key={item.id} item={item} tripId={tripId} />
+        <ChecklistItemCard
+          key={item.id}
+          item={item}
+          tripId={tripId}
+          toggling={toggling}
+          onToggle={onToggle}
+        />
       ))}
     </div>
   );
