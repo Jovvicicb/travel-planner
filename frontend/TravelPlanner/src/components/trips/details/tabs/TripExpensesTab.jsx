@@ -127,7 +127,7 @@ export function TripExpensesTab({ trip }) {
         )}
 
         {!loadingExpenses && !expensesError && expenses.length > 0 && (
-          <ExpenseList expenses={expenses} />
+          <ExpenseList expenses={expenses} tripId={trip.id} />
         )}
       </div>
     </div>

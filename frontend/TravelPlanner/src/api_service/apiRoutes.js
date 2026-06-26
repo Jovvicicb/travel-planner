@@ -36,5 +36,7 @@ export const API_ROUTES = {
     // Expenses and budget
     expensesCreate: (tripId) => `/trips/${tripId}/expenses`,
     expensesList: (tripId) => `/trips/${tripId}/expenses`,
+    expensesUpdate: (tripId, expenseId) =>
+      `/trips/${tripId}/expenses/${expenseId}`,
   },
 };

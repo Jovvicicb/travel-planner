@@ -1,6 +1,7 @@
+import { ButtonLink } from "../../../ui/ButtonLink";
 import { toExpenseListItemDisplayModel } from "../../../../mappers/trips/expenses/list/expenseListItemDisplayMapper";
 
-export function ExpenseCard({ expense }) {
+export function ExpenseCard({ expense, tripId }) {
   const displayExpense = toExpenseListItemDisplayModel(expense);
 
   return (
@@ -19,9 +20,19 @@ export function ExpenseCard({ expense }) {
           </p>
         </div>
 
-        <span className="shrink-0 rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#4b4036]">
-          {displayExpense.amountDisplay}
-        </span>
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <span className="rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#4b4036]">
+            {displayExpense.amountDisplay}
+          </span>
+
+          <ButtonLink
+            to={`/trips/${tripId}/expenses/${displayExpense.id}/edit`}
+            variant="secondary"
+            size="sm"
+          >
+            Edit
+          </ButtonLink>
+        </div>
       </div>
 
       <div className="my-4 h-px bg-[#d6c8b8]" />

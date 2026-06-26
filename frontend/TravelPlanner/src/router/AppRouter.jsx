@@ -13,6 +13,7 @@ import { AdminRoute } from "./AdminRoute";
 import { EditDestinationPage } from "../pages/trips/EditDestinationPage";
 import { CreateActivityPage } from "../pages/trips/CreateActivityPage";
 import { EditActivityPage } from "../pages/trips/EditActivityPage";
+import { EditExpensePage } from "../pages/trips/EditExpensePage";
 
 export function AppRouter() {
   return (
@@ -40,6 +41,10 @@ export function AppRouter() {
           <Route
             path="/trips/:tripId/destinations/:destinationId/activities/:activityId/edit"
             element={<EditActivityPage />}
+          />
+          <Route
+            path="/trips/:tripId/expenses/:expenseId/edit"
+            element={<EditExpensePage />}
           />
           <Route path="/trips/:tripId" element={<TripDetailsPage />} />
         </Route>
