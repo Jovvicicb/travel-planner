@@ -2,29 +2,31 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs } from "../../../ui/Tabs";
 import { TripActivitiesTab } from "./TripActivitiesTab";
+import { TripChecklistTab } from "./TripChecklistTab";
 import { TripDestinationsTab } from "./TripDestinationsTab";
-import { TripOverviewTab } from "./TripOverviewTab";
 import { TripExpensesTab } from "./TripExpensesTab";
+import { TripOverviewTab } from "./TripOverviewTab";
 
 const TRIP_DETAILS_TABS = [
   {
     id: "overview",
     label: "Overview",
   },
-
   {
     id: "destinations",
     label: "Destinations",
   },
-
   {
     id: "activities",
     label: "Activities",
   },
-
   {
     id: "expenses",
     label: "Expenses",
+  },
+  {
+    id: "checklist",
+    label: "Checklist",
   },
 ];
 
@@ -54,6 +56,8 @@ export function TripDetailsTabs({ trip }) {
         {activeTab === "activities" && <TripActivitiesTab trip={trip} />}
 
         {activeTab === "expenses" && <TripExpensesTab trip={trip} />}
+
+        {activeTab === "checklist" && <TripChecklistTab trip={trip} />}
       </section>
     </>
   );

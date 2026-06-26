@@ -45,5 +45,8 @@ export const API_ROUTES = {
       `/trips/${tripId}/expenses/${expenseId}`,
 
     budgetSummary: (tripId) => `/trips/${tripId}/budget-summary`,
+
+    // Checklist
+    checklistCreate: (tripId) => `/trips/${tripId}/checklist`,
   },
 };
