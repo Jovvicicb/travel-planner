@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useCreateChecklistItem } from "../../../../hooks/trips/checklist/create/useCreateChecklistItem";
+import { useDeleteChecklistItem } from "../../../../hooks/trips/checklist/delete/useDeleteChecklistItem";
 import { useChecklistItems } from "../../../../hooks/trips/checklist/list/useChecklistItems";
 import { useToggleChecklistItem } from "../../../../hooks/trips/checklist/toggle/useToggleChecklistItem";
 import { createChecklistItemFormModel } from "../../../../models/trips/checklist/create/createChecklistItemFormModel";
 import { validateCreateChecklistItemForm } from "../../../../validation/trips/checklist/create/checklistItemCreateValidation";
 import { CreateChecklistItemForm } from "../../checklist/create/CreateChecklistItemForm";
 import { ChecklistItemList } from "../../checklist/list/ChecklistItemList";
+import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
@@ -18,6 +20,7 @@ export function TripChecklistTab({ trip }) {
   );
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const {
     checklistItems,
@@ -37,6 +40,12 @@ export function TripChecklistTab({ trip }) {
     toggleChecklistItemError,
     toggleChecklistItem,
   } = useToggleChecklistItem();
+
+  const {
+    deletingChecklistItem,
+    deleteChecklistItemError,
+    deleteChecklistItem,
+  } = useDeleteChecklistItem();
 
   useEffect(() => {
     if (!successMessage) {
@@ -107,6 +116,32 @@ export function TripChecklistTab({ trip }) {
     await reloadChecklistItems();
   }
 
+  function handleDeleteClick(item) {
+    setItemToDelete(item);
+    setSuccessMessage("");
+  }
+
+  function handleCancelDelete() {
+    setItemToDelete(null);
+  }
+
+  async function handleConfirmDelete() {
+    if (!itemToDelete) {
+      return;
+    }
+
+    await deleteChecklistItem(trip.id, itemToDelete.id);
+
+    const deletedItemTitle = itemToDelete.title;
+
+    setItemToDelete(null);
+    setSuccessMessage(
+      `Checklist item "${deletedItemTitle}" deleted successfully.`,
+    );
+
+    await reloadChecklistItems();
+  }
+
   return (
     <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
@@ -129,6 +164,12 @@ export function TripChecklistTab({ trip }) {
       {toggleChecklistItemError && (
         <div className="mb-5">
           <ErrorBox message={toggleChecklistItemError} />
+        </div>
+      )}
+
+      {deleteChecklistItemError && (
+        <div className="mb-5">
+          <ErrorBox message={deleteChecklistItemError} />
         </div>
       )}
 
@@ -172,9 +213,25 @@ export function TripChecklistTab({ trip }) {
               tripId={trip.id}
               toggling={togglingChecklistItem}
               onToggle={handleToggle}
+              onDelete={handleDeleteClick}
             />
           )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(itemToDelete)}
+        title="Delete checklist item?"
+        description={
+          itemToDelete
+            ? `This action will permanently delete "${itemToDelete.title}". This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete item"
+        cancelLabel="Cancel"
+        confirming={deletingChecklistItem}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 }

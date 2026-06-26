@@ -1,7 +1,14 @@
+import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { toChecklistItemDisplayModel } from "../../../../mappers/trips/checklist/list/checklistItemDisplayMapper";
 
-export function ChecklistItemCard({ item, tripId, toggling, onToggle }) {
+export function ChecklistItemCard({
+  item,
+  tripId,
+  toggling,
+  onToggle,
+  onDelete,
+}) {
   const displayItem = toChecklistItemDisplayModel(item);
 
   const completed = displayItem.isCompleted;
@@ -64,6 +71,15 @@ export function ChecklistItemCard({ item, tripId, toggling, onToggle }) {
           >
             Edit
           </ButtonLink>
+
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={() => onDelete(item)}
+          >
+            Delete
+          </Button>
         </div>
       </div>
     </article>

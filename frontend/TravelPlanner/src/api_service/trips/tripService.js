@@ -144,4 +144,8 @@ export const tripService = {
   toggleChecklistItem(tripId, itemId) {
     return apiClient.patch(API_ROUTES.trips.checklistToggle(tripId, itemId));
   },
+
+  deleteChecklistItem(tripId, itemId) {
+    return apiClient.delete(API_ROUTES.trips.checklistDelete(tripId, itemId));
+  },
 };
