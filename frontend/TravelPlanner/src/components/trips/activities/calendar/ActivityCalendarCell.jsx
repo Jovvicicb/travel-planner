@@ -30,7 +30,7 @@ export function ActivityCalendarCell({ cell, onSelectActivity }) {
     >
       <div className="mb-2 flex items-center justify-between gap-2">
         {cell.isTripDay ? (
-          <span className="rounded-full border border-[#d6c8b8] bg-[#fffaf3] px-2 py-0.5 text-[11px] font-black uppercase tracking-[0.1em] text-[#7b6b5d]">
+          <span className="rounded-full border border-[#d6c8b8] bg-[#fffaf3] px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-[#7b6b5d]">
             Trip day
           </span>
         ) : (

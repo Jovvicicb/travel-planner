@@ -26,5 +26,8 @@ export const API_ROUTES = {
       `/trips/${tripId}/destinations/${destinationId}/activities`,
 
     activitiesCalendar: (tripId) => `/trips/${tripId}/activities/calendar`,
+
+    activitiesUpdate: (tripId, destinationId, activityId) =>
+      `/trips/${tripId}/destinations/${destinationId}/activities/${activityId}`,
   },
 };

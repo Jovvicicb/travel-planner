@@ -186,7 +186,7 @@ export function TripActivitiesTab({ trip }) {
                 !loadingActivities &&
                 !activitiesError &&
                 activities.length > 0 && (
-                  <ActivityList activities={activities} />
+                  <ActivityList activities={activities} tripId={trip.id} />
                 )}
             </section>
           </>
