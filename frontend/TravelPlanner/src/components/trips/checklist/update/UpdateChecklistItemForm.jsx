@@ -1,6 +1,6 @@
 import { ChecklistItemForm } from "../form/ChecklistItemForm";
 
-export function CreateChecklistItemForm({
+export function UpdateChecklistItemForm({
   formData,
   errors,
   submitting,
@@ -13,8 +13,8 @@ export function CreateChecklistItemForm({
       formData={formData}
       errors={errors}
       submitting={submitting}
-      submitLabel="Add checklist item"
-      showCompletedField={false}
+      submitLabel="Update checklist item"
+      showCompletedField
       onChange={onChange}
       onSubmit={onSubmit}
       onCancel={onCancel}

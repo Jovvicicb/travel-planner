@@ -1,6 +1,7 @@
+import { ButtonLink } from "../../../ui/ButtonLink";
 import { toChecklistItemDisplayModel } from "../../../../mappers/trips/checklist/list/checklistItemDisplayMapper";
 
-export function ChecklistItemCard({ item }) {
+export function ChecklistItemCard({ item, tripId }) {
   const displayItem = toChecklistItemDisplayModel(item);
 
   return (
@@ -23,16 +24,26 @@ export function ChecklistItemCard({ item }) {
           </p>
         </div>
 
-        <span
-          className={[
-            "shrink-0 rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em]",
-            displayItem.isCompleted
-              ? "border-[#746454] bg-[#6f5f48] text-[#fffaf3]"
-              : "border-[#cdbca9] bg-[#f8f3ec] text-[#4b4036]",
-          ].join(" ")}
-        >
-          {displayItem.statusLabel}
-        </span>
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <span
+            className={[
+              "rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em]",
+              displayItem.isCompleted
+                ? "border-[#746454] bg-[#6f5f48] text-[#fffaf3]"
+                : "border-[#cdbca9] bg-[#f8f3ec] text-[#4b4036]",
+            ].join(" ")}
+          >
+            {displayItem.statusLabel}
+          </span>
+
+          <ButtonLink
+            to={`/trips/${tripId}/checklist/${displayItem.id}/edit`}
+            variant="secondary"
+            size="sm"
+          >
+            Edit
+          </ButtonLink>
+        </div>
       </div>
     </article>
   );

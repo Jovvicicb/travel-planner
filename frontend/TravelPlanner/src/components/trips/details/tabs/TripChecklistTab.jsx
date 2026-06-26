@@ -142,7 +142,7 @@ export function TripChecklistTab({ trip }) {
         {!loadingChecklistItems &&
           !checklistItemsError &&
           checklistItems.length > 0 && (
-            <ChecklistItemList items={checklistItems} />
+            <ChecklistItemList items={checklistItems} tripId={trip.id} />
           )}
       </div>
     </div>

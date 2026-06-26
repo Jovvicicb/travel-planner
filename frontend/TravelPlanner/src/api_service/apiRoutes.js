@@ -48,6 +48,9 @@ export const API_ROUTES = {
 
     // Checklist
     checklistCreate: (tripId) => `/trips/${tripId}/checklist`,
+
     checklistList: (tripId) => `/trips/${tripId}/checklist`,
+
+    checklistUpdate: (tripId, itemId) => `/trips/${tripId}/checklist/${itemId}`,
   },
 };

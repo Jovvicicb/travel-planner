@@ -6,6 +6,7 @@ export function ChecklistItemForm({
   errors,
   submitting,
   submitLabel,
+  showCompletedField = false,
   onChange,
   onSubmit,
   onCancel,
@@ -40,6 +41,22 @@ export function ChecklistItemForm({
           <FieldError message={errors.title} />
         </div>
       </div>
+
+      {showCompletedField && (
+        <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-2xl border border-[#d6c8b8] bg-[#f8f3ec] p-3">
+          <input
+            type="checkbox"
+            name="isCompleted"
+            checked={formData.isCompleted}
+            onChange={onChange}
+            className="h-4 w-4 accent-[#6f5f48]"
+          />
+
+          <span className="text-sm font-black text-[#2f2924]">
+            Mark item as completed
+          </span>
+        </label>
+      )}
 
       <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button

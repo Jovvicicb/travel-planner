@@ -14,6 +14,7 @@ import { EditDestinationPage } from "../pages/trips/EditDestinationPage";
 import { CreateActivityPage } from "../pages/trips/CreateActivityPage";
 import { EditActivityPage } from "../pages/trips/EditActivityPage";
 import { EditExpensePage } from "../pages/trips/EditExpensePage";
+import { EditChecklistItemPage } from "../pages/trips/EditChecklistItemPage";
 
 export function AppRouter() {
   return (
@@ -45,6 +46,10 @@ export function AppRouter() {
           <Route
             path="/trips/:tripId/expenses/:expenseId/edit"
             element={<EditExpensePage />}
+          />
+          <Route
+            path="/trips/:tripId/checklist/:itemId/edit"
+            element={<EditChecklistItemPage />}
           />
           <Route path="/trips/:tripId" element={<TripDetailsPage />} />
         </Route>

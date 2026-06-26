@@ -9,6 +9,7 @@ import { toUpdateActivityRequest } from "../../mappers/trips/activities/update/u
 import { toCreateExpenseRequest } from "../../mappers/trips/expenses/create/createExpenseRequestMapper";
 import { toUpdateExpenseRequest } from "../../mappers/trips/expenses/update/updateExpenseRequestMapper";
 import { toCreateChecklistItemRequest } from "../../mappers/trips/checklist/create/createChecklistItemRequestMapper";
+import { toUpdateChecklistItemRequest } from "../../mappers/trips/checklist/update/updateChecklistItemRequestMapper";
 
 export const tripService = {
   // Travel plans
@@ -131,5 +132,12 @@ export const tripService = {
 
   getChecklistItems(tripId) {
     return apiClient.get(API_ROUTES.trips.checklistList(tripId));
+  },
+
+  updateChecklistItem(tripId, itemId, data) {
+    return apiClient.put(
+      API_ROUTES.trips.checklistUpdate(tripId, itemId),
+      toUpdateChecklistItemRequest(data),
+    );
   },
 };
