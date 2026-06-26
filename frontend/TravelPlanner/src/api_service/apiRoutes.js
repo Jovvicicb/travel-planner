@@ -32,5 +32,8 @@ export const API_ROUTES = {
 
     activitiesDelete: (tripId, destinationId, activityId) =>
       `/trips/${tripId}/destinations/${destinationId}/activities/${activityId}`,
+
+    // Expenses and budget
+    expensesCreate: (tripId) => `/trips/${tripId}/expenses`,
   },
 };

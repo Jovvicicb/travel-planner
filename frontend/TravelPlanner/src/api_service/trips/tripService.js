@@ -6,6 +6,7 @@ import { toCreateDestinationRequest } from "../../mappers/trips/destinations/cre
 import { toUpdateDestinationRequest } from "../../mappers/trips/destinations/update/updateDestinationRequestMapper";
 import { toCreateActivityRequest } from "../../mappers/trips/activities/create/createActivityRequestMapper";
 import { toUpdateActivityRequest } from "../../mappers/trips/activities/update/updateActivityRequestMapper";
+import { toCreateExpenseRequest } from "../../mappers/trips/expenses/create/createExpenseRequestMapper";
 
 export const tripService = {
   // Travel plans
@@ -88,6 +89,14 @@ export const tripService = {
   deleteActivity(tripId, destinationId, activityId) {
     return apiClient.delete(
       API_ROUTES.trips.activitiesDelete(tripId, destinationId, activityId),
+    );
+  },
+
+  // Expenses and budget
+  createExpense(tripId, data) {
+    return apiClient.post(
+      API_ROUTES.trips.expensesCreate(tripId),
+      toCreateExpenseRequest(data),
     );
   },
 };

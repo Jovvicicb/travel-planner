@@ -4,19 +4,27 @@ import { Tabs } from "../../../ui/Tabs";
 import { TripActivitiesTab } from "./TripActivitiesTab";
 import { TripDestinationsTab } from "./TripDestinationsTab";
 import { TripOverviewTab } from "./TripOverviewTab";
+import { TripExpensesTab } from "./TripExpensesTab";
 
 const TRIP_DETAILS_TABS = [
   {
     id: "overview",
     label: "Overview",
   },
+
   {
     id: "destinations",
     label: "Destinations",
   },
+
   {
     id: "activities",
     label: "Activities",
+  },
+
+  {
+    id: "expenses",
+    label: "Expenses",
   },
 ];
 
@@ -44,6 +52,8 @@ export function TripDetailsTabs({ trip }) {
         {activeTab === "destinations" && <TripDestinationsTab trip={trip} />}
 
         {activeTab === "activities" && <TripActivitiesTab trip={trip} />}
+
+        {activeTab === "expenses" && <TripExpensesTab trip={trip} />}
       </section>
     </>
   );
