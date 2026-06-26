@@ -115,4 +115,8 @@ export const tripService = {
   deleteExpense(tripId, expenseId) {
     return apiClient.delete(API_ROUTES.trips.expensesDelete(tripId, expenseId));
   },
+
+  getBudgetSummary(tripId) {
+    return apiClient.get(API_ROUTES.trips.budgetSummary(tripId));
+  },
 };

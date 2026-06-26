@@ -43,5 +43,7 @@ export const API_ROUTES = {
 
     expensesDelete: (tripId, expenseId) =>
       `/trips/${tripId}/expenses/${expenseId}`,
+
+    budgetSummary: (tripId) => `/trips/${tripId}/budget-summary`,
   },
 };

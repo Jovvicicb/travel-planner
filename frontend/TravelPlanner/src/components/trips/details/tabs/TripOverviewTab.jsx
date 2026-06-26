@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toTripDetailsDisplayModel } from "../../../../mappers/trips/details/tripDetailsDisplayMapper";
 import { useDeleteTrip } from "../../../../hooks/trips/delete/useDeleteTrip";
+import { useBudgetSummary } from "../../../../hooks/trips/budget/useBudgetSummary";
+import { BudgetSummaryCard } from "../../budget/BudgetSummaryCard";
 import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { ErrorBox } from "../../../ui/ErrorBox";
+import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { TripInfoItem } from "../TripInfoItem";
 
@@ -14,6 +17,8 @@ export function TripOverviewTab({ trip }) {
   const displayTrip = toTripDetailsDisplayModel(trip);
   const { deleting, deleteError, deleteTrip } = useDeleteTrip();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { budgetSummary, loadingBudgetSummary, budgetSummaryError } =
+    useBudgetSummary(trip.id);
 
   function handleDeleteClick() {
     setShowDeleteDialog(true);
@@ -88,6 +93,20 @@ export function TripOverviewTab({ trip }) {
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <TripInfoItem label="Created at" value={displayTrip.createdAt} />
         <TripInfoItem label="Updated at" value={displayTrip.updatedAt} />
+      </div>
+
+      <div className="mt-6 border-t-2 border-[#b8a692] pt-5">
+        {loadingBudgetSummary && (
+          <LoadingState message="Loading budget summary..." />
+        )}
+
+        {!loadingBudgetSummary && budgetSummaryError && (
+          <ErrorBox message={budgetSummaryError} />
+        )}
+
+        {!loadingBudgetSummary && !budgetSummaryError && budgetSummary && (
+          <BudgetSummaryCard budgetSummary={budgetSummary} />
+        )}
       </div>
 
       <ConfirmDialog
