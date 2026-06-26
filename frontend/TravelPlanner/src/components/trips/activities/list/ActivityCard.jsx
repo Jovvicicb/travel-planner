@@ -1,7 +1,8 @@
+import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { toActivityListItemDisplayModel } from "../../../../mappers/trips/activities/list/activityListItemDisplayMapper";
 
-export function ActivityCard({ activity, tripId }) {
+export function ActivityCard({ activity, tripId, onDelete }) {
   const displayActivity = toActivityListItemDisplayModel(activity);
 
   return (
@@ -32,6 +33,15 @@ export function ActivityCard({ activity, tripId }) {
           >
             Edit
           </ButtonLink>
+
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={() => onDelete(activity)}
+          >
+            Delete
+          </Button>
         </div>
       </div>
 

@@ -1,10 +1,15 @@
 import { ActivityCard } from "./ActivityCard";
 
-export function ActivityList({ activities, tripId }) {
+export function ActivityList({ activities, tripId, onDelete }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {activities.map((activity) => (
-        <ActivityCard key={activity.id} activity={activity} tripId={tripId} />
+        <ActivityCard
+          key={activity.id}
+          activity={activity}
+          tripId={tripId}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );

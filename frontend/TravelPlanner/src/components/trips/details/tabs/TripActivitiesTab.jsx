@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useActivityCalendar } from "../../../../hooks/trips/activities/calendar/useActivityCalendar";
+import { useDeleteActivity } from "../../../../hooks/trips/activities/delete/useDeleteActivity";
 import { useActivities } from "../../../../hooks/trips/activities/list/useActivities";
 import { useDestinations } from "../../../../hooks/trips/destinations/list/useDestinations";
 import { toDestinationListItemDisplayModel } from "../../../../mappers/trips/destinations/list/destinationListItemDisplayMapper";
 import { ActivityCalendarMonthView } from "../../activities/calendar/ActivityCalendarMonthView";
 import { ActivityList } from "../../activities/list/ActivityList";
 import { ActivityTabSwitcher } from "../../activities/tabs/ActivityTabSwitcher";
+import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
+import { SuccessBox } from "../../../ui/SuccessBox";
 
 export function TripActivitiesTab({ trip }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,21 +24,42 @@ export function TripActivitiesTab({ trip }) {
   const [selectedDestinationId, setSelectedDestinationId] =
     useState(initialDestinationId);
   const [activeActivityView, setActiveActivityView] = useState(initialView);
+  const [activityToDelete, setActivityToDelete] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const { destinations, loadingDestinations, destinationsError } =
     useDestinations(trip.id);
 
-  const { activities, loadingActivities, activitiesError } = useActivities(
-    trip.id,
-    selectedDestinationId,
-  );
+  const { activities, loadingActivities, activitiesError, reloadActivities } =
+    useActivities(trip.id, selectedDestinationId);
 
-  const { calendarDays, loadingActivityCalendar, activityCalendarError } =
-    useActivityCalendar(trip.id);
+  const {
+    calendarDays,
+    loadingActivityCalendar,
+    activityCalendarError,
+    reloadActivityCalendar,
+  } = useActivityCalendar(trip.id);
+
+  const { deletingActivity, deleteActivityError, deleteActivity } =
+    useDeleteActivity();
 
   const selectedDestination = destinations.find(
     (destination) => destination.id === Number(selectedDestinationId),
   );
+
+  useEffect(() => {
+    if (!successMessage) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [successMessage]);
 
   function updateActivityUrl(view, destinationId = selectedDestinationId) {
     const nextParams = {
@@ -59,6 +83,7 @@ export function TripActivitiesTab({ trip }) {
     const destinationId = event.target.value;
 
     setSelectedDestinationId(destinationId);
+    setSuccessMessage("");
     updateActivityUrl("list", destinationId);
   }
 
@@ -67,7 +92,39 @@ export function TripActivitiesTab({ trip }) {
 
     setSelectedDestinationId(destinationId);
     setActiveActivityView("list");
+    setSuccessMessage("");
     updateActivityUrl("list", destinationId);
+  }
+
+  function handleDeleteClick(activity) {
+    setActivityToDelete(activity);
+    setSuccessMessage("");
+  }
+
+  function handleCancelDelete() {
+    setActivityToDelete(null);
+  }
+
+  async function handleConfirmDelete() {
+    if (!activityToDelete) {
+      return;
+    }
+
+    await deleteActivity(
+      trip.id,
+      activityToDelete.destinationId,
+      activityToDelete.id,
+    );
+
+    const deletedActivityTitle = activityToDelete.title;
+
+    setActivityToDelete(null);
+    setSuccessMessage(
+      `Activity "${deletedActivityTitle}" deleted successfully.`,
+    );
+
+    await reloadActivities();
+    await reloadActivityCalendar();
   }
 
   return (
@@ -76,6 +133,18 @@ export function TripActivitiesTab({ trip }) {
         title="Activities"
         description="Review activities by destination or use the calendar view to browse the travel plan day by day."
       />
+
+      {successMessage && (
+        <div className="mb-5">
+          <SuccessBox message={successMessage} />
+        </div>
+      )}
+
+      {deleteActivityError && (
+        <div className="mb-5">
+          <ErrorBox message={deleteActivityError} />
+        </div>
+      )}
 
       <ActivityTabSwitcher
         activeView={activeActivityView}
@@ -186,7 +255,11 @@ export function TripActivitiesTab({ trip }) {
                 !loadingActivities &&
                 !activitiesError &&
                 activities.length > 0 && (
-                  <ActivityList activities={activities} tripId={trip.id} />
+                  <ActivityList
+                    activities={activities}
+                    tripId={trip.id}
+                    onDelete={handleDeleteClick}
+                  />
                 )}
             </section>
           </>
@@ -230,6 +303,21 @@ export function TripActivitiesTab({ trip }) {
               )}
           </section>
         )}
+
+      <ConfirmDialog
+        open={Boolean(activityToDelete)}
+        title="Delete activity?"
+        description={
+          activityToDelete
+            ? `This action will permanently delete "${activityToDelete.title}". This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete activity"
+        cancelLabel="Cancel"
+        confirming={deletingActivity}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 }
