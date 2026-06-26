@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useCreateExpense } from "../../../../hooks/trips/expenses/create/useCreateExpense";
+import { useDeleteExpense } from "../../../../hooks/trips/expenses/delete/useDeleteExpense";
 import { useExpenses } from "../../../../hooks/trips/expenses/list/useExpenses";
 import { createExpenseFormModel } from "../../../../models/trips/expenses/create/createExpenseFormModel";
 import { validateCreateExpenseForm } from "../../../../validation/trips/expenses/create/expenseCreateValidation";
 import { CreateExpenseForm } from "../../expenses/create/CreateExpenseForm";
 import { ExpenseList } from "../../expenses/list/ExpenseList";
+import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
@@ -15,12 +17,16 @@ export function TripExpensesTab({ trip }) {
   const [formData, setFormData] = useState(() => createExpenseFormModel());
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
 
   const { expenses, loadingExpenses, expensesError, reloadExpenses } =
     useExpenses(trip.id);
 
   const { creatingExpense, createExpenseError, createExpense } =
     useCreateExpense();
+
+  const { deletingExpense, deleteExpenseError, deleteExpense } =
+    useDeleteExpense();
 
   useEffect(() => {
     if (!successMessage) {
@@ -79,6 +85,30 @@ export function TripExpensesTab({ trip }) {
     setSuccessMessage("");
   }
 
+  function handleDeleteClick(expense) {
+    setExpenseToDelete(expense);
+    setSuccessMessage("");
+  }
+
+  function handleCancelDelete() {
+    setExpenseToDelete(null);
+  }
+
+  async function handleConfirmDelete() {
+    if (!expenseToDelete) {
+      return;
+    }
+
+    await deleteExpense(trip.id, expenseToDelete.id);
+
+    const deletedExpenseTitle = expenseToDelete.title;
+
+    setExpenseToDelete(null);
+    setSuccessMessage(`Expense "${deletedExpenseTitle}" deleted successfully.`);
+
+    await reloadExpenses();
+  }
+
   return (
     <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
@@ -95,6 +125,12 @@ export function TripExpensesTab({ trip }) {
       {createExpenseError && (
         <div className="mb-5">
           <ErrorBox message={createExpenseError} />
+        </div>
+      )}
+
+      {deleteExpenseError && (
+        <div className="mb-5">
+          <ErrorBox message={deleteExpenseError} />
         </div>
       )}
 
@@ -127,9 +163,28 @@ export function TripExpensesTab({ trip }) {
         )}
 
         {!loadingExpenses && !expensesError && expenses.length > 0 && (
-          <ExpenseList expenses={expenses} tripId={trip.id} />
+          <ExpenseList
+            expenses={expenses}
+            tripId={trip.id}
+            onDelete={handleDeleteClick}
+          />
         )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(expenseToDelete)}
+        title="Delete expense?"
+        description={
+          expenseToDelete
+            ? `This action will permanently delete "${expenseToDelete.title}". This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete expense"
+        cancelLabel="Cancel"
+        confirming={deletingExpense}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 }

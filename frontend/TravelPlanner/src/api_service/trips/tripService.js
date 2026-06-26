@@ -111,4 +111,8 @@ export const tripService = {
       toUpdateExpenseRequest(data),
     );
   },
+
+  deleteExpense(tripId, expenseId) {
+    return apiClient.delete(API_ROUTES.trips.expensesDelete(tripId, expenseId));
+  },
 };

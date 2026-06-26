@@ -1,7 +1,8 @@
+import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { toExpenseListItemDisplayModel } from "../../../../mappers/trips/expenses/list/expenseListItemDisplayMapper";
 
-export function ExpenseCard({ expense, tripId }) {
+export function ExpenseCard({ expense, tripId, onDelete }) {
   const displayExpense = toExpenseListItemDisplayModel(expense);
 
   return (
@@ -32,6 +33,15 @@ export function ExpenseCard({ expense, tripId }) {
           >
             Edit
           </ButtonLink>
+
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={() => onDelete(expense)}
+          >
+            Delete
+          </Button>
         </div>
       </div>
 
