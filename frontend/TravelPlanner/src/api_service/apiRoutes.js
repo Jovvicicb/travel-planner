@@ -76,6 +76,8 @@ export const API_ROUTES = {
     users: {
       list: "/admin/users",
       details: (userId) => `/admin/users/${userId}`,
+      updateRole: (userId) => `/admin/users/${userId}/role`,
+      delete: (userId) => `/admin/users/${userId}`,
     },
   },
 };
