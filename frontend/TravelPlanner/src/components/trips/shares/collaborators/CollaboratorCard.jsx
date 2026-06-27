@@ -18,11 +18,11 @@ export function CollaboratorCard({ collaborator, removing, onRemove }) {
             </span>
           </div>
 
-          <h3 className="break-words text-base font-black tracking-tight text-[#2f2924]">
+          <h3 className="wrap-break-word text-base font-black tracking-tight text-[#2f2924]">
             {displayCollaborator.fullName}
           </h3>
 
-          <p className="mt-1 break-words text-sm font-semibold text-[#7b6b5d]">
+          <p className="mt-1 wrap-break-word text-sm font-semibold text-[#7b6b5d]">
             {displayCollaborator.email}
           </p>
 

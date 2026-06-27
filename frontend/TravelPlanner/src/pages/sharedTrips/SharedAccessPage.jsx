@@ -45,7 +45,7 @@ export function SharedAccessPage() {
         />
 
         <div className="mt-5 max-w-2xl">
-          <SharedAccessEntry />
+          <SharedAccessEntry showQrScanner />
         </div>
       </section>
     </div>

@@ -7,7 +7,7 @@ export function AuthLayout({ title, subtitle, children }) {
         <section className="grid w-full max-w-5xl overflow-hidden rounded-4xl border border-[#d6c8b8] bg-[#f8f3ec] shadow-2xl shadow-[#2f2924]/10 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="hidden bg-[#5a4d41] p-10 text-[#f8f3ec] lg:flex lg:flex-col lg:justify-center">
             <div>
-              <h1 className="mt-3 text-5xl font-black leading-tight tracking-tight text-[#fffaf3]">
+              <h1 className="text-5xl font-black leading-tight tracking-tight text-[#fffaf3]">
                 Travel Planner
               </h1>
 
@@ -17,7 +17,7 @@ export function AuthLayout({ title, subtitle, children }) {
               </p>
 
               <div className="mt-8">
-                <SharedAccessEntry dark />
+                <SharedAccessEntry dark showQrScanner />
               </div>
             </div>
           </div>
@@ -47,11 +47,12 @@ export function AuthLayout({ title, subtitle, children }) {
               </p>
 
               <p className="mt-1 text-sm font-semibold leading-6 text-[#7b6b5d]">
-                Paste it below to open the shared travel plan preview.
+                Paste it below or scan a QR code to open the shared travel plan
+                preview.
               </p>
 
-              <div className="mt-8">
-                <SharedAccessEntry dark />
+              <div className="mt-4">
+                <SharedAccessEntry showQrScanner />
               </div>
             </div>
           </div>
