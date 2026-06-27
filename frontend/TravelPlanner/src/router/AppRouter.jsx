@@ -16,6 +16,7 @@ import { EditActivityPage } from "../pages/trips/EditActivityPage";
 import { EditExpensePage } from "../pages/trips/EditExpensePage";
 import { EditChecklistItemPage } from "../pages/trips/EditChecklistItemPage";
 import { SharedTripPage } from "../pages/sharedTrips/SharedTripPage";
+import { SharedAccessPage } from "../pages/sharedTrips/SharedAccessPage";
 
 export function AppRouter() {
   return (
@@ -61,6 +62,8 @@ export function AppRouter() {
           />
 
           <Route path="/trips/:tripId" element={<TripDetailsPage />} />
+
+          <Route path="/shared-access" element={<SharedAccessPage />} />
         </Route>
       </Route>
 

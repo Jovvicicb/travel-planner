@@ -21,9 +21,9 @@ export function Sidebar() {
 
       <nav className="flex flex-1 flex-col gap-1">
         <SidebarLink to="/trips" label="Travel plans" icon="🧭" />
-        <SidebarLink to="/reminders" label="Reminders" icon="⏰" />
-        <SidebarLink to="/shared" label="Shared access" icon="👥" />
+        <SidebarLink to="/shared-access" label="Shared access" icon="👥" />
 
+        <SidebarLink to="/reminders" label="Reminders" icon="⏰" />
         {isAdmin && (
           <div className="mt-5 border-t border-[#746454] pt-5">
             <p className="mb-2 px-3 text-xs font-black uppercase tracking-[0.18em] text-[#b9aa99]">
