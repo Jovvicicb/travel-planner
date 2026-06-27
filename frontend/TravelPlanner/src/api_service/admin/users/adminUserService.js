@@ -5,4 +5,8 @@ export const adminUserService = {
   getUsers() {
     return apiClient.get(API_ROUTES.admin.users.list);
   },
+
+  getUserById(userId) {
+    return apiClient.get(API_ROUTES.admin.users.details(userId));
+  },
 };

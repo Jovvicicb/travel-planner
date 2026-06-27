@@ -10,41 +10,43 @@ export function AdminUsersPage() {
   const { users, loadingUsers, usersError } = useAdminUsers();
 
   return (
-    <div className="grid gap-6">
+    <>
       <AppHeader
         title="User management"
-        subtitle="Review registered Travel Planner users in one place."
+        description="Review registered Travel Planner users in one place."
       />
 
-      <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
-        <SectionHeader
-          title="Users"
-          description="View all registered users with their role, status and account creation date."
-        />
-
-        {loadingUsers && <LoadingState message="Loading users..." />}
-
-        {!loadingUsers && usersError && <ErrorBox message={usersError} />}
-
-        {!loadingUsers && !usersError && users.length === 0 && (
-          <EmptyState
-            title="No users found"
-            description="Registered users will appear here."
+      <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8">
+        <section className="w-full rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+          <SectionHeader
+            title="Users"
+            description="View all registered users with their role, status and account creation date."
           />
-        )}
 
-        {!loadingUsers && !usersError && users.length > 0 && (
-          <div className="grid gap-5">
-            <div className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 shadow-sm shadow-[#2f2924]/5">
-              <p className="text-sm font-black text-[#2f2924]">
-                Total users: {users.length}
-              </p>
+          {loadingUsers && <LoadingState message="Loading users..." />}
+
+          {!loadingUsers && usersError && <ErrorBox message={usersError} />}
+
+          {!loadingUsers && !usersError && users.length === 0 && (
+            <EmptyState
+              title="No users found"
+              description="Registered users will appear here."
+            />
+          )}
+
+          {!loadingUsers && !usersError && users.length > 0 && (
+            <div className="grid gap-5">
+              <div className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 shadow-sm shadow-[#2f2924]/5">
+                <p className="text-sm font-black text-[#2f2924]">
+                  Total users: {users.length}
+                </p>
+              </div>
+
+              <AdminUserList users={users} />
             </div>
-
-            <AdminUserList users={users} />
-          </div>
-        )}
-      </section>
-    </div>
+          )}
+        </section>
+      </main>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { toAdminUserDisplayModel } from "../../../mappers/admin/users/adminUserDisplayMapper";
+import { ButtonLink } from "../../ui/ButtonLink";
 
 export function AdminUserCard({ user }) {
   const displayUser = toAdminUserDisplayModel(user);
@@ -32,6 +33,16 @@ export function AdminUserCard({ user }) {
           <p className="mt-3 text-xs font-semibold text-[#9a8b7b]">
             Created: {displayUser.createdAtDisplay}
           </p>
+        </div>
+
+        <div className="shrink-0">
+          <ButtonLink
+            to={`/admin/users/${displayUser.id}`}
+            size="sm"
+            variant="primary"
+          >
+            Open profile
+          </ButtonLink>
         </div>
       </div>
     </article>

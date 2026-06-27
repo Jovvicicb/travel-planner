@@ -75,6 +75,7 @@ export const API_ROUTES = {
   admin: {
     users: {
       list: "/admin/users",
+      details: (userId) => `/admin/users/${userId}`,
     },
   },
 };

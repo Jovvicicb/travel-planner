@@ -17,6 +17,7 @@ import { EditExpensePage } from "../pages/trips/EditExpensePage";
 import { EditChecklistItemPage } from "../pages/trips/EditChecklistItemPage";
 import { SharedTripPage } from "../pages/sharedTrips/SharedTripPage";
 import { SharedAccessPage } from "../pages/sharedTrips/SharedAccessPage";
+import { AdminUserDetailsPage } from "../pages/admin/AdminUserDetailsPage";
 
 export function AppRouter() {
   return (
@@ -70,6 +71,11 @@ export function AppRouter() {
       <Route element={<AdminRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/admin/users" element={<AdminUsersPage />} />
+
+          <Route
+            path="/admin/users/:userId"
+            element={<AdminUserDetailsPage />}
+          />
         </Route>
       </Route>
 
