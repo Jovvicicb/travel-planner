@@ -71,4 +71,10 @@ export const API_ROUTES = {
   sharedTrips: {
     details: (token) => `/shared/trips/${token}`,
   },
+
+  admin: {
+    users: {
+      list: "/admin/users",
+    },
+  },
 };
