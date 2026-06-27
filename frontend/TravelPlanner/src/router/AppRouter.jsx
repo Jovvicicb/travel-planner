@@ -15,6 +15,7 @@ import { CreateActivityPage } from "../pages/trips/CreateActivityPage";
 import { EditActivityPage } from "../pages/trips/EditActivityPage";
 import { EditExpensePage } from "../pages/trips/EditExpensePage";
 import { EditChecklistItemPage } from "../pages/trips/EditChecklistItemPage";
+import { SharedTripPage } from "../pages/sharedTrips/SharedTripPage";
 
 export function AppRouter() {
   return (
@@ -24,6 +25,7 @@ export function AppRouter() {
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/shared/trips/:token" element={<SharedTripPage />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
