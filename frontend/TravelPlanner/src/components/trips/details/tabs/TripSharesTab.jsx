@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
+import { useCollaborators } from "../../../../hooks/trips/shares/collaborators/useCollaborators";
+import { useRemoveCollaborator } from "../../../../hooks/trips/shares/collaborators/useRemoveCollaborator";
 import { useCreateShare } from "../../../../hooks/trips/shares/create/useCreateShare";
 import { useDeactivateShare } from "../../../../hooks/trips/shares/deactivate/useDeactivateShare";
 import { useShares } from "../../../../hooks/trips/shares/list/useShares";
 import { createShareFormModel } from "../../../../models/trips/shares/create/createShareFormModel";
 import { validateCreateShareForm } from "../../../../validation/trips/shares/create/shareCreateValidation";
+import { CollaboratorList } from "../../shares/collaborators/CollaboratorList";
 import { CreatedShareCard } from "../../shares/create/CreatedShareCard";
 import { CreateShareForm } from "../../shares/create/CreateShareForm";
 import { ShareList } from "../../shares/list/ShareList";
+import { SharingTabSwitcher } from "../../shares/tabs/SharingTabSwitcher";
 import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
@@ -19,16 +23,28 @@ export function TripSharesTab({ trip }) {
   const [errors, setErrors] = useState({});
   const [createdShare, setCreatedShare] = useState(null);
   const [shareToDeactivate, setShareToDeactivate] = useState(null);
+  const [collaboratorToRemove, setCollaboratorToRemove] = useState(null);
+  const [activeSharingTab, setActiveSharingTab] = useState("links");
   const [successMessage, setSuccessMessage] = useState("");
 
   const { shares, loadingShares, sharesError, reloadShares } = useShares(
     trip.id,
   );
 
+  const {
+    collaborators,
+    loadingCollaborators,
+    collaboratorsError,
+    reloadCollaborators,
+  } = useCollaborators(trip.id);
+
   const { creatingShare, createShareError, createShare } = useCreateShare();
 
   const { deactivatingShare, deactivateShareError, deactivateShare } =
     useDeactivateShare();
+
+  const { removingCollaborator, removeCollaboratorError, removeCollaborator } =
+    useRemoveCollaborator();
 
   useEffect(() => {
     if (!successMessage) {
@@ -75,6 +91,7 @@ export function TripSharesTab({ trip }) {
     setCreatedShare(newShare);
     setFormData(createShareFormModel());
     setErrors({});
+    setActiveSharingTab("links");
     setSuccessMessage("Share link created successfully.");
 
     await reloadShares();
@@ -115,11 +132,36 @@ export function TripSharesTab({ trip }) {
     await reloadShares();
   }
 
+  function handleRemoveCollaboratorClick(collaborator) {
+    setCollaboratorToRemove(collaborator);
+    setSuccessMessage("");
+  }
+
+  function handleCancelRemoveCollaborator() {
+    setCollaboratorToRemove(null);
+  }
+
+  async function handleConfirmRemoveCollaborator() {
+    if (!collaboratorToRemove) {
+      return;
+    }
+
+    await removeCollaborator(trip.id, collaboratorToRemove.userId);
+
+    const removedName =
+      collaboratorToRemove.fullName || `User #${collaboratorToRemove.userId}`;
+
+    setCollaboratorToRemove(null);
+    setSuccessMessage(`${removedName} removed from collaborators.`);
+
+    await reloadCollaborators();
+  }
+
   return (
     <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
         title="Sharing"
-        description="Create share links and QR codes for this travel plan."
+        description="Create share links, QR codes and manage edit collaborators."
       />
 
       {successMessage && (
@@ -140,6 +182,12 @@ export function TripSharesTab({ trip }) {
         </div>
       )}
 
+      {removeCollaboratorError && (
+        <div className="mb-5">
+          <ErrorBox message={removeCollaboratorError} />
+        </div>
+      )}
+
       <CreateShareForm
         formData={formData}
         errors={errors}
@@ -156,29 +204,76 @@ export function TripSharesTab({ trip }) {
       )}
 
       <div className="mt-6 border-t-2 border-[#b8a692] pt-5">
-        <SectionHeader
-          title="Share links"
-          description="Review generated links, copy them or deactivate access."
+        <SharingTabSwitcher
+          activeTab={activeSharingTab}
+          onChange={setActiveSharingTab}
         />
 
-        {loadingShares && <LoadingState message="Loading share links..." />}
+        {activeSharingTab === "links" && (
+          <div className="mt-5">
+            <SectionHeader
+              title="Share links"
+              description="Review generated links, copy them or deactivate access."
+            />
 
-        {!loadingShares && sharesError && <ErrorBox message={sharesError} />}
+            {loadingShares && <LoadingState message="Loading share links..." />}
 
-        {!loadingShares && !sharesError && shares.length === 0 && (
-          <EmptyState
-            title="No share links yet"
-            description="Create a share link to let someone open this travel plan."
-          />
+            {!loadingShares && sharesError && (
+              <ErrorBox message={sharesError} />
+            )}
+
+            {!loadingShares && !sharesError && shares.length === 0 && (
+              <EmptyState
+                title="No share links yet"
+                description="Create a share link to let someone open this travel plan."
+              />
+            )}
+
+            {!loadingShares && !sharesError && shares.length > 0 && (
+              <ShareList
+                shares={shares}
+                deactivating={deactivatingShare}
+                onCopy={handleCopyLink}
+                onDeactivate={handleDeactivateClick}
+              />
+            )}
+          </div>
         )}
 
-        {!loadingShares && !sharesError && shares.length > 0 && (
-          <ShareList
-            shares={shares}
-            deactivating={deactivatingShare}
-            onCopy={handleCopyLink}
-            onDeactivate={handleDeactivateClick}
-          />
+        {activeSharingTab === "collaborators" && (
+          <div className="mt-5">
+            <SectionHeader
+              title="Collaborators"
+              description="Manage users who claimed edit access to this travel plan."
+            />
+
+            {loadingCollaborators && (
+              <LoadingState message="Loading collaborators..." />
+            )}
+
+            {!loadingCollaborators && collaboratorsError && (
+              <ErrorBox message={collaboratorsError} />
+            )}
+
+            {!loadingCollaborators &&
+              !collaboratorsError &&
+              collaborators.length === 0 && (
+                <EmptyState
+                  title="No collaborators yet"
+                  description="Users who claim edit access from an edit share link will appear here."
+                />
+              )}
+
+            {!loadingCollaborators &&
+              !collaboratorsError &&
+              collaborators.length > 0 && (
+                <CollaboratorList
+                  collaborators={collaborators}
+                  removing={removingCollaborator}
+                  onRemove={handleRemoveCollaboratorClick}
+                />
+              )}
+          </div>
         )}
       </div>
 
@@ -191,6 +286,24 @@ export function TripSharesTab({ trip }) {
         confirming={deactivatingShare}
         onConfirm={handleConfirmDeactivate}
         onCancel={handleCancelDeactivate}
+      />
+
+      <ConfirmDialog
+        open={Boolean(collaboratorToRemove)}
+        title="Remove collaborator?"
+        description={
+          collaboratorToRemove
+            ? `This will remove edit access for "${
+                collaboratorToRemove.fullName ||
+                `User #${collaboratorToRemove.userId}`
+              }".`
+            : ""
+        }
+        confirmLabel="Remove access"
+        cancelLabel="Cancel"
+        confirming={removingCollaborator}
+        onConfirm={handleConfirmRemoveCollaborator}
+        onCancel={handleCancelRemoveCollaborator}
       />
     </div>
   );

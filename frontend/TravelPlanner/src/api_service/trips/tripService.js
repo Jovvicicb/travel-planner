@@ -169,4 +169,14 @@ export const tripService = {
   claimShare(token) {
     return apiClient.post(API_ROUTES.trips.claimShare(token), {});
   },
+
+  getCollaborators(tripId) {
+    return apiClient.get(API_ROUTES.trips.collaboratorsList(tripId));
+  },
+
+  removeCollaborator(tripId, userId) {
+    return apiClient.delete(
+      API_ROUTES.trips.collaboratorsRemove(tripId, userId),
+    );
+  },
 };

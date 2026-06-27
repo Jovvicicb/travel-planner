@@ -63,6 +63,9 @@ export const API_ROUTES = {
     sharesList: (tripId) => `/trips/${tripId}/shares`,
     sharesDeactivate: (tripId, shareId) => `/trips/${tripId}/shares/${shareId}`,
     claimShare: (token) => `/trips/${token}/claim`,
+    collaboratorsList: (tripId) => `/trips/${tripId}/collaborators`,
+    collaboratorsRemove: (tripId, userId) =>
+      `/trips/${tripId}/collaborators/${userId}`,
   },
 
   sharedTrips: {
