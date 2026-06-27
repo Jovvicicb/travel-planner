@@ -10,6 +10,7 @@ import { toCreateExpenseRequest } from "../../mappers/trips/expenses/create/crea
 import { toUpdateExpenseRequest } from "../../mappers/trips/expenses/update/updateExpenseRequestMapper";
 import { toCreateChecklistItemRequest } from "../../mappers/trips/checklist/create/createChecklistItemRequestMapper";
 import { toUpdateChecklistItemRequest } from "../../mappers/trips/checklist/update/updateChecklistItemRequestMapper";
+import { toCreateShareRequest } from "../../mappers/trips/shares/create/createShareRequestMapper";
 
 export const tripService = {
   // Travel plans
@@ -147,5 +148,21 @@ export const tripService = {
 
   deleteChecklistItem(tripId, itemId) {
     return apiClient.delete(API_ROUTES.trips.checklistDelete(tripId, itemId));
+  },
+
+  // Sharing
+  createShare(tripId, data) {
+    return apiClient.post(
+      API_ROUTES.trips.sharesCreate(tripId),
+      toCreateShareRequest(data),
+    );
+  },
+
+  getShares(tripId) {
+    return apiClient.get(API_ROUTES.trips.sharesList(tripId));
+  },
+
+  deactivateShare(tripId, shareId) {
+    return apiClient.delete(API_ROUTES.trips.sharesDeactivate(tripId, shareId));
   },
 };

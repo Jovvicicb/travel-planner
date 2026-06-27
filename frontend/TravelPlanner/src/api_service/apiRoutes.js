@@ -57,5 +57,10 @@ export const API_ROUTES = {
       `/trips/${tripId}/checklist/${itemId}/toggle`,
 
     checklistDelete: (tripId, itemId) => `/trips/${tripId}/checklist/${itemId}`,
+
+    // Sharing
+    sharesCreate: (tripId) => `/trips/${tripId}/shares`,
+    sharesList: (tripId) => `/trips/${tripId}/shares`,
+    sharesDeactivate: (tripId, shareId) => `/trips/${tripId}/shares/${shareId}`,
   },
 };
