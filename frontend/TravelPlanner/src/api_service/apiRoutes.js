@@ -72,6 +72,10 @@ export const API_ROUTES = {
     details: (token) => `/shared/trips/${token}`,
   },
 
+  reminders: {
+    byTrip: (tripId) => `/reminders/trip/${tripId}`,
+  },
+
   admin: {
     users: {
       list: "/admin/users",

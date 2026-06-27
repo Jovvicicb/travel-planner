@@ -7,6 +7,7 @@ import { TripDestinationsTab } from "./TripDestinationsTab";
 import { TripExpensesTab } from "./TripExpensesTab";
 import { TripOverviewTab } from "./TripOverviewTab";
 import { TripSharesTab } from "./TripSharesTab";
+import { TripRemindersTab } from "./TripRemindersTab";
 
 const TRIP_DETAILS_TABS = [
   {
@@ -32,6 +33,10 @@ const TRIP_DETAILS_TABS = [
   {
     id: "shares",
     label: "Sharing",
+  },
+  {
+    id: "reminders",
+    label: "Reminders",
   },
 ];
 
@@ -65,6 +70,8 @@ export function TripDetailsTabs({ trip }) {
         {activeTab === "checklist" && <TripChecklistTab trip={trip} />}
 
         {activeTab === "shares" && <TripSharesTab trip={trip} />}
+
+        {activeTab === "reminders" && <TripRemindersTab trip={trip} />}
       </section>
     </>
   );
