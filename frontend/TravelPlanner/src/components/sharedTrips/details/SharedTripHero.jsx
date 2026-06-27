@@ -1,3 +1,4 @@
+import { Button } from "../../ui/Button";
 import { toSharedTripDisplayModel } from "../../../mappers/sharedTrips/details/sharedTripDisplayMapper";
 
 function InfoItem({ label, value }) {
@@ -12,7 +13,7 @@ function InfoItem({ label, value }) {
   );
 }
 
-export function SharedTripHero({ sharedTrip }) {
+export function SharedTripHero({ sharedTrip, claiming, onClaimEditAccess }) {
   const displayTrip = toSharedTripDisplayModel(sharedTrip);
 
   if (!displayTrip) {
@@ -41,6 +42,23 @@ export function SharedTripHero({ sharedTrip }) {
             {displayTrip.trip.description}
           </p>
         </div>
+
+        {displayTrip.canClaimEditAccess && (
+          <div className="shrink-0">
+            <Button
+              type="button"
+              size="sm"
+              disabled={claiming}
+              onClick={onClaimEditAccess}
+            >
+              {claiming ? "Claiming..." : "Claim edit access"}
+            </Button>
+
+            <p className="mt-2 max-w-56 text-xs font-semibold leading-5 text-[#7b6b5d]">
+              Sign in is required before edit access can be claimed.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mt-5 grid gap-4 md:grid-cols-3">

@@ -165,4 +165,8 @@ export const tripService = {
   deactivateShare(tripId, shareId) {
     return apiClient.delete(API_ROUTES.trips.sharesDeactivate(tripId, shareId));
   },
+
+  claimShare(token) {
+    return apiClient.post(API_ROUTES.trips.claimShare(token), {});
+  },
 };

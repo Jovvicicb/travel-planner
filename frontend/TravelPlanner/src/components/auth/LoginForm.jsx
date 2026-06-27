@@ -1,20 +1,38 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuth";
 import { createLoginFormModel } from "../../models/auth/loginFormModel";
 import { validateLoginForm } from "../../validation/auth/authValidation";
+import {
+  getPendingSharedTripRedirect,
+  removePendingSharedTripRedirect,
+} from "../../helpers/sharedTripRedirectHelper";
 import { Button } from "../ui/Button";
 import { FieldError } from "../ui/FieldError";
 import { ErrorBox } from "../ui/ErrorBox";
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login, authError } = useAuth();
 
   const [formData, setFormData] = useState(createLoginFormModel);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  function getSafeRedirectPath() {
+    const redirectFromUrl = searchParams.get("redirect");
+    const redirectFromStorage = getPendingSharedTripRedirect();
+
+    const redirectPath = redirectFromUrl || redirectFromStorage || "/trips";
+
+    if (!redirectPath.startsWith("/")) {
+      return "/trips";
+    }
+
+    return redirectPath;
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -46,7 +64,11 @@ export function LoginForm() {
 
       await login(formData);
 
-      navigate("/trips", { replace: true });
+      const redirectPath = getSafeRedirectPath();
+
+      removePendingSharedTripRedirect();
+
+      navigate(redirectPath, { replace: true });
     } catch (error) {
       setSubmitError(error.message);
     } finally {

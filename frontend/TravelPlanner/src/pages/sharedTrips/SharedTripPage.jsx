@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { SharedActivityCalendarSection } from "../../components/sharedTrips/details/SharedActivityCalendarSection";
 import { SharedBudgetSummary } from "../../components/sharedTrips/details/SharedBudgetSummary";
 import { SharedChecklistSection } from "../../components/sharedTrips/details/SharedChecklistSection";
@@ -8,13 +8,56 @@ import { SharedTripHeader } from "../../components/sharedTrips/details/SharedTri
 import { SharedTripHero } from "../../components/sharedTrips/details/SharedTripHero";
 import { ErrorBox } from "../../components/ui/ErrorBox";
 import { LoadingState } from "../../components/ui/LoadingState";
+import { SuccessBox } from "../../components/ui/SuccessBox";
+import { hasAccessToken } from "../../helpers/tokenHelper";
+import { savePendingSharedTripRedirect } from "../../helpers/sharedTripRedirectHelper";
 import { useSharedTravelPlan } from "../../hooks/sharedTrips/details/useSharedTravelPlan";
+import { useClaimShare } from "../../hooks/trips/shares/claim/useClaimShare";
+import { useState } from "react";
 
 export function SharedTripPage() {
   const { token } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   const { sharedTrip, loadingSharedTrip, sharedTripError } =
     useSharedTravelPlan(token);
+
+  const { claimingShare, claimShareError, claimShare } = useClaimShare();
+
+  async function handleClaimEditAccess() {
+    const redirectPath = `${location.pathname}${location.search}`;
+
+    if (!hasAccessToken()) {
+      savePendingSharedTripRedirect(redirectPath);
+
+      navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`);
+
+      return;
+    }
+
+    const result = await claimShare(token);
+
+    if (!result) {
+      return;
+    }
+
+    if (result.alreadyHadAccess) {
+      setSuccessMessage(
+        "You already have edit access to this travel plan. Redirecting...",
+      );
+    } else {
+      setSuccessMessage(
+        "Edit access claimed successfully. Redirecting to travel plan...",
+      );
+    }
+
+    setTimeout(() => {
+      navigate(`/trips/${result.travelPlanId}`);
+    }, 900);
+  }
 
   return (
     <main className="min-h-screen bg-[#eee6dc] px-6 py-6 text-[#2f2924] lg:px-8">
@@ -35,7 +78,15 @@ export function SharedTripPage() {
 
         {!loadingSharedTrip && !sharedTripError && sharedTrip && (
           <>
-            <SharedTripHero sharedTrip={sharedTrip} />
+            {successMessage && <SuccessBox message={successMessage} />}
+
+            {claimShareError && <ErrorBox message={claimShareError} />}
+
+            <SharedTripHero
+              sharedTrip={sharedTrip}
+              claiming={claimingShare}
+              onClaimEditAccess={handleClaimEditAccess}
+            />
 
             <SharedBudgetSummary sharedTrip={sharedTrip} />
 

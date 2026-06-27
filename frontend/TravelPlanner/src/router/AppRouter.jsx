@@ -22,10 +22,11 @@ export function AppRouter() {
     <Routes>
       <Route path="/" element={<Navigate to="/trips" replace />} />
 
+      <Route path="/shared/trips/:token" element={<SharedTripPage />} />
+
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/shared/trips/:token" element={<SharedTripPage />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
@@ -33,26 +34,32 @@ export function AppRouter() {
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/trips/create" element={<CreateTripPage />} />
           <Route path="/trips/:tripId/edit" element={<EditTripPage />} />
+
           <Route
             path="/trips/:tripId/destinations/:destinationId/edit"
             element={<EditDestinationPage />}
           />
+
           <Route
             path="/trips/:tripId/destinations/:destinationId/activities/create"
             element={<CreateActivityPage />}
           />
+
           <Route
             path="/trips/:tripId/destinations/:destinationId/activities/:activityId/edit"
             element={<EditActivityPage />}
           />
+
           <Route
             path="/trips/:tripId/expenses/:expenseId/edit"
             element={<EditExpensePage />}
           />
+
           <Route
             path="/trips/:tripId/checklist/:itemId/edit"
             element={<EditChecklistItemPage />}
           />
+
           <Route path="/trips/:tripId" element={<TripDetailsPage />} />
         </Route>
       </Route>
