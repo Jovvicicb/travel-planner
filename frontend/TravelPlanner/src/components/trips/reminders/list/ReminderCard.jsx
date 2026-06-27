@@ -1,4 +1,6 @@
+import { REMINDER_STATUSES } from "../../../../constants/enums/reminderStatuses";
 import { toReminderDisplayModel } from "../../../../mappers/reminders/reminderDisplayMapper";
+import { Button } from "../../../ui/Button";
 
 const statusClasses = {
   upcoming: "border-[#746454] bg-[#6f5f48] text-[#fffaf3]",
@@ -6,8 +8,15 @@ const statusClasses = {
   completed: "border-[#8ba888] bg-[#edf7ec] text-[#3f6f3d]",
 };
 
-export function ReminderCard({ reminder }) {
+export function ReminderCard({
+  reminder,
+  completing,
+  deleting,
+  onComplete,
+  onDelete,
+}) {
   const displayReminder = toReminderDisplayModel(reminder);
+  const canComplete = displayReminder.status === REMINDER_STATUSES.TRIGGERED;
 
   return (
     <article className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4 shadow-sm shadow-[#2f2924]/5">
@@ -46,6 +55,29 @@ export function ReminderCard({ reminder }) {
               <p>Completed: {displayReminder.completedAtDisplay}</p>
             )}
           </div>
+        </div>
+
+        <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+          {canComplete && (
+            <Button
+              type="button"
+              size="sm"
+              disabled={completing || deleting}
+              onClick={() => onComplete(reminder)}
+            >
+              {completing ? "Completing..." : "Complete"}
+            </Button>
+          )}
+
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            disabled={completing || deleting}
+            onClick={() => onDelete(reminder)}
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </Button>
         </div>
       </div>
     </article>
