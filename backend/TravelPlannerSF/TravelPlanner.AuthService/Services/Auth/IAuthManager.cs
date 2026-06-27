@@ -19,6 +19,8 @@ namespace TravelPlanner.AuthService.Services.Auth
 
         Task<ServiceResultDto<AdminUserResponseDto>> GetUserByIdAsync(int userId);
 
+        Task<ServiceResultDto<List<UserLookupResponseDto>>> GetUsersByIdsAsync(List<int> userIds);
+
         Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role);
 
         Task<ServiceResultDto> DeleteUserAsync(int userId);

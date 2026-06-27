@@ -158,6 +158,34 @@ namespace TravelPlanner.AuthService.Services.Auth
             );
         }
 
+        public async Task<ServiceResultDto<List<UserLookupResponseDto>>> GetUsersByIdsAsync(List<int> userIds)
+        {
+            var validation = AuthValidator.ValidateUserIds(userIds);
+
+            if (!validation.IsValid)
+            {
+                return ServiceResultDto<List<UserLookupResponseDto>>.Fail(
+                    validation.Message,
+                    validation.StatusCode
+                );
+            }
+
+            var distinctIds = userIds
+                .Distinct()
+                .ToList();
+
+            var users = await userRepository.GetByIdsAsync(distinctIds);
+
+            var response = users
+                .Select(AuthMapper.ToUserLookupResponse)
+                .ToList();
+
+            return ServiceResultDto<List<UserLookupResponseDto>>.Ok(
+                response,
+                "Users fetched successfully."
+            );
+        }
+
         public async Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role)
         {
             var validation = AuthValidator.ValidateUpdateRole(userId, role);

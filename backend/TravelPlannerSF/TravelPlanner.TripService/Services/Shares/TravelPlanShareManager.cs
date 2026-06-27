@@ -1,8 +1,11 @@
-﻿using TravelPlanner.Contracts.DTOs.Common;
+﻿using Microsoft.ServiceFabric.Services.Remoting.Client;
+using TravelPlanner.Contracts.DTOs.Auth;
+using TravelPlanner.Contracts.DTOs.Common;
 using TravelPlanner.Contracts.DTOs.Trips.Activities.Calendar;
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.Contracts.DTOs.Trips.Shares;
 using TravelPlanner.Contracts.Enums;
+using TravelPlanner.Contracts.Interfaces.Auth;
 using TravelPlanner.TripService.Entities.Collaborators;
 using TravelPlanner.TripService.Entities.Shares;
 using TravelPlanner.TripService.Helpers;
@@ -34,6 +37,7 @@ namespace TravelPlanner.TripService.Services.Shares
         private readonly IExpenseRepository expenseRepository;
         private readonly IChecklistRepository checklistRepository;
         private readonly ITravelPlanCollaboratorRepository collaboratorRepository;
+        private readonly IAuthService authService;
 
         public TravelPlanShareManager(
             ITravelPlanRepository travelPlanRepository,
@@ -51,6 +55,10 @@ namespace TravelPlanner.TripService.Services.Shares
             this.expenseRepository = expenseRepository;
             this.checklistRepository = checklistRepository;
             this.collaboratorRepository = collaboratorRepository;
+
+            this.authService = ServiceProxy.Create<IAuthService>(
+                new Uri("fabric:/TravelPlannerSF/TravelPlanner.AuthService")
+            );
         }
 
         // Sharing
@@ -415,8 +423,31 @@ namespace TravelPlanner.TripService.Services.Shares
 
             var collaborators = await collaboratorRepository.GetByTravelPlanIdAsync(travelPlanId);
 
+            var userIds = collaborators
+                .Select(collaborator => collaborator.UserId)
+                .Distinct()
+                .ToList();
+
+            var usersById = new Dictionary<int, UserLookupResponseDto>();
+
+            if (userIds.Count > 0)
+            {
+                var usersResult = await authService.GetUsersByIdsAsync(userIds);
+
+                if (usersResult.Success && usersResult.Data != null)
+                {
+                    usersById = usersResult.Data
+                        .ToDictionary(user => user.Id);
+                }
+            }
+
             var response = collaborators
-                .Select(TravelPlanCollaboratorMapper.ToResponse)
+                .Select(collaborator =>
+                {
+                    usersById.TryGetValue(collaborator.UserId, out var user);
+
+                    return TravelPlanCollaboratorMapper.ToResponse(collaborator, user);
+                })
                 .ToList();
 
             return ServiceResultDto<List<TravelPlanCollaboratorResponseDto>>.Ok(

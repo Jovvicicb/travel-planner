@@ -26,6 +26,23 @@ namespace TravelPlanner.AuthService.Repositories
                 .FirstOrDefaultAsync(user => user.Id == id && user.IsActive);
         }
 
+        public async Task<List<User>> GetByIdsAsync(List<int> userIds)
+        {
+            var distinctIds = userIds
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList();
+
+            if (distinctIds.Count == 0)
+            {
+                return new List<User>();
+            }
+
+            return await dbContext.Users
+                .Where(user => distinctIds.Contains(user.Id))
+                .ToListAsync();
+        }
+
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await dbContext.Users

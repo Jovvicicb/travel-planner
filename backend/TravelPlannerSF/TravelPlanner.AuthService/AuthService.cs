@@ -95,6 +95,15 @@ namespace TravelPlanner.AuthService
             return await authManager.GetUserByIdAsync(userId);
         }
 
+        public async Task<ServiceResultDto<List<UserLookupResponseDto>>> GetUsersByIdsAsync(List<int> userIds)
+        {
+            using var scope = serviceProvider.CreateScope();
+
+            var authManager = scope.ServiceProvider.GetRequiredService<IAuthManager>();
+
+            return await authManager.GetUsersByIdsAsync(userIds);
+        }
+      
         public async Task<ServiceResultDto<AdminUserResponseDto>> UpdateUserRoleAsync(int userId, UserRole role)
         {
             using var scope = serviceProvider.CreateScope();

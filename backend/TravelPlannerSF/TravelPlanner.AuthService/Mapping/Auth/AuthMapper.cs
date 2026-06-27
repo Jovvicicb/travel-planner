@@ -37,5 +37,16 @@ namespace TravelPlanner.AuthService.Mapping.Auth
                 CreatedAt = user.CreatedAt
             };
         }
+
+        public static UserLookupResponseDto ToUserLookupResponse(User user)
+        {
+            return new UserLookupResponseDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                IsActive = user.IsActive
+            };
+        }
     }
 }

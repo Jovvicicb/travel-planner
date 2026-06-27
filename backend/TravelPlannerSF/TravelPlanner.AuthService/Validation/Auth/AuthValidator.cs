@@ -71,6 +71,21 @@ namespace TravelPlanner.AuthService.Validation.Auth
             return ValidationResultDto.Success();
         }
 
+        public static ValidationResultDto ValidateUserIds(List<int> userIds)
+        {
+            if (userIds == null || userIds.Count == 0)
+            {
+                return ValidationResultDto.Fail("User ids are required.");
+            }
+
+            if (userIds.Any(id => id <= 0))
+            {
+                return ValidationResultDto.Fail("One or more user ids are not valid.");
+            }
+
+            return ValidationResultDto.Success();
+        }
+
         public static ValidationResultDto ValidateUpdateRole(int userId, UserRole role)
         {
             var userIdValidation = ValidateUserId(userId);

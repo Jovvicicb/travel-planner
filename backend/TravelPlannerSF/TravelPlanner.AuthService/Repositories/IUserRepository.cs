@@ -8,6 +8,8 @@ namespace TravelPlanner.AuthService.Repositories
 
         Task<User?> GetByIdAsync(int id);
 
+        Task<List<User>> GetByIdsAsync(List<int> userIds);
+
         Task<User?> GetByEmailAsync(string email);
 
         Task<bool> EmailExistsAsync(string email);
