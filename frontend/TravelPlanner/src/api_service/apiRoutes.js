@@ -73,6 +73,7 @@ export const API_ROUTES = {
   },
 
   reminders: {
+    create: "/reminders",
     byTrip: (tripId) => `/reminders/trip/${tripId}`,
   },
 
