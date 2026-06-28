@@ -19,6 +19,7 @@ import { SuccessBox } from "../../../ui/SuccessBox";
 import { CreateReminderForm } from "../../reminders/create/CreateReminderForm";
 import { ReminderList } from "../../reminders/list/ReminderList";
 import { ReminderStatusTabs } from "../../reminders/tabs/ReminderStatusTabs";
+import { notifyTriggeredReminderCountChanged } from "../../../../events/reminders/triggeredReminderCountEvents";
 
 export function TripRemindersTab({ trip }) {
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -126,6 +127,8 @@ export function TripRemindersTab({ trip }) {
   async function handleCompleteReminder(reminder) {
     await completeReminder(reminder.id);
 
+    notifyTriggeredReminderCountChanged(-1);
+
     setActiveTab("completed");
     setSuccessMessage("Reminder completed successfully.");
 
@@ -147,6 +150,10 @@ export function TripRemindersTab({ trip }) {
     }
 
     await deleteReminder(reminderToDelete.id);
+
+    if (reminderToDelete.status === REMINDER_STATUSES.TRIGGERED) {
+      notifyTriggeredReminderCountChanged(-1);
+    }
 
     setReminderToDelete(null);
     setSuccessMessage("Reminder deleted successfully.");

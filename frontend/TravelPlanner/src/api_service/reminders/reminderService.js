@@ -19,6 +19,10 @@ export const reminderService = {
     return apiClient.get(API_ROUTES.reminders.triggered);
   },
 
+  getTriggeredCount() {
+    return apiClient.get(API_ROUTES.reminders.triggeredCount);
+  },
+
   getById(reminderId) {
     return apiClient.get(API_ROUTES.reminders.details(reminderId));
   },

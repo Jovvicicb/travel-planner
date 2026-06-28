@@ -10,6 +10,7 @@ import { SuccessBox } from "../../components/ui/SuccessBox";
 import { useCompleteReminder } from "../../hooks/reminders/complete/useCompleteReminder";
 import { useDeleteReminder } from "../../hooks/reminders/delete/useDeleteReminder";
 import { useTriggeredReminders } from "../../hooks/reminders/list/useTriggeredReminders";
+import { notifyTriggeredReminderCountChanged } from "../../events/reminders/triggeredReminderCountEvents";
 
 export function RemindersPage() {
   const [successMessage, setSuccessMessage] = useState("");
@@ -41,6 +42,8 @@ export function RemindersPage() {
   async function handleCompleteReminder(reminder) {
     await completeReminder(reminder.id);
 
+    notifyTriggeredReminderCountChanged(-1);
+
     setSuccessMessage("Reminder completed successfully.");
 
     await reloadReminders();
@@ -61,6 +64,8 @@ export function RemindersPage() {
     }
 
     await deleteReminder(reminderToDelete.id);
+
+    notifyTriggeredReminderCountChanged(-1);
 
     setReminderToDelete(null);
     setSuccessMessage("Reminder deleted successfully.");
