@@ -1,6 +1,7 @@
 import { REMINDER_STATUSES } from "../../../../constants/enums/reminderStatuses";
 import { toReminderDisplayModel } from "../../../../mappers/reminders/reminderDisplayMapper";
 import { Button } from "../../../ui/Button";
+import { ButtonLink } from "../../../ui/ButtonLink";
 
 const statusClasses = {
   upcoming: "border-[#746454] bg-[#6f5f48] text-[#fffaf3]",
@@ -16,7 +17,9 @@ export function ReminderCard({
   onDelete,
 }) {
   const displayReminder = toReminderDisplayModel(reminder);
+
   const canComplete = displayReminder.status === REMINDER_STATUSES.TRIGGERED;
+  const canEdit = displayReminder.status !== REMINDER_STATUSES.COMPLETED;
 
   return (
     <article className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4 shadow-sm shadow-[#2f2924]/5">
@@ -58,6 +61,16 @@ export function ReminderCard({
         </div>
 
         <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+          {canEdit && (
+            <ButtonLink
+              to={`/trips/${displayReminder.travelPlanId}/reminders/${displayReminder.id}/edit`}
+              variant="secondary"
+              size="sm"
+            >
+              Edit
+            </ButtonLink>
+          )}
+
           {canComplete && (
             <Button
               type="button"

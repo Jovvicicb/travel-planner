@@ -18,6 +18,7 @@ import { EditChecklistItemPage } from "../pages/trips/EditChecklistItemPage";
 import { SharedTripPage } from "../pages/sharedTrips/SharedTripPage";
 import { SharedAccessPage } from "../pages/sharedTrips/SharedAccessPage";
 import { AdminUserDetailsPage } from "../pages/admin/AdminUserDetailsPage";
+import { EditReminderPage } from "../pages/trips/EditReminderPage";
 
 export function AppRouter() {
   return (
@@ -60,6 +61,11 @@ export function AppRouter() {
           <Route
             path="/trips/:tripId/checklist/:itemId/edit"
             element={<EditChecklistItemPage />}
+          />
+
+          <Route
+            path="/trips/:tripId/reminders/:reminderId/edit"
+            element={<EditReminderPage />}
           />
 
           <Route path="/trips/:tripId" element={<TripDetailsPage />} />
