@@ -101,6 +101,12 @@ namespace TravelPlanner.ReportService.Services.Reports
                  command.IsAdmin
             );
 
+            var sharesResult = await tripService.GetSharesAsync(
+                command.TravelPlanId,
+                command.RequestUserId,
+                command.IsAdmin
+            );
+
             var reportData = new TravelPlanReportData
             {
                 TravelPlan = travelPlanResult.Data,
@@ -109,7 +115,10 @@ namespace TravelPlanner.ReportService.Services.Reports
                 Expenses = expensesResult.Data ?? new(),
                 BudgetSummary = budgetSummaryResult.Data,
                 ChecklistItems = checklistResult.Data ?? new(),
-                Reminders = remindersResult.Data ?? new()
+                Reminders = remindersResult.Data ?? new(),
+                ShareLinks = sharesResult.Success && sharesResult.Data != null
+                    ? sharesResult.Data
+                    : new()
             };
 
             var content = reportGenerator.Generate(reportData);

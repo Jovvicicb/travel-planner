@@ -4,6 +4,7 @@ using TravelPlanner.Contracts.DTOs.Trips.Checklist;
 using TravelPlanner.Contracts.DTOs.Trips.Destinations;
 using TravelPlanner.Contracts.DTOs.Trips.Expenses;
 using TravelPlanner.Contracts.DTOs.Trips.TravelPlans;
+using TravelPlanner.Contracts.DTOs.Trips.Shares;
 
 namespace TravelPlanner.ReportService.Models.Reports
 {
@@ -22,5 +23,7 @@ namespace TravelPlanner.ReportService.Models.Reports
         public List<ChecklistItemResponseDto> ChecklistItems { get; set; } = new();
 
         public List<ReminderResponseDto> Reminders { get; set; } = new();
+
+        public List<TravelPlanShareResponseDto> ShareLinks { get; set; } = new();
     }
 }
