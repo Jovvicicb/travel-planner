@@ -21,10 +21,6 @@ namespace TravelPlanner.ReportService.Models.Reports
 
         public List<ChecklistItemResponseDto> ChecklistItems { get; set; } = new();
 
-        public List<ReminderResponseDto> ActiveReminders { get; set; } = new();
-
-        public List<ReminderResponseDto> TriggeredReminders { get; set; } = new();
-
-        public List<ReminderResponseDto> CompletedReminders { get; set; } = new();
+        public List<ReminderResponseDto> Reminders { get; set; } = new();
     }
 }

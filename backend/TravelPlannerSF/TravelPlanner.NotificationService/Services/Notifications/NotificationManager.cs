@@ -154,17 +154,6 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             );
         }
 
-        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetActiveRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
-        {
-            return await GetRemindersByStatusAsync(
-                travelPlanId,
-                requestUserId,
-                isAdmin,
-                ReminderStatus.Pending,
-                "Active reminders fetched successfully."
-            );
-        }
-
         public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetTriggeredRemindersAsync(int requestUserId, bool isAdmin)
         {
             if (requestUserId <= 0)
@@ -188,55 +177,26 @@ namespace TravelPlanner.NotificationService.Services.Notifications
             );
         }
 
-        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetCompletedRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        public async Task<ServiceResultDto<int>> GetTriggeredReminderCountAsync(int requestUserId, bool isAdmin)
         {
-            return await GetRemindersByStatusAsync(
-                travelPlanId,
-                requestUserId,
-                isAdmin,
-                ReminderStatus.Completed,
-                "Completed reminders fetched successfully."
-            );
-        }
-
-        private async Task<ServiceResultDto<List<ReminderResponseDto>>> GetRemindersByStatusAsync(int travelPlanId, int requestUserId, bool isAdmin, ReminderStatus status, string successMessage)
-        {
-            var validation = ReminderValidator.ValidateGetByTravelPlan(travelPlanId, requestUserId);
-
-            if (!validation.IsValid)
+            if (requestUserId <= 0)
             {
-                return ServiceResultDto<List<ReminderResponseDto>>.Fail(
-                    validation.Message,
-                    validation.StatusCode
+                return ServiceResultDto<int>.Fail(
+                    "Authenticated user is required.",
+                    401
                 );
             }
 
-            var travelPlanResult = await tripService.GetTravelPlanByIdAsync(
-                travelPlanId,
-                requestUserId,
-                isAdmin
-            );
-
-            if (!travelPlanResult.Success)
-            {
-                return ServiceResultDto<List<ReminderResponseDto>>.Fail(
-                    travelPlanResult.Message,
-                    travelPlanResult.StatusCode
+            var count = isAdmin
+                ? await reminderRepository.CountByStatusAsync(ReminderStatus.Triggered)
+                : await reminderRepository.CountByStatusAndUserIdAsync(
+                    ReminderStatus.Triggered,
+                    requestUserId
                 );
-            }
 
-            var reminders = await reminderRepository.GetByTravelPlanIdAndStatusAsync(
-                travelPlanId,
-                status
-            );
-
-            var response = reminders
-                .Select(ReminderMapper.ToResponse)
-                .ToList();
-
-            return ServiceResultDto<List<ReminderResponseDto>>.Ok(
-                response,
-                successMessage
+            return ServiceResultDto<int>.Ok(
+                count,
+                "Triggered reminder count fetched successfully."
             );
         }
 

@@ -38,23 +38,26 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
                 .ToListAsync();
         }
 
-        public async Task<List<Reminder>> GetByTravelPlanIdAndStatusAsync(int travelPlanId, ReminderStatus status)
-        {
-            return await context.Reminders
-                .Where(reminder =>
-                    reminder.TravelPlanId == travelPlanId &&
-                    reminder.Status == status)
-                .OrderBy(reminder => reminder.ReminderAt)
-                .ThenByDescending(reminder => reminder.CreatedAt)
-                .ToListAsync();
-        }
-
         public async Task<List<Reminder>> GetByStatusAsync(ReminderStatus status)
         {
             return await context.Reminders
                 .Where(reminder => reminder.Status == status)
                 .OrderBy(reminder => reminder.ReminderAt)
                 .ToListAsync();
+        }
+
+        public async Task<int> CountByStatusAsync(ReminderStatus status)
+        {
+            return await context.Reminders
+                .CountAsync(reminder => reminder.Status == status);
+        }
+
+        public async Task<int> CountByStatusAndUserIdAsync(ReminderStatus status, int userId)
+        {
+            return await context.Reminders
+                .CountAsync(reminder =>
+                    reminder.Status == status &&
+                    reminder.UserId == userId);
         }
 
         public async Task UpdateAsync(Reminder reminder)

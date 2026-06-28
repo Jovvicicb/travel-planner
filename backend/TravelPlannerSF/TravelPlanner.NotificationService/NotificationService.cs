@@ -77,15 +77,6 @@ namespace TravelPlanner.NotificationService
             return await manager.GetRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
         }
 
-        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetActiveRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
-        {
-            using var scope = serviceProvider.CreateScope();
-
-            var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
-
-            return await manager.GetActiveRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
-        }
-
         public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetTriggeredRemindersAsync(int requestUserId, bool isAdmin)
         {
             using var scope = serviceProvider.CreateScope();
@@ -95,13 +86,13 @@ namespace TravelPlanner.NotificationService
             return await manager.GetTriggeredRemindersAsync(requestUserId, isAdmin);
         }
 
-        public async Task<ServiceResultDto<List<ReminderResponseDto>>> GetCompletedRemindersByTravelPlanAsync(int travelPlanId, int requestUserId, bool isAdmin)
+        public async Task<ServiceResultDto<int>> GetTriggeredReminderCountAsync(int requestUserId, bool isAdmin)
         {
             using var scope = serviceProvider.CreateScope();
 
             var manager = scope.ServiceProvider.GetRequiredService<INotificationManager>();
 
-            return await manager.GetCompletedRemindersByTravelPlanAsync(travelPlanId, requestUserId, isAdmin);
+            return await manager.GetTriggeredReminderCountAsync(requestUserId, isAdmin);
         }
 
         public async Task<ServiceResultDto<ReminderResponseDto>> UpdateReminderAsync(UpdateReminderCommandDto command)

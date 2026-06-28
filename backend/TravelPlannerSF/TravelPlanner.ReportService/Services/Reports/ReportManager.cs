@@ -95,21 +95,10 @@ namespace TravelPlanner.ReportService.Services.Reports
                 command.IsAdmin
             );
 
-            var activeRemindersResult = await notificationService.GetActiveRemindersByTravelPlanAsync(
-                command.TravelPlanId,
-                command.RequestUserId,
-                command.IsAdmin
-            );
-
-            var triggeredRemindersResult = await notificationService.GetTriggeredRemindersAsync(
-                command.RequestUserId,
-                command.IsAdmin
-            );
-
-            var completedRemindersResult = await notificationService.GetCompletedRemindersByTravelPlanAsync(
-                command.TravelPlanId,
-                command.RequestUserId,
-                command.IsAdmin
+            var remindersResult = await notificationService.GetRemindersByTravelPlanAsync(
+                 command.TravelPlanId,
+                 command.RequestUserId,
+                 command.IsAdmin
             );
 
             var reportData = new TravelPlanReportData
@@ -120,11 +109,7 @@ namespace TravelPlanner.ReportService.Services.Reports
                 Expenses = expensesResult.Data ?? new(),
                 BudgetSummary = budgetSummaryResult.Data,
                 ChecklistItems = checklistResult.Data ?? new(),
-                ActiveReminders = activeRemindersResult.Data ?? new(),
-                TriggeredReminders = triggeredRemindersResult.Data?
-                .Where(reminder => reminder.TravelPlanId == command.TravelPlanId)
-                .ToList() ?? new(),
-                CompletedReminders = completedRemindersResult.Data ?? new()
+                Reminders = remindersResult.Data ?? new()
             };
 
             var content = reportGenerator.Generate(reportData);
