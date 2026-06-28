@@ -1,19 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuth";
+import { getUserInitials } from "../../helpers/userInitialsHelper";
 import { Badge } from "../ui/Badge";
-
-function getInitials(fullName) {
-  if (!fullName) {
-    return "U";
-  }
-
-  return fullName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
 
 export function UserSidebarCard() {
   const { user, isAdmin, isAuthenticated, logout } = useAuth();
@@ -48,7 +36,7 @@ export function UserSidebarCard() {
     <div className="mt-5 rounded-3xl border border-[#746454] bg-[#5a4d41] p-4 shadow-lg shadow-[#2f2924]/15">
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#f8f3ec] text-sm font-black text-[#4b4036] shadow-md shadow-[#2f2924]/20">
-          {getInitials(user?.fullName)}
+          {getUserInitials(user?.fullName)}
         </div>
 
         <div className="min-w-0 flex-1">

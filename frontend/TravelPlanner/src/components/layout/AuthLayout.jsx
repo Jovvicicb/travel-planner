@@ -1,26 +1,15 @@
 import { SharedAccessEntry } from "../sharedTrips/access/SharedAccessEntry";
+import { AuthBackgroundPattern } from "./AuthBackgroundPattern";
+import { AuthBrandPanel } from "./AuthBrandPanel";
 
 export function AuthLayout({ title, subtitle, children }) {
   return (
-    <main className="min-h-screen bg-[#eee6dc] px-6 py-10 text-[#2f2924]">
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center justify-center">
+    <main className="relative min-h-screen overflow-hidden bg-[#eee6dc] px-6 py-10 text-[#2f2924]">
+      <AuthBackgroundPattern />
+
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center justify-center">
         <section className="grid w-full max-w-5xl overflow-hidden rounded-4xl border border-[#d6c8b8] bg-[#f8f3ec] shadow-2xl shadow-[#2f2924]/10 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="hidden bg-[#5a4d41] p-10 text-[#f8f3ec] lg:flex lg:flex-col lg:justify-center">
-            <div>
-              <h1 className="text-5xl font-black leading-tight tracking-tight text-[#fffaf3]">
-                Travel Planner
-              </h1>
-
-              <p className="mt-4 max-w-sm text-sm font-semibold leading-6 text-[#eadfd2]">
-                Sign in to manage your travel plans, or paste a shared trip link
-                to open a travel plan preview.
-              </p>
-
-              <div className="mt-8">
-                <SharedAccessEntry dark showQrScanner />
-              </div>
-            </div>
-          </div>
+          <AuthBrandPanel />
 
           <div className="p-7 sm:p-10">
             <div>
