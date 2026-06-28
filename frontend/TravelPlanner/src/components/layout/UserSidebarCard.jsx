@@ -20,7 +20,7 @@ export function UserSidebarCard() {
 
   if (!isAuthenticated) {
     return (
-      <div className="mt-6 rounded-3xl border border-[#746454] bg-[#5a4d41] p-4 shadow-lg shadow-[#2f2924]/15">
+      <div className="mt-5 rounded-3xl border border-[#746454] bg-[#5a4d41] p-4 shadow-lg shadow-[#2f2924]/15">
         <p className="mb-3 text-sm font-bold text-[#f8f3ec]">
           Continue planning your trips.
         </p>
@@ -45,7 +45,7 @@ export function UserSidebarCard() {
   }
 
   return (
-    <div className="mt-6 rounded-3xl border border-[#867463] bg-[#6a5b4d] p-4 shadow-lg shadow-[#2f2924]/10">
+    <div className="mt-5 rounded-3xl border border-[#746454] bg-[#5a4d41] p-4 shadow-lg shadow-[#2f2924]/15">
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[#f8f3ec] text-sm font-black text-[#4b4036] shadow-md shadow-[#2f2924]/20">
           {getInitials(user?.fullName)}
@@ -55,6 +55,7 @@ export function UserSidebarCard() {
           <p className="truncate text-sm font-black text-[#fffaf3]">
             {user?.fullName}
           </p>
+
           <p className="truncate text-xs font-medium text-[#d8cbbb]">
             {user?.email}
           </p>
