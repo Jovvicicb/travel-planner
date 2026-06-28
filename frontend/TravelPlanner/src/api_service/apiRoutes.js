@@ -83,6 +83,10 @@ export const API_ROUTES = {
     delete: (reminderId) => `/reminders/${reminderId}`,
   },
 
+  reports: {
+    tripReport: (tripId) => `/trips/${tripId}/report`,
+  },
+
   admin: {
     users: {
       list: "/admin/users",
