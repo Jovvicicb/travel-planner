@@ -21,13 +21,17 @@ export function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  function getSafeRedirectPath() {
+  function getSafeRedirectPath(currentUser) {
     const redirectFromUrl = searchParams.get("redirect");
     const redirectFromStorage = getPendingSharedTripRedirect();
 
     const redirectPath = redirectFromUrl || redirectFromStorage || "/trips";
 
     if (!redirectPath.startsWith("/")) {
+      return "/trips";
+    }
+
+    if (redirectPath.startsWith("/admin") && currentUser.role !== 1) {
       return "/trips";
     }
 
@@ -62,9 +66,9 @@ export function LoginForm() {
       setSubmitting(true);
       setSubmitError("");
 
-      await login(formData);
+      const currentUser = await login(formData);
 
-      const redirectPath = getSafeRedirectPath();
+      const redirectPath = getSafeRedirectPath(currentUser);
 
       removePendingSharedTripRedirect();
 

@@ -3,7 +3,13 @@ import { useAuth } from "../hooks/auth/useAuth";
 
 export function PublicRoute() {
   const location = useLocation();
-  const { initializing, isAuthenticated } = useAuth();
+  const {
+    initializing,
+    isAuthenticated,
+    isAdmin,
+    logoutRedirect,
+    clearLogoutRedirect,
+  } = useAuth();
 
   if (initializing) {
     return <p>Loading application...</p>;
@@ -13,7 +19,16 @@ export function PublicRoute() {
     const searchParams = new URLSearchParams(location.search);
     const redirectPath = searchParams.get("redirect");
 
-    if (redirectPath && redirectPath.startsWith("/")) {
+    if (logoutRedirect) {
+      clearLogoutRedirect();
+      return <Navigate to="/trips" replace />;
+    }
+
+    if (
+      redirectPath &&
+      redirectPath.startsWith("/") &&
+      (!redirectPath.startsWith("/admin") || isAdmin)
+    ) {
       return <Navigate to={redirectPath} replace />;
     }
 

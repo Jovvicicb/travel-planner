@@ -15,6 +15,7 @@ export function AuthProvider({ children }) {
     Boolean(getAccessToken()),
   );
   const [authError, setAuthError] = useState("");
+  const [logoutRedirect, setLogoutRedirect] = useState(false);
 
   const isAuthenticated = Boolean(user && token);
   const isAdmin = user?.role === USER_ROLES.ADMIN;
@@ -70,6 +71,7 @@ export function AuthProvider({ children }) {
       saveAccessToken(receivedToken);
       setToken(receivedToken);
       setUser(currentUser);
+      setLogoutRedirect(false);
 
       return currentUser;
     } catch (error) {
@@ -96,6 +98,7 @@ export function AuthProvider({ children }) {
       saveAccessToken(receivedToken);
       setToken(receivedToken);
       setUser(currentUser);
+      setLogoutRedirect(false);
 
       return currentUser;
     } catch (error) {
@@ -105,10 +108,15 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
+    setLogoutRedirect(true);
     removeAccessToken();
     setToken(null);
     setUser(null);
     setAuthError("");
+  }
+
+  function clearLogoutRedirect() {
+    setLogoutRedirect(false);
   }
 
   const value = useMemo(
@@ -119,11 +127,21 @@ export function AuthProvider({ children }) {
       authError,
       isAuthenticated,
       isAdmin,
+      logoutRedirect,
       login,
       register,
       logout,
+      clearLogoutRedirect,
     }),
-    [user, token, initializing, authError, isAuthenticated, isAdmin],
+    [
+      user,
+      token,
+      initializing,
+      authError,
+      isAuthenticated,
+      isAdmin,
+      logoutRedirect,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

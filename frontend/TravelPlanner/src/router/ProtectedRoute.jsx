@@ -3,13 +3,17 @@ import { useAuth } from "../hooks/auth/useAuth";
 
 export function ProtectedRoute() {
   const location = useLocation();
-  const { initializing, isAuthenticated } = useAuth();
+  const { initializing, isAuthenticated, logoutRedirect } = useAuth();
 
   if (initializing) {
     return <p>Loading application...</p>;
   }
 
   if (!isAuthenticated) {
+    if (logoutRedirect) {
+      return <Navigate to="/login" replace />;
+    }
+
     const redirectPath = `${location.pathname}${location.search}`;
 
     return (
