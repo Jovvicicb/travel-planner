@@ -117,6 +117,27 @@ namespace TravelPlanner.Api.Controllers
             return ResponseHelper.Send(this, result);
         }
 
+        [HttpGet("triggered/count")]
+        public async Task<IActionResult> GetTriggeredCount()
+        {
+            var userContext = UserContextHelper.GetUserContext(User);
+
+            if (userContext == null)
+            {
+                return ResponseHelper.Send(
+                    this,
+                    ServiceResultDto.Fail("Invalid authentication token.", 401)
+                );
+            }
+
+            var result = await notificationService.GetTriggeredReminderCountAsync(
+                userContext.Value.UserId,
+                userContext.Value.IsAdmin
+            );
+
+            return ResponseHelper.Send(this, result);
+        }
+
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReminderRequestDto request)
         {
