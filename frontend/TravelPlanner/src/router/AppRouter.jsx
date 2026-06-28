@@ -19,6 +19,7 @@ import { SharedTripPage } from "../pages/sharedTrips/SharedTripPage";
 import { SharedAccessPage } from "../pages/sharedTrips/SharedAccessPage";
 import { AdminUserDetailsPage } from "../pages/admin/AdminUserDetailsPage";
 import { EditReminderPage } from "../pages/trips/EditReminderPage";
+import { RemindersPage } from "../pages/reminders/RemindersPage";
 
 export function AppRouter() {
   return (
@@ -71,6 +72,8 @@ export function AppRouter() {
           <Route path="/trips/:tripId" element={<TripDetailsPage />} />
 
           <Route path="/shared-access" element={<SharedAccessPage />} />
+
+          <Route path="/reminders" element={<RemindersPage />} />
         </Route>
       </Route>
 

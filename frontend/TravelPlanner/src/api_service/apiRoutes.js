@@ -75,6 +75,7 @@ export const API_ROUTES = {
   reminders: {
     create: "/reminders",
     byTrip: (tripId) => `/reminders/trip/${tripId}`,
+    triggered: "/reminders/triggered",
     details: (reminderId) => `/reminders/${reminderId}`,
     update: (reminderId) => `/reminders/${reminderId}`,
     complete: (reminderId) => `/reminders/${reminderId}/complete`,
