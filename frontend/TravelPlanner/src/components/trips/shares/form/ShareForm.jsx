@@ -1,6 +1,7 @@
 import { SHARE_ACCESS_LEVEL_OPTIONS } from "../../../../constants/enums/shareAccessLevels";
 import { Button } from "../../../ui/Button";
 import { FieldError } from "../../../ui/FieldError";
+import { FormField } from "../../../ui/FormField";
 
 export function ShareForm({
   formData,
@@ -49,27 +50,17 @@ export function ShareForm({
           </div>
         </div>
 
-        <div>
-          <label className="text-xs font-black text-[#2f2924]">
-            Expiration date
-          </label>
-
-          <input
-            type="date"
-            name="expiresAt"
-            value={formData.expiresAt}
-            onChange={onChange}
-            className="mt-1.5 w-full rounded-xl border border-[#d6c8b8] bg-[#f8f3ec] px-3 py-2 text-sm font-semibold text-[#2f2924] outline-none transition focus:border-[#746454] focus:ring-2 focus:ring-[#746454]/10"
-          />
-
-          <p className="mt-1 text-xs font-semibold text-[#7b6b5d]">
-            Leave empty if the link should not expire.
-          </p>
-
-          <div className="mt-1">
-            <FieldError message={errors.expiresAt} />
-          </div>
-        </div>
+        <FormField
+          name="expiresAt"
+          label="Expiration date"
+          type="date"
+          value={formData.expiresAt}
+          helperText="Leave empty if the link should not expire."
+          size="sm"
+          surface="soft"
+          error={errors.expiresAt}
+          onChange={onChange}
+        />
       </div>
 
       <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

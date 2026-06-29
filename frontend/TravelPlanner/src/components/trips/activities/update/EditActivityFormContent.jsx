@@ -6,7 +6,7 @@ import { createUpdateActivityFormModel } from "../../../../models/trips/activiti
 import { validateUpdateActivityForm } from "../../../../validation/trips/activities/update/activityUpdateValidation";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
-import { UpdateActivityForm } from "./UpdateActivityForm";
+import { ActivityForm } from "../form/ActivityForm";
 
 export function EditActivityFormContent({ trip, destination, activity }) {
   const navigate = useNavigate();
@@ -77,11 +77,12 @@ export function EditActivityFormContent({ trip, destination, activity }) {
         </div>
       )}
 
-      <UpdateActivityForm
+      <ActivityForm
         formData={formData}
         errors={errors}
         destination={destination}
         submitting={updatingActivity}
+        submitLabel="Update activity"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

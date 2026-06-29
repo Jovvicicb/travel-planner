@@ -6,7 +6,7 @@ import { toUpdateReminderFormModel } from "../../../../mappers/reminders/update/
 import { validateUpdateReminderForm } from "../../../../validation/reminders/update/reminderUpdateValidation";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
-import { UpdateReminderForm } from "./UpdateReminderForm";
+import { ReminderForm } from "../form/ReminderForm";
 
 export function EditReminderFormContent({ tripId, reminder }) {
   const navigate = useNavigate();
@@ -72,10 +72,11 @@ export function EditReminderFormContent({ tripId, reminder }) {
         </div>
       )}
 
-      <UpdateReminderForm
+      <ReminderForm
         formData={formData}
         errors={errors}
         submitting={updatingReminder}
+        submitLabel="Save reminder"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

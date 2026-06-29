@@ -1,6 +1,7 @@
 import { QRCodeCanvas } from "qrcode.react";
-import { Button } from "../../../ui/Button";
+
 import { toShareListItemDisplayModel } from "../../../../mappers/trips/shares/list/shareListItemDisplayMapper";
+import { Button } from "../../../ui/Button";
 
 export function ShareCard({ share, deactivating, onCopy, onDeactivate }) {
   const displayShare = toShareListItemDisplayModel(share);

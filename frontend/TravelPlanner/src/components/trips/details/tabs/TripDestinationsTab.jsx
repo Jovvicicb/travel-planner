@@ -6,7 +6,7 @@ import { useDeleteDestination } from "../../../../hooks/trips/destinations/delet
 import { useDestinations } from "../../../../hooks/trips/destinations/list/useDestinations";
 import { createDestinationFormModel } from "../../../../models/trips/destinations/create/createDestinationFormModel";
 import { validateCreateDestinationForm } from "../../../../validation/trips/destinations/create/destinationCreateValidation";
-import { CreateDestinationForm } from "../../destinations/create/CreateDestinationForm";
+import { DestinationForm } from "../../destinations/form/DestinationForm";
 import { DestinationList } from "../../destinations/list/DestinationList";
 import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
@@ -148,11 +148,14 @@ export function TripDestinationsTab({ trip }) {
         </div>
       )}
 
-      <CreateDestinationForm
+      <DestinationForm
+        formTitle="Add destination"
+        formDescription="Dates must stay inside the travel plan range."
         formData={formData}
         errors={errors}
         travelPlan={trip}
         submitting={creatingDestination}
+        submitLabel="Add destination"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

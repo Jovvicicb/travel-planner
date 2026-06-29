@@ -16,7 +16,7 @@ import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
 import { CollaboratorList } from "../../shares/collaborators/CollaboratorList";
 import { CreatedShareCard } from "../../shares/create/CreatedShareCard";
-import { CreateShareForm } from "../../shares/create/CreateShareForm";
+import { ShareForm } from "../../shares/form/ShareForm";
 import { ShareList } from "../../shares/list/ShareList";
 import { SharingTabSwitcher } from "../../shares/tabs/SharingTabSwitcher";
 
@@ -202,7 +202,7 @@ export function TripSharesTab({ trip }) {
         </div>
       )}
 
-      <CreateShareForm
+      <ShareForm
         formData={formData}
         errors={errors}
         submitting={creatingShare}

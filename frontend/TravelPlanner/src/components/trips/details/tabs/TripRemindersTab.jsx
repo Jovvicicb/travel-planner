@@ -19,7 +19,7 @@ import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
-import { CreateReminderForm } from "../../reminders/create/CreateReminderForm";
+import { ReminderForm } from "../../reminders/form/ReminderForm";
 import { ReminderList } from "../../reminders/list/ReminderList";
 import { ReminderStatusTabs } from "../../reminders/tabs/ReminderStatusTabs";
 
@@ -200,10 +200,11 @@ export function TripRemindersTab({ trip }) {
           </div>
         )}
 
-        <CreateReminderForm
+        <ReminderForm
           formData={formData}
           errors={errors}
           submitting={creatingReminder}
+          submitLabel="Create reminder"
           onChange={handleChange}
           onSubmit={handleSubmit}
           onCancel={handleCancel}

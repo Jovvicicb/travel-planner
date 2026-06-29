@@ -1,34 +1,14 @@
+import {
+  formatSharedDate,
+  formatSharedTime,
+} from "../../../helpers/sharedTrips/sharedTripFormatHelper";
 import { EmptyState } from "../../ui/EmptyState";
 import { SectionHeader } from "../../ui/SectionHeader";
-
-const ACTIVITY_STATUS_LABELS = {
-  0: "Planned",
-  1: "Reserved",
-  2: "Completed",
-  3: "Cancelled",
-};
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
-
-function formatTime(value) {
-  if (!value) {
-    return "";
-  }
-
-  return value.toString().slice(0, 5);
-}
+import { ACTIVITY_STATUS_LABELS } from "../../../constants/enums/activityStatuses";
 
 export function SharedActivityCalendarSection({ activityCalendar }) {
+  const hasActivityCalendarDays = activityCalendar.length > 0;
+
   return (
     <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
@@ -36,14 +16,14 @@ export function SharedActivityCalendarSection({ activityCalendar }) {
         description="Read-only activities grouped by travel date."
       />
 
-      {activityCalendar.length === 0 && (
+      {!hasActivityCalendarDays && (
         <EmptyState
           title="No activities"
           description="This shared travel plan does not have activities yet."
         />
       )}
 
-      {activityCalendar.length > 0 && (
+      {hasActivityCalendarDays && (
         <div className="grid gap-4">
           {activityCalendar.map((day) => (
             <article
@@ -51,7 +31,7 @@ export function SharedActivityCalendarSection({ activityCalendar }) {
               className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4"
             >
               <h3 className="border-b border-[#d6c8b8] pb-3 text-sm font-black text-[#2f2924]">
-                {formatDate(day.date)}
+                {formatSharedDate(day.date)}
               </h3>
 
               <div className="mt-4 grid gap-3">
@@ -67,8 +47,9 @@ export function SharedActivityCalendarSection({ activityCalendar }) {
                         </h4>
 
                         <p className="mt-1 text-xs font-semibold text-[#7b6b5d]">
-                          {formatTime(activity.startTime)} -{" "}
-                          {formatTime(activity.endTime)} · {activity.location}
+                          {formatSharedTime(activity.startTime)} -{" "}
+                          {formatSharedTime(activity.endTime)} ·{" "}
+                          {activity.location}
                         </p>
                       </div>
 

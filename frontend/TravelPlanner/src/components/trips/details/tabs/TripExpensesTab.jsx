@@ -12,7 +12,7 @@ import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
-import { CreateExpenseForm } from "../../expenses/create/CreateExpenseForm";
+import { ExpenseForm } from "../../expenses/form/ExpenseForm";
 import { ExpenseList } from "../../expenses/list/ExpenseList";
 
 export function TripExpensesTab({ trip }) {
@@ -138,10 +138,11 @@ export function TripExpensesTab({ trip }) {
         </div>
       )}
 
-      <CreateExpenseForm
+      <ExpenseForm
         formData={formData}
         errors={errors}
         submitting={creatingExpense}
+        submitLabel="Add expense"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

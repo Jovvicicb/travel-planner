@@ -1,37 +1,14 @@
+import {
+  formatSharedDate,
+  formatSharedMoney,
+} from "../../../helpers/sharedTrips/sharedTripFormatHelper";
 import { EmptyState } from "../../ui/EmptyState";
 import { SectionHeader } from "../../ui/SectionHeader";
-
-const EXPENSE_CATEGORY_LABELS = {
-  0: "Transport",
-  1: "Accommodation",
-  2: "Food",
-  3: "Tickets",
-  4: "Shopping",
-  5: "Other",
-};
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
-
-function formatMoney(value) {
-  const amount = Number(value || 0);
-
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "EUR",
-  }).format(amount);
-}
+import { EXPENSE_CATEGORY_LABELS } from "../../../constants/enums/expenseCategories";
 
 export function SharedExpensesSection({ expenses }) {
+  const hasExpenses = expenses.length > 0;
+
   return (
     <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
@@ -39,14 +16,14 @@ export function SharedExpensesSection({ expenses }) {
         description="Read-only recorded expenses for this shared travel plan."
       />
 
-      {expenses.length === 0 && (
+      {!hasExpenses && (
         <EmptyState
           title="No expenses"
           description="This shared travel plan does not have recorded expenses yet."
         />
       )}
 
-      {expenses.length > 0 && (
+      {hasExpenses && (
         <div className="grid gap-4 lg:grid-cols-2">
           {expenses.map((expense) => (
             <article
@@ -61,12 +38,12 @@ export function SharedExpensesSection({ expenses }) {
 
                   <p className="mt-1 text-sm font-semibold text-[#7b6b5d]">
                     {EXPENSE_CATEGORY_LABELS[expense.category] || "Unknown"} ·{" "}
-                    {formatDate(expense.expenseDate)}
+                    {formatSharedDate(expense.expenseDate)}
                   </p>
                 </div>
 
                 <span className="shrink-0 rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-3 py-1 text-xs font-black text-[#4b4036]">
-                  {formatMoney(expense.amount)}
+                  {formatSharedMoney(expense.amount)}
                 </span>
               </div>
 

@@ -13,7 +13,7 @@ import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
-import { CreateChecklistItemForm } from "../../checklist/create/CreateChecklistItemForm";
+import { ChecklistItemForm } from "../../checklist/form/ChecklistItemForm";
 import { ChecklistItemList } from "../../checklist/list/ChecklistItemList";
 
 export function TripChecklistTab({ trip }) {
@@ -183,10 +183,12 @@ export function TripChecklistTab({ trip }) {
         </div>
       )}
 
-      <CreateChecklistItemForm
+      <ChecklistItemForm
         formData={formData}
         errors={errors}
         submitting={creatingChecklistItem}
+        submitLabel="Add checklist item"
+        showCompletedField={false}
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

@@ -33,3 +33,12 @@ export const EXPENSE_CATEGORY_OPTIONS = [
     label: "Other",
   },
 ];
+
+export const EXPENSE_CATEGORY_LABELS = {
+  [EXPENSE_CATEGORIES.TRANSPORT]: "Transport",
+  [EXPENSE_CATEGORIES.ACCOMMODATION]: "Accommodation",
+  [EXPENSE_CATEGORIES.FOOD]: "Food",
+  [EXPENSE_CATEGORIES.TICKETS]: "Tickets",
+  [EXPENSE_CATEGORIES.SHOPPING]: "Shopping",
+  [EXPENSE_CATEGORIES.OTHER]: "Other",
+};

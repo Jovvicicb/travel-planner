@@ -6,7 +6,7 @@ import { createActivityFormModel } from "../../../../models/trips/activities/cre
 import { validateCreateActivityForm } from "../../../../validation/trips/activities/create/activityCreateValidation";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
-import { CreateActivityForm } from "./CreateActivityForm";
+import { ActivityForm } from "../form/ActivityForm";
 
 export function CreateActivityFormContent({ trip, destination }) {
   const navigate = useNavigate();
@@ -16,6 +16,8 @@ export function CreateActivityFormContent({ trip, destination }) {
 
   const [formData, setFormData] = useState(() => createActivityFormModel());
   const [errors, setErrors] = useState({});
+
+  const activitiesPath = `/trips/${trip.id}?tab=activities&destinationId=${destination.id}`;
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -41,11 +43,17 @@ export function CreateActivityFormContent({ trip, destination }) {
       return;
     }
 
-    await createActivity(trip.id, destination.id, formData);
-
-    navigate(
-      `/trips/${trip.id}?tab=activities&destinationId=${destination.id}`,
+    const createdActivity = await createActivity(
+      trip.id,
+      destination.id,
+      formData,
     );
+
+    if (!createdActivity) {
+      return;
+    }
+
+    navigate(activitiesPath);
   }
 
   function handleCancel() {
@@ -65,11 +73,12 @@ export function CreateActivityFormContent({ trip, destination }) {
         </div>
       )}
 
-      <CreateActivityForm
+      <ActivityForm
         formData={formData}
         errors={errors}
         destination={destination}
         submitting={creatingActivity}
+        submitLabel="Add activity"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

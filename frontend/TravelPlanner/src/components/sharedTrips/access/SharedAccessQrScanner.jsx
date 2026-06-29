@@ -1,7 +1,16 @@
 import { Html5Qrcode } from "html5-qrcode";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+
 import { Button } from "../../ui/Button";
 import { ErrorBox } from "../../ui/ErrorBox";
+
+const QR_SCANNER_CONFIG = {
+  fps: 10,
+  qrbox: {
+    width: 260,
+    height: 260,
+  },
+};
 
 export function SharedAccessQrScanner({ onScan }) {
   const readerId = useId().replaceAll(":", "");
@@ -11,6 +20,12 @@ export function SharedAccessQrScanner({ onScan }) {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scannerError, setScannerError] = useState("");
+
+  useEffect(() => {
+    return () => {
+      stopScanner();
+    };
+  }, []);
 
   async function stopScanner() {
     if (!scannerRef.current || !startedRef.current) {
@@ -41,13 +56,7 @@ export function SharedAccessQrScanner({ onScan }) {
 
       await scanner.start(
         { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: {
-            width: 260,
-            height: 260,
-          },
-        },
+        QR_SCANNER_CONFIG,
         async (decodedText) => {
           await stopScanner();
 
@@ -72,7 +81,7 @@ export function SharedAccessQrScanner({ onScan }) {
     }
   }
 
-  async function handleOpenScanner() {
+  function handleOpenScanner() {
     setScannerError("");
     setScannerOpen(true);
 
@@ -104,7 +113,7 @@ export function SharedAccessQrScanner({ onScan }) {
         </Button>
       </div>
 
-      {scannerError && (
+      {scannerError && !scannerOpen && (
         <div className="mt-3">
           <ErrorBox message={scannerError} />
         </div>
@@ -140,11 +149,12 @@ export function SharedAccessQrScanner({ onScan }) {
 
             <style>
               {`
-                    #${readerId} video {
-                    transform: scaleX(-1);
-                    }
-                `}
+                #${readerId} video {
+                  transform: scaleX(-1);
+                }
+              `}
             </style>
+
             <div className="overflow-hidden rounded-3xl border border-[#d6c8b8] bg-[#2f2924] p-2">
               <div id={readerId} className="overflow-hidden rounded-2xl" />
             </div>

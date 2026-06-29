@@ -1,19 +1,10 @@
+import { formatSharedDate } from "../../../helpers/sharedTrips/sharedTripFormatHelper";
 import { EmptyState } from "../../ui/EmptyState";
 import { SectionHeader } from "../../ui/SectionHeader";
 
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
-
 export function SharedDestinationsSection({ destinations }) {
+  const hasDestinations = destinations.length > 0;
+
   return (
     <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader
@@ -21,14 +12,14 @@ export function SharedDestinationsSection({ destinations }) {
         description="Places included in this shared travel plan."
       />
 
-      {destinations.length === 0 && (
+      {!hasDestinations && (
         <EmptyState
           title="No destinations"
           description="This shared travel plan does not have destinations yet."
         />
       )}
 
-      {destinations.length > 0 && (
+      {hasDestinations && (
         <div className="grid gap-4 lg:grid-cols-2">
           {destinations.map((destination) => (
             <article
@@ -44,8 +35,8 @@ export function SharedDestinationsSection({ destinations }) {
               </p>
 
               <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-[#9a8b7b]">
-                {formatDate(destination.startDate)} -{" "}
-                {formatDate(destination.endDate)}
+                {formatSharedDate(destination.startDate)} -{" "}
+                {formatSharedDate(destination.endDate)}
               </p>
 
               <p className="mt-3 line-clamp-3 text-sm font-semibold leading-6 text-[#7b6b5d]">

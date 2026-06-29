@@ -1,20 +1,18 @@
 import { toBudgetSummaryDisplayModel } from "../../../mappers/trips/budget/budgetSummaryDisplayMapper";
 
 function BudgetSummaryItem({ label, value, danger = false }) {
+  const valueClassName = [
+    "mt-2 text-xl font-black tracking-tight",
+    danger ? "text-[#7f2f2f]" : "text-[#2f2924]",
+  ].join(" ");
+
   return (
     <div className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4 shadow-sm shadow-[#2f2924]/5">
       <p className="text-xs font-black uppercase tracking-[0.16em] text-[#9a8b7b]">
         {label}
       </p>
 
-      <p
-        className={[
-          "mt-2 text-xl font-black tracking-tight",
-          danger ? "text-[#7f2f2f]" : "text-[#2f2924]",
-        ].join(" ")}
-      >
-        {value}
-      </p>
+      <p className={valueClassName}>{value}</p>
     </div>
   );
 }
@@ -25,6 +23,15 @@ export function BudgetSummaryCard({ budgetSummary }) {
   if (!summary) {
     return null;
   }
+
+  const hasOverBudgetStatus = summary.isOverBudget;
+
+  const statusBadgeClassName = [
+    "w-fit rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em]",
+    hasOverBudgetStatus
+      ? "border-[#7f2f2f]/30 bg-[#7f2f2f]/10 text-[#7f2f2f]"
+      : "border-[#746454] bg-[#6f5f48] text-[#fffaf3]",
+  ].join(" ");
 
   return (
     <section className="rounded-2xl border border-[#d6c8b8] bg-[#f8f3ec] p-4 shadow-sm shadow-[#2f2924]/5">
@@ -40,16 +47,7 @@ export function BudgetSummaryCard({ budgetSummary }) {
           </p>
         </div>
 
-        <span
-          className={[
-            "w-fit rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em]",
-            summary.isOverBudget
-              ? "border-[#7f2f2f]/30 bg-[#7f2f2f]/10 text-[#7f2f2f]"
-              : "border-[#746454] bg-[#6f5f48] text-[#fffaf3]",
-          ].join(" ")}
-        >
-          {summary.statusLabel}
-        </span>
+        <span className={statusBadgeClassName}>{summary.statusLabel}</span>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -61,13 +59,13 @@ export function BudgetSummaryCard({ budgetSummary }) {
         <BudgetSummaryItem
           label="Total expenses"
           value={summary.totalExpensesDisplay}
-          danger={summary.isOverBudget}
+          danger={hasOverBudgetStatus}
         />
 
         <BudgetSummaryItem
-          label={summary.isOverBudget ? "Over budget by" : "Remaining budget"}
+          label={hasOverBudgetStatus ? "Over budget by" : "Remaining budget"}
           value={summary.remainingBudgetDisplay}
-          danger={summary.isOverBudget}
+          danger={hasOverBudgetStatus}
         />
       </div>
     </section>

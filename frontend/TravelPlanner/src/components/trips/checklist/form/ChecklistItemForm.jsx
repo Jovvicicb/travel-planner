@@ -1,5 +1,5 @@
 import { Button } from "../../../ui/Button";
-import { FieldError } from "../../../ui/FieldError";
+import { FormField } from "../../../ui/FormField";
 
 export function ChecklistItemForm({
   formData,
@@ -25,22 +25,16 @@ export function ChecklistItemForm({
         </p>
       </div>
 
-      <div>
-        <label className="text-xs font-black text-[#2f2924]">Title</label>
-
-        <input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={onChange}
-          placeholder="Pack passport"
-          className="mt-1.5 w-full rounded-xl border border-[#d6c8b8] bg-[#f8f3ec] px-3 py-2 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-2 focus:ring-[#746454]/10"
-        />
-
-        <div className="mt-1">
-          <FieldError message={errors.title} />
-        </div>
-      </div>
+      <FormField
+        name="title"
+        label="Title"
+        value={formData.title}
+        placeholder="Pack passport"
+        size="sm"
+        surface="soft"
+        error={errors.title}
+        onChange={onChange}
+      />
 
       {showCompletedField && (
         <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-2xl border border-[#d6c8b8] bg-[#f8f3ec] p-3">

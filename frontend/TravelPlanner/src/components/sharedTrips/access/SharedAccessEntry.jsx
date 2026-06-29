@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   createSharedTripPath,
   extractSharedTripToken,
@@ -10,6 +11,7 @@ import { SharedAccessQrScanner } from "./SharedAccessQrScanner";
 
 export function SharedAccessEntry({ dark = false, showQrScanner = false }) {
   const navigate = useNavigate();
+  const sharedLinkId = useId();
 
   const [sharedLink, setSharedLink] = useState("");
   const [error, setError] = useState("");
@@ -48,7 +50,7 @@ export function SharedAccessEntry({ dark = false, showQrScanner = false }) {
       <form onSubmit={handleSubmit} noValidate className="space-y-3">
         <div>
           <label
-            htmlFor="sharedLink"
+            htmlFor={sharedLinkId}
             className={[
               "text-xs font-black uppercase tracking-[0.16em]",
               dark ? "text-[#d8cbbb]" : "text-[#7b6b5d]",
@@ -58,7 +60,7 @@ export function SharedAccessEntry({ dark = false, showQrScanner = false }) {
           </label>
 
           <input
-            id="sharedLink"
+            id={sharedLinkId}
             name="sharedLink"
             type="text"
             value={sharedLink}

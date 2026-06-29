@@ -6,7 +6,7 @@ import { createUpdateExpenseFormModel } from "../../../../models/trips/expenses/
 import { validateUpdateExpenseForm } from "../../../../validation/trips/expenses/update/expenseUpdateValidation";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
-import { UpdateExpenseForm } from "./UpdateExpenseForm";
+import { ExpenseForm } from "../form/ExpenseForm";
 
 export function EditExpenseFormContent({ trip, expense }) {
   const navigate = useNavigate();
@@ -72,10 +72,11 @@ export function EditExpenseFormContent({ trip, expense }) {
         </div>
       )}
 
-      <UpdateExpenseForm
+      <ExpenseForm
         formData={formData}
         errors={errors}
         submitting={updatingExpense}
+        submitLabel="Update expense"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

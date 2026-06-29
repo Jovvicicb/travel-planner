@@ -6,7 +6,7 @@ import { createUpdateChecklistItemFormModel } from "../../../../models/trips/che
 import { validateUpdateChecklistItemForm } from "../../../../validation/trips/checklist/update/checklistItemUpdateValidation";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { SectionHeader } from "../../../ui/SectionHeader";
-import { UpdateChecklistItemForm } from "./UpdateChecklistItemForm";
+import { ChecklistItemForm } from "../form/ChecklistItemForm";
 
 export function EditChecklistItemFormContent({ trip, item }) {
   const navigate = useNavigate();
@@ -79,10 +79,12 @@ export function EditChecklistItemFormContent({ trip, item }) {
         </div>
       )}
 
-      <UpdateChecklistItemForm
+      <ChecklistItemForm
         formData={formData}
         errors={errors}
         submitting={updatingChecklistItem}
+        submitLabel="Update checklist item"
+        showCompletedField
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

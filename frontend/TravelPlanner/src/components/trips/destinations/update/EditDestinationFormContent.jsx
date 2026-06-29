@@ -5,7 +5,7 @@ import { useUpdateDestination } from "../../../../hooks/trips/destinations/updat
 import { createUpdateDestinationFormModel } from "../../../../models/trips/destinations/update/updateDestinationFormModel";
 import { validateUpdateDestinationForm } from "../../../../validation/trips/destinations/update/destinationUpdateValidation";
 import { ErrorBox } from "../../../ui/ErrorBox";
-import { UpdateDestinationForm } from "./UpdateDestinationForm";
+import { DestinationForm } from "../form/DestinationForm";
 
 export function EditDestinationFormContent({ trip, destination }) {
   const navigate = useNavigate();
@@ -68,11 +68,14 @@ export function EditDestinationFormContent({ trip, destination }) {
         </div>
       )}
 
-      <UpdateDestinationForm
+      <DestinationForm
+        formTitle="Update destination"
+        formDescription="Update destination information. Dates must stay inside the travel plan range."
         formData={formData}
         errors={errors}
         travelPlan={trip}
         submitting={updatingDestination}
+        submitLabel="Update destination"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
