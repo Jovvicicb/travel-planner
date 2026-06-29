@@ -1,33 +1,8 @@
 import {
-  REMINDER_STATUS_LABELS,
-  REMINDER_STATUSES,
+  getReminderStatusLabel,
+  getReminderStatusTone,
 } from "../../constants/enums/reminderStatuses";
-
-function formatDateTime(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
-}
-
-function getStatusTone(status) {
-  if (status === REMINDER_STATUSES.TRIGGERED) {
-    return "triggered";
-  }
-
-  if (status === REMINDER_STATUSES.COMPLETED) {
-    return "completed";
-  }
-
-  return "upcoming";
-}
+import { formatDisplayDateTime } from "../../helpers/display/displayFormatHelper";
 
 export function toReminderDisplayModel(reminder) {
   return {
@@ -37,14 +12,14 @@ export function toReminderDisplayModel(reminder) {
     title: reminder.title || "Untitled reminder",
     description: reminder.description || "",
     reminderAt: reminder.reminderAt,
-    reminderAtDisplay: formatDateTime(reminder.reminderAt),
+    reminderAtDisplay: formatDisplayDateTime(reminder.reminderAt),
     status: reminder.status,
-    statusLabel: REMINDER_STATUS_LABELS[reminder.status] || "Unknown",
-    statusTone: getStatusTone(reminder.status),
+    statusLabel: getReminderStatusLabel(reminder.status),
+    statusTone: getReminderStatusTone(reminder.status),
     createdAt: reminder.createdAt,
-    createdAtDisplay: formatDateTime(reminder.createdAt),
+    createdAtDisplay: formatDisplayDateTime(reminder.createdAt),
     completedAt: reminder.completedAt,
-    completedAtDisplay: formatDateTime(reminder.completedAt),
+    completedAtDisplay: formatDisplayDateTime(reminder.completedAt),
   };
 }
 

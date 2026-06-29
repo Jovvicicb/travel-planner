@@ -1,10 +1,10 @@
+import { getActivityStatusLabel } from "../../../constants/enums/activityStatuses";
 import {
-  formatSharedDate,
-  formatSharedTime,
-} from "../../../helpers/sharedTrips/sharedTripFormatHelper";
+  formatDisplayDate,
+  formatDisplayTime,
+} from "../../../helpers/display/displayFormatHelper";
 import { EmptyState } from "../../ui/EmptyState";
 import { SectionHeader } from "../../ui/SectionHeader";
-import { ACTIVITY_STATUS_LABELS } from "../../../constants/enums/activityStatuses";
 
 export function SharedActivityCalendarSection({ activityCalendar }) {
   const hasActivityCalendarDays = activityCalendar.length > 0;
@@ -31,7 +31,7 @@ export function SharedActivityCalendarSection({ activityCalendar }) {
               className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4"
             >
               <h3 className="border-b border-[#d6c8b8] pb-3 text-sm font-black text-[#2f2924]">
-                {formatSharedDate(day.date)}
+                {formatDisplayDate(day.date)}
               </h3>
 
               <div className="mt-4 grid gap-3">
@@ -47,14 +47,14 @@ export function SharedActivityCalendarSection({ activityCalendar }) {
                         </h4>
 
                         <p className="mt-1 text-xs font-semibold text-[#7b6b5d]">
-                          {formatSharedTime(activity.startTime)} -{" "}
-                          {formatSharedTime(activity.endTime)} ·{" "}
+                          {formatDisplayTime(activity.startTime)} -{" "}
+                          {formatDisplayTime(activity.endTime)} ·{" "}
                           {activity.location}
                         </p>
                       </div>
 
                       <span className="w-fit rounded-full border border-[#cdbca9] bg-[#fffaf3] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#4b4036]">
-                        {ACTIVITY_STATUS_LABELS[activity.status] || "Unknown"}
+                        {getActivityStatusLabel(activity.status)}
                       </span>
                     </div>
 

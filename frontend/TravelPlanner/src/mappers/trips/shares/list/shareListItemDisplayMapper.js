@@ -1,18 +1,12 @@
-const SHARE_ACCESS_LEVEL_LABELS = {
-  0: "View",
-  1: "Edit",
-};
+import { getShareAccessLevelLabel } from "../../../../constants/enums/shareAccessLevels";
+import { formatDisplayDate } from "../../../../helpers/display/displayFormatHelper";
 
-function formatDate(value) {
+function formatShareExpirationDate(value) {
   if (!value) {
     return "Never";
   }
 
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
+  return formatDisplayDate(value);
 }
 
 export function toShareListItemDisplayModel(share) {
@@ -22,12 +16,12 @@ export function toShareListItemDisplayModel(share) {
     token: share.token,
     shareUrl: share.shareUrl,
     accessLevel: share.accessLevel,
-    accessLevelLabel: SHARE_ACCESS_LEVEL_LABELS[share.accessLevel] || "Unknown",
+    accessLevelLabel: getShareAccessLevelLabel(share.accessLevel),
     expiresAt: share.expiresAt,
-    expiresAtDisplay: formatDate(share.expiresAt),
+    expiresAtDisplay: formatShareExpirationDate(share.expiresAt),
     isActive: share.isActive,
     statusLabel: share.isActive ? "Active" : "Inactive",
     createdAt: share.createdAt,
-    createdAtDisplay: formatDate(share.createdAt),
+    createdAtDisplay: formatDisplayDate(share.createdAt),
   };
 }

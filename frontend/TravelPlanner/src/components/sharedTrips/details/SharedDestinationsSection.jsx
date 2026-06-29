@@ -1,4 +1,4 @@
-import { formatSharedDate } from "../../../helpers/sharedTrips/sharedTripFormatHelper";
+import { formatDisplayDate } from "../../../helpers/display/displayFormatHelper";
 import { EmptyState } from "../../ui/EmptyState";
 import { SectionHeader } from "../../ui/SectionHeader";
 
@@ -35,8 +35,8 @@ export function SharedDestinationsSection({ destinations }) {
               </p>
 
               <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-[#9a8b7b]">
-                {formatSharedDate(destination.startDate)} -{" "}
-                {formatSharedDate(destination.endDate)}
+                {formatDisplayDate(destination.startDate)} -{" "}
+                {formatDisplayDate(destination.endDate)}
               </p>
 
               <p className="mt-3 line-clamp-3 text-sm font-semibold leading-6 text-[#7b6b5d]">

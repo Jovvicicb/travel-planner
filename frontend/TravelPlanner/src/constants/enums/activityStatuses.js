@@ -30,3 +30,7 @@ export const ACTIVITY_STATUS_LABELS = {
   [ACTIVITY_STATUSES.COMPLETED]: "Completed",
   [ACTIVITY_STATUSES.CANCELLED]: "Cancelled",
 };
+
+export function getActivityStatusLabel(status) {
+  return ACTIVITY_STATUS_LABELS[status] || "Unknown";
+}

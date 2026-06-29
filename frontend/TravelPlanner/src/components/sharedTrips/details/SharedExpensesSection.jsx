@@ -1,10 +1,10 @@
+import { getExpenseCategoryLabel } from "../../../constants/enums/expenseCategories";
 import {
-  formatSharedDate,
-  formatSharedMoney,
-} from "../../../helpers/sharedTrips/sharedTripFormatHelper";
+  formatDisplayDate,
+  formatDisplayMoney,
+} from "../../../helpers/display/displayFormatHelper";
 import { EmptyState } from "../../ui/EmptyState";
 import { SectionHeader } from "../../ui/SectionHeader";
-import { EXPENSE_CATEGORY_LABELS } from "../../../constants/enums/expenseCategories";
 
 export function SharedExpensesSection({ expenses }) {
   const hasExpenses = expenses.length > 0;
@@ -37,13 +37,13 @@ export function SharedExpensesSection({ expenses }) {
                   </h3>
 
                   <p className="mt-1 text-sm font-semibold text-[#7b6b5d]">
-                    {EXPENSE_CATEGORY_LABELS[expense.category] || "Unknown"} ·{" "}
-                    {formatSharedDate(expense.expenseDate)}
+                    {getExpenseCategoryLabel(expense.category)} ·{" "}
+                    {formatDisplayDate(expense.expenseDate)}
                   </p>
                 </div>
 
                 <span className="shrink-0 rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-3 py-1 text-xs font-black text-[#4b4036]">
-                  {formatSharedMoney(expense.amount)}
+                  {formatDisplayMoney(expense.amount)}
                 </span>
               </div>
 

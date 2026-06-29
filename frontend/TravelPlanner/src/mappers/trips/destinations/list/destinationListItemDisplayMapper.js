@@ -1,25 +1,17 @@
-function formatDate(value) {
-  if (!value) return "";
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
+import { formatDisplayDate } from "../../../../helpers/display/displayFormatHelper";
 
 export function toDestinationListItemDisplayModel(destination) {
+  const startDateDisplay = formatDisplayDate(destination.startDate);
+  const endDateDisplay = formatDisplayDate(destination.endDate);
+  const dateRange = `${startDateDisplay} - ${endDateDisplay}`;
+
   return {
     id: destination.id,
     travelPlanId: destination.travelPlanId,
     name: destination.name,
     location: destination.location,
     notes: destination.notes || "No notes added.",
-    dateRange: `${formatDate(destination.startDate)} - ${formatDate(
-      destination.endDate,
-    )}`,
-    selectLabel: `${destination.name} #${destination.id} · ${formatDate(
-      destination.startDate,
-    )} - ${formatDate(destination.endDate)}`,
+    dateRange,
+    selectLabel: `${destination.name} #${destination.id} · ${dateRange}`,
   };
 }

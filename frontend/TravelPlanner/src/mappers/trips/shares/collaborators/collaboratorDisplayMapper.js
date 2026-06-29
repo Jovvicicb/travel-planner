@@ -1,19 +1,5 @@
-const SHARE_ACCESS_LEVEL_LABELS = {
-  0: "View",
-  1: "Edit",
-};
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
+import { getShareAccessLevelLabel } from "../../../../constants/enums/shareAccessLevels";
+import { formatDisplayDate } from "../../../../helpers/display/displayFormatHelper";
 
 export function toCollaboratorDisplayModel(collaborator) {
   return {
@@ -22,9 +8,8 @@ export function toCollaboratorDisplayModel(collaborator) {
     fullName: collaborator.fullName || `User #${collaborator.userId}`,
     email: collaborator.email || "No email available",
     accessLevel: collaborator.accessLevel,
-    accessLevelLabel:
-      SHARE_ACCESS_LEVEL_LABELS[collaborator.accessLevel] || "Unknown",
+    accessLevelLabel: getShareAccessLevelLabel(collaborator.accessLevel),
     createdAt: collaborator.createdAt,
-    createdAtDisplay: formatDate(collaborator.createdAt),
+    createdAtDisplay: formatDisplayDate(collaborator.createdAt),
   };
 }

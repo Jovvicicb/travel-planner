@@ -1,7 +1,11 @@
+import { toDateTimeRequestValue } from "../../../helpers/forms/dateTimeInputHelper";
+
 export function toUpdateReminderRequest(data) {
+  const description = data.description?.trim();
+
   return {
     title: data.title.trim(),
-    description: data.description?.trim() || null,
-    reminderAt: `${data.reminderDate}T${data.reminderTime}:00`,
+    description: description || null,
+    reminderAt: toDateTimeRequestValue(data.reminderDate, data.reminderTime),
   };
 }

@@ -1,14 +1,4 @@
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
+import { formatDisplayDate } from "../../../../helpers/display/displayFormatHelper";
 
 export function toChecklistItemDisplayModel(item) {
   return {
@@ -18,8 +8,8 @@ export function toChecklistItemDisplayModel(item) {
     isCompleted: item.isCompleted,
     statusLabel: item.isCompleted ? "Completed" : "Pending",
     createdAt: item.createdAt,
-    createdAtDisplay: formatDate(item.createdAt),
+    createdAtDisplay: formatDisplayDate(item.createdAt),
     updatedAt: item.updatedAt,
-    updatedAtDisplay: formatDate(item.updatedAt),
+    updatedAtDisplay: formatDisplayDate(item.updatedAt),
   };
 }

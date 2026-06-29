@@ -42,3 +42,7 @@ export const EXPENSE_CATEGORY_LABELS = {
   [EXPENSE_CATEGORIES.SHOPPING]: "Shopping",
   [EXPENSE_CATEGORIES.OTHER]: "Other",
 };
+
+export function getExpenseCategoryLabel(category) {
+  return EXPENSE_CATEGORY_LABELS[category] || "Unknown";
+}

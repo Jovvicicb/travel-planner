@@ -1,40 +1,25 @@
-import { USER_ROLES } from "../../../constants/enums/userRoles";
-
-const USER_ROLE_LABELS = {
-  [USER_ROLES.USER]: "User",
-  [USER_ROLES.ADMIN]: "Admin",
-  user: "User",
-  admin: "Admin",
-  User: "User",
-  Admin: "Admin",
-};
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
+import {
+  USER_ROLES,
+  getUserRoleLabel,
+  isAdminRole,
+} from "../../../constants/enums/userRoles";
+import { formatDisplayDate } from "../../../helpers/display/displayFormatHelper";
 
 export function toAdminUserDisplayModel(user) {
   const role = user.role;
+  const isAdmin = isAdminRole(role);
 
   return {
     id: user.id,
     fullName: user.fullName || "Unnamed user",
     email: user.email || "No email available",
     role,
-    roleLabel: USER_ROLE_LABELS[role] || "Unknown",
-    isAdmin: role === USER_ROLES.ADMIN || role === "Admin" || role === "admin",
+    roleLabel: getUserRoleLabel(role),
+    isAdmin,
     isActive: Boolean(user.isActive),
     statusLabel: user.isActive ? "Active" : "Inactive",
     createdAt: user.createdAt,
-    createdAtDisplay: formatDate(user.createdAt),
+    createdAtDisplay: formatDisplayDate(user.createdAt),
   };
 }
 

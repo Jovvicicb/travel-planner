@@ -13,3 +13,25 @@ export const SHARE_ACCESS_LEVEL_OPTIONS = [
     label: "Edit",
   },
 ];
+
+export const SHARE_ACCESS_LEVEL_LABELS = {
+  [SHARE_ACCESS_LEVELS.VIEW]: "View",
+  [SHARE_ACCESS_LEVELS.EDIT]: "Edit",
+};
+
+export const SHARE_ACCESS_LEVEL_BADGE_LABELS = {
+  [SHARE_ACCESS_LEVELS.VIEW]: "View access",
+  [SHARE_ACCESS_LEVELS.EDIT]: "Edit access",
+};
+
+export function getShareAccessLevelLabel(accessLevel) {
+  return SHARE_ACCESS_LEVEL_LABELS[accessLevel] || "Unknown";
+}
+
+export function getShareAccessLevelBadgeLabel(accessLevel) {
+  return SHARE_ACCESS_LEVEL_BADGE_LABELS[accessLevel] || "Unknown access";
+}
+
+export function canClaimShareEditAccess(accessLevel) {
+  return Number(accessLevel) === SHARE_ACCESS_LEVELS.EDIT;
+}

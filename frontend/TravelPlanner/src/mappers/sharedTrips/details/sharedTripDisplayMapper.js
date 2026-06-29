@@ -1,28 +1,11 @@
-const SHARE_ACCESS_LEVEL_LABELS = {
-  0: "View access",
-  1: "Edit access",
-};
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
-
-function formatMoney(value) {
-  const amount = Number(value || 0);
-
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "EUR",
-  }).format(amount);
-}
+import {
+  canClaimShareEditAccess,
+  getShareAccessLevelBadgeLabel,
+} from "../../../constants/enums/shareAccessLevels";
+import {
+  formatDisplayDate,
+  formatDisplayMoney,
+} from "../../../helpers/display/displayFormatHelper";
 
 export function toSharedTripDisplayModel(sharedTrip) {
   if (!sharedTrip) {
@@ -31,12 +14,15 @@ export function toSharedTripDisplayModel(sharedTrip) {
 
   const trip = sharedTrip.travelPlan;
   const budget = sharedTrip.budgetSummary;
+  const accessLevel = sharedTrip.accessLevel;
+  const tripDateRange = `${formatDisplayDate(trip.startDate)} - ${formatDisplayDate(
+    trip.endDate,
+  )}`;
 
   return {
-    accessLevel: sharedTrip.accessLevel,
-    accessLevelLabel:
-      SHARE_ACCESS_LEVEL_LABELS[sharedTrip.accessLevel] || "Unknown access",
-    canClaimEditAccess: sharedTrip.accessLevel === 1,
+    accessLevel,
+    accessLevelLabel: getShareAccessLevelBadgeLabel(accessLevel),
+    canClaimEditAccess: canClaimShareEditAccess(accessLevel),
 
     trip: {
       id: trip.id,
@@ -45,16 +31,16 @@ export function toSharedTripDisplayModel(sharedTrip) {
       destination: trip.destination,
       startDate: trip.startDate,
       endDate: trip.endDate,
-      dateRange: `${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}`,
+      dateRange: tripDateRange,
       budget: trip.budget,
-      budgetDisplay: formatMoney(trip.budget),
+      budgetDisplay: formatDisplayMoney(trip.budget),
     },
 
     budget: budget
       ? {
-          plannedBudgetDisplay: formatMoney(budget.plannedBudget),
-          totalExpensesDisplay: formatMoney(budget.totalExpenses),
-          remainingBudgetDisplay: formatMoney(budget.remainingBudget),
+          plannedBudgetDisplay: formatDisplayMoney(budget.plannedBudget),
+          totalExpensesDisplay: formatDisplayMoney(budget.totalExpenses),
+          remainingBudgetDisplay: formatDisplayMoney(budget.remainingBudget),
           isOverBudget: budget.isOverBudget,
           statusLabel: budget.isOverBudget ? "Over budget" : "Within budget",
         }

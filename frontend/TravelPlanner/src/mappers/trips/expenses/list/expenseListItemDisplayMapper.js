@@ -1,32 +1,8 @@
-const EXPENSE_CATEGORY_LABELS = {
-  0: "Transport",
-  1: "Accommodation",
-  2: "Food",
-  3: "Tickets",
-  4: "Shopping",
-  5: "Other",
-};
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(value));
-}
-
-function formatMoney(value) {
-  const amount = Number(value || 0);
-
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "EUR",
-  }).format(amount);
-}
+import { getExpenseCategoryLabel } from "../../../../constants/enums/expenseCategories";
+import {
+  formatDisplayDate,
+  formatDisplayMoney,
+} from "../../../../helpers/display/displayFormatHelper";
 
 export function toExpenseListItemDisplayModel(expense) {
   return {
@@ -34,11 +10,11 @@ export function toExpenseListItemDisplayModel(expense) {
     travelPlanId: expense.travelPlanId,
     title: expense.title,
     category: expense.category,
-    categoryLabel: EXPENSE_CATEGORY_LABELS[expense.category] || "Unknown",
+    categoryLabel: getExpenseCategoryLabel(expense.category),
     amount: expense.amount,
-    amountDisplay: formatMoney(expense.amount),
+    amountDisplay: formatDisplayMoney(expense.amount),
     expenseDate: expense.expenseDate,
-    dateDisplay: formatDate(expense.expenseDate),
+    dateDisplay: formatDisplayDate(expense.expenseDate),
     description: expense.description || "No description added.",
   };
 }

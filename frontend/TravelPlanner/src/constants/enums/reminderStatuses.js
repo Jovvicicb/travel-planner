@@ -27,3 +27,17 @@ export const REMINDER_STATUS_LABELS = {
   [REMINDER_STATUSES.TRIGGERED]: "Triggered",
   [REMINDER_STATUSES.COMPLETED]: "Completed",
 };
+
+export const REMINDER_STATUS_TONES = {
+  [REMINDER_STATUSES.PENDING]: "upcoming",
+  [REMINDER_STATUSES.TRIGGERED]: "triggered",
+  [REMINDER_STATUSES.COMPLETED]: "completed",
+};
+
+export function getReminderStatusLabel(status) {
+  return REMINDER_STATUS_LABELS[status] || "Unknown";
+}
+
+export function getReminderStatusTone(status) {
+  return REMINDER_STATUS_TONES[status] || "upcoming";
+}

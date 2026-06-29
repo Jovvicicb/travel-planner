@@ -1,11 +1,18 @@
+import {
+  toStartOfDayRequestValue,
+  toTimeRequestValue,
+} from "../../../../helpers/forms/dateTimeInputHelper";
+
 export function toCreateActivityRequest(data) {
+  const description = data.description?.trim();
+
   return {
     title: data.title.trim(),
-    activityDate: `${data.activityDate}T00:00:00`,
-    startTime: `${data.startTime}:00`,
-    endTime: `${data.endTime}:00`,
+    activityDate: toStartOfDayRequestValue(data.activityDate),
+    startTime: toTimeRequestValue(data.startTime),
+    endTime: toTimeRequestValue(data.endTime),
     location: data.location.trim(),
-    description: data.description.trim() || null,
+    description: description || null,
     estimatedCost: data.estimatedCost === "" ? 0 : Number(data.estimatedCost),
     status: Number(data.status),
   };

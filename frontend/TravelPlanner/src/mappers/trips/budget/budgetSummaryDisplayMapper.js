@@ -1,11 +1,4 @@
-function formatMoney(value) {
-  const amount = Number(value || 0);
-
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "EUR",
-  }).format(amount);
-}
+import { formatDisplayMoney } from "../../../helpers/display/displayFormatHelper";
 
 export function toBudgetSummaryDisplayModel(summary) {
   if (!summary) {
@@ -18,9 +11,9 @@ export function toBudgetSummaryDisplayModel(summary) {
     totalExpenses: summary.totalExpenses,
     remainingBudget: summary.remainingBudget,
     isOverBudget: summary.isOverBudget,
-    plannedBudgetDisplay: formatMoney(summary.plannedBudget),
-    totalExpensesDisplay: formatMoney(summary.totalExpenses),
-    remainingBudgetDisplay: formatMoney(summary.remainingBudget),
+    plannedBudgetDisplay: formatDisplayMoney(summary.plannedBudget),
+    totalExpensesDisplay: formatDisplayMoney(summary.totalExpenses),
+    remainingBudgetDisplay: formatDisplayMoney(summary.remainingBudget),
     statusLabel: summary.isOverBudget ? "Over budget" : "Within budget",
   };
 }
