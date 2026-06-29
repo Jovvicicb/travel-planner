@@ -3,15 +3,18 @@ import { SharedAccessEntry } from "../../components/sharedTrips/access/SharedAcc
 import { SharedAccessStepCard } from "../../components/sharedTrips/access/SharedAccessStepCard";
 import { SectionHeader } from "../../components/ui/SectionHeader";
 
+const sectionClassName =
+  "rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5";
+
 export function SharedAccessPage() {
   return (
     <div className="grid gap-6">
       <AppHeader
         title="Shared access"
-        subtitle="Open shared travel plans from links you receive in one simple place."
+        description="Open shared travel plans from links you receive in one simple place."
       />
 
-      <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+      <section className={sectionClassName}>
         <SectionHeader
           title="How shared access works"
           description="Use a shared link to preview a travel plan and claim edit access when the link allows it."
@@ -38,7 +41,7 @@ export function SharedAccessPage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+      <section className={sectionClassName}>
         <SectionHeader
           title="Open shared travel plan"
           description="Paste a shared travel plan link or token below."

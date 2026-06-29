@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+
 import { SharedActivityCalendarSection } from "../../components/sharedTrips/details/SharedActivityCalendarSection";
 import { SharedBudgetSummary } from "../../components/sharedTrips/details/SharedBudgetSummary";
 import { SharedChecklistSection } from "../../components/sharedTrips/details/SharedChecklistSection";
@@ -9,11 +11,15 @@ import { SharedTripHero } from "../../components/sharedTrips/details/SharedTripH
 import { ErrorBox } from "../../components/ui/ErrorBox";
 import { LoadingState } from "../../components/ui/LoadingState";
 import { SuccessBox } from "../../components/ui/SuccessBox";
-import { hasAccessToken } from "../../helpers/tokenHelper";
 import { savePendingSharedTripRedirect } from "../../helpers/sharedTripRedirectHelper";
+import { hasAccessToken } from "../../helpers/tokenHelper";
 import { useSharedTravelPlan } from "../../hooks/sharedTrips/details/useSharedTravelPlan";
 import { useClaimShare } from "../../hooks/trips/shares/claim/useClaimShare";
-import { useState } from "react";
+
+const CLAIM_REDIRECT_DELAY_MS = 900;
+
+const statusSectionClassName =
+  "rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5";
 
 export function SharedTripPage() {
   const { token } = useParams();
@@ -28,11 +34,14 @@ export function SharedTripPage() {
   const { claimingShare, claimShareError, claimShare } = useClaimShare();
 
   async function handleClaimEditAccess() {
+    if (!token) {
+      return;
+    }
+
     const redirectPath = `${location.pathname}${location.search}`;
 
     if (!hasAccessToken()) {
       savePendingSharedTripRedirect(redirectPath);
-
       navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`);
 
       return;
@@ -56,7 +65,7 @@ export function SharedTripPage() {
 
     setTimeout(() => {
       navigate(`/trips/${result.travelPlanId}`);
-    }, 900);
+    }, CLAIM_REDIRECT_DELAY_MS);
   }
 
   return (
@@ -65,13 +74,13 @@ export function SharedTripPage() {
         <SharedTripHeader />
 
         {loadingSharedTrip && (
-          <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+          <section className={statusSectionClassName}>
             <LoadingState message="Loading shared travel plan..." />
           </section>
         )}
 
         {!loadingSharedTrip && sharedTripError && (
-          <section className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+          <section className={statusSectionClassName}>
             <ErrorBox message={sharedTripError} />
           </section>
         )}

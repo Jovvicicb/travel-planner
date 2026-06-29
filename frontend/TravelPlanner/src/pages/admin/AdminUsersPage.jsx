@@ -9,6 +9,8 @@ import { useAdminUsers } from "../../hooks/admin/users/useAdminUsers";
 export function AdminUsersPage() {
   const { users, loadingUsers, usersError } = useAdminUsers();
 
+  const hasUsers = users.length > 0;
+
   return (
     <>
       <AppHeader
@@ -27,14 +29,14 @@ export function AdminUsersPage() {
 
           {!loadingUsers && usersError && <ErrorBox message={usersError} />}
 
-          {!loadingUsers && !usersError && users.length === 0 && (
+          {!loadingUsers && !usersError && !hasUsers && (
             <EmptyState
               title="No users found"
               description="Registered users will appear here."
             />
           )}
 
-          {!loadingUsers && !usersError && users.length > 0 && (
+          {!loadingUsers && !usersError && hasUsers && (
             <div className="grid gap-5">
               <div className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 shadow-sm shadow-[#2f2924]/5">
                 <p className="text-sm font-black text-[#2f2924]">

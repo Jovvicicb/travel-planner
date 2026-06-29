@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+
+import { notifyTriggeredReminderCountChanged } from "../../events/reminders/triggeredReminderCountEvents";
 import { AppHeader } from "../../components/layout/AppHeader";
 import { ReminderList } from "../../components/trips/reminders/list/ReminderList";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
@@ -10,7 +12,8 @@ import { SuccessBox } from "../../components/ui/SuccessBox";
 import { useCompleteReminder } from "../../hooks/reminders/complete/useCompleteReminder";
 import { useDeleteReminder } from "../../hooks/reminders/delete/useDeleteReminder";
 import { useTriggeredReminders } from "../../hooks/reminders/list/useTriggeredReminders";
-import { notifyTriggeredReminderCountChanged } from "../../events/reminders/triggeredReminderCountEvents";
+
+const SUCCESS_MESSAGE_TIMEOUT_MS = 3000;
 
 export function RemindersPage() {
   const [successMessage, setSuccessMessage] = useState("");
@@ -25,6 +28,8 @@ export function RemindersPage() {
   const { deletingReminder, deleteReminderError, deleteReminder } =
     useDeleteReminder();
 
+  const hasReminders = reminders.length > 0;
+
   useEffect(() => {
     if (!successMessage) {
       return;
@@ -32,7 +37,7 @@ export function RemindersPage() {
 
     const timeoutId = setTimeout(() => {
       setSuccessMessage("");
-    }, 3000);
+    }, SUCCESS_MESSAGE_TIMEOUT_MS);
 
     return () => {
       clearTimeout(timeoutId);
@@ -40,10 +45,13 @@ export function RemindersPage() {
   }, [successMessage]);
 
   async function handleCompleteReminder(reminder) {
-    await completeReminder(reminder.id);
+    const completedReminder = await completeReminder(reminder.id);
+
+    if (!completedReminder) {
+      return;
+    }
 
     notifyTriggeredReminderCountChanged(-1);
-
     setSuccessMessage("Reminder completed successfully.");
 
     await reloadReminders();
@@ -63,7 +71,11 @@ export function RemindersPage() {
       return;
     }
 
-    await deleteReminder(reminderToDelete.id);
+    const deletedReminder = await deleteReminder(reminderToDelete.id);
+
+    if (!deletedReminder) {
+      return;
+    }
 
     notifyTriggeredReminderCountChanged(-1);
 
@@ -113,14 +125,14 @@ export function RemindersPage() {
             <ErrorBox message={remindersError} />
           )}
 
-          {!loadingReminders && !remindersError && reminders.length === 0 && (
+          {!loadingReminders && !remindersError && !hasReminders && (
             <EmptyState
               title="No triggered reminders"
               description="Triggered reminders will appear here when their scheduled time arrives."
             />
           )}
 
-          {!loadingReminders && !remindersError && reminders.length > 0 && (
+          {!loadingReminders && !remindersError && hasReminders && (
             <ReminderList
               reminders={reminders}
               completing={completingReminder}

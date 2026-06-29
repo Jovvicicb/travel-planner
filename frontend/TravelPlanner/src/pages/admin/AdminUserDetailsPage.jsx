@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import { AdminUserActionsCard } from "../../components/admin/users/AdminUserActionsCard";
 import { AdminUserProfileCard } from "../../components/admin/users/AdminUserProfileCard";
 import { AppHeader } from "../../components/layout/AppHeader";
@@ -10,6 +11,9 @@ import { SuccessBox } from "../../components/ui/SuccessBox";
 import { useAdminUser } from "../../hooks/admin/users/useAdminUser";
 import { useDeleteAdminUser } from "../../hooks/admin/users/useDeleteAdminUser";
 import { useUpdateAdminUserRole } from "../../hooks/admin/users/useUpdateAdminUserRole";
+
+const statusCardClassName =
+  "rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5";
 
 export function AdminUserDetailsPage() {
   const { userId } = useParams();
@@ -55,7 +59,11 @@ export function AdminUserDetailsPage() {
       return;
     }
 
-    await deleteUser(user.id);
+    const deletedUser = await deleteUser(user.id);
+
+    if (!deletedUser) {
+      return;
+    }
 
     setDeleteDialogOpen(false);
 
@@ -76,14 +84,20 @@ export function AdminUserDetailsPage() {
       <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8">
         <section className="grid w-full gap-6">
           {loadingUser && (
-            <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+            <div className={statusCardClassName}>
               <LoadingState message="Loading user profile..." />
             </div>
           )}
 
           {!loadingUser && userError && (
-            <div className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
+            <div className={statusCardClassName}>
               <ErrorBox message={userError} />
+            </div>
+          )}
+
+          {!loadingUser && !userError && !user && (
+            <div className={statusCardClassName}>
+              <ErrorBox message="User not found." />
             </div>
           )}
 
