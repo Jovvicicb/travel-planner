@@ -1,10 +1,4 @@
-function toDateInputValue(value) {
-  if (!value) {
-    return "";
-  }
-
-  return value.split("T")[0];
-}
+import { toDateInputValue } from "../../../../helpers/forms/dateTimeInputHelper";
 
 export function createUpdateDestinationFormModel(destination) {
   return {

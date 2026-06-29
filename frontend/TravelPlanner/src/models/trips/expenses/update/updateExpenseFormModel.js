@@ -1,17 +1,12 @@
-function toDateInputValue(value) {
-  if (!value) {
-    return "";
-  }
-
-  return value.split("T")[0];
-}
+import { EXPENSE_CATEGORIES } from "../../../../constants/enums/expenseCategories";
+import { toDateInputValue } from "../../../../helpers/forms/dateTimeInputHelper";
 
 export function createUpdateExpenseFormModel(expense) {
   return {
     title: expense.title || "",
     category:
       expense.category === null || expense.category === undefined
-        ? "5"
+        ? String(EXPENSE_CATEGORIES.OTHER)
         : String(expense.category),
     amount:
       expense.amount === null || expense.amount === undefined

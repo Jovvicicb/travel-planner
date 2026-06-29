@@ -1,18 +1,8 @@
-function toDateInputValue(value) {
-  if (!value) {
-    return "";
-  }
-
-  return value.split("T")[0];
-}
-
-function toTimeInputValue(value) {
-  if (!value) {
-    return "";
-  }
-
-  return value.toString().slice(0, 5);
-}
+import { ACTIVITY_STATUSES } from "../../../../constants/enums/activityStatuses";
+import {
+  toDateInputValue,
+  toTimeInputValue,
+} from "../../../../helpers/forms/dateTimeInputHelper";
 
 export function createUpdateActivityFormModel(activity) {
   return {
@@ -28,7 +18,7 @@ export function createUpdateActivityFormModel(activity) {
         : String(activity.estimatedCost),
     status:
       activity.status === null || activity.status === undefined
-        ? "0"
+        ? String(ACTIVITY_STATUSES.PLANNED)
         : String(activity.status),
   };
 }

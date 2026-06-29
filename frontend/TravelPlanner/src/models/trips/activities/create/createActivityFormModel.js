@@ -1,3 +1,5 @@
+import { ACTIVITY_STATUSES } from "../../../../constants/enums/activityStatuses";
+
 export function createActivityFormModel() {
   return {
     title: "",
@@ -7,6 +9,6 @@ export function createActivityFormModel() {
     location: "",
     description: "",
     estimatedCost: "",
-    status: "0",
+    status: String(ACTIVITY_STATUSES.PLANNED),
   };
 }
