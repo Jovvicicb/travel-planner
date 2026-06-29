@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+
 import {
   REMINDER_STATUSES,
   REMINDER_STATUS_TABS,
 } from "../../../../constants/enums/reminderStatuses";
+import { notifyTriggeredReminderCountChanged } from "../../../../events/reminders/triggeredReminderCountEvents";
+import { useSuccessMessage } from "../../../../hooks/common/useSuccessMessage";
 import { useCompleteReminder } from "../../../../hooks/reminders/complete/useCompleteReminder";
 import { useCreateReminder } from "../../../../hooks/reminders/create/useCreateReminder";
 import { useDeleteReminder } from "../../../../hooks/reminders/delete/useDeleteReminder";
@@ -19,14 +22,15 @@ import { SuccessBox } from "../../../ui/SuccessBox";
 import { CreateReminderForm } from "../../reminders/create/CreateReminderForm";
 import { ReminderList } from "../../reminders/list/ReminderList";
 import { ReminderStatusTabs } from "../../reminders/tabs/ReminderStatusTabs";
-import { notifyTriggeredReminderCountChanged } from "../../../../events/reminders/triggeredReminderCountEvents";
 
 export function TripRemindersTab({ trip }) {
   const [activeTab, setActiveTab] = useState("upcoming");
   const [formData, setFormData] = useState(() => createReminderFormModel());
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
   const [reminderToDelete, setReminderToDelete] = useState(null);
+
+  const { successMessage, setSuccessMessage, clearSuccessMessage } =
+    useSuccessMessage();
 
   const { reminders, loadingReminders, remindersError, reloadReminders } =
     useTripReminders(trip.id);
@@ -39,20 +43,6 @@ export function TripRemindersTab({ trip }) {
 
   const { deletingReminder, deleteReminderError, deleteReminder } =
     useDeleteReminder();
-
-  useEffect(() => {
-    if (!successMessage) {
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [successMessage]);
 
   const counts = useMemo(
     () => ({
@@ -70,6 +60,10 @@ export function TripRemindersTab({ trip }) {
     (tab) => tab.id === activeTab,
   )?.status;
 
+  const activeLabel =
+    REMINDER_STATUS_TABS.find((tab) => tab.id === activeTab)?.label ||
+    "Reminders";
+
   const visibleReminders = useMemo(() => {
     if (activeStatus === undefined) {
       return [];
@@ -78,9 +72,12 @@ export function TripRemindersTab({ trip }) {
     return filterRemindersByStatus(reminders, activeStatus);
   }, [reminders, activeStatus]);
 
-  const activeLabel =
-    REMINDER_STATUS_TABS.find((tab) => tab.id === activeTab)?.label ||
-    "Reminders";
+  const hasVisibleReminders = visibleReminders.length > 0;
+
+  function resetForm() {
+    setFormData(createReminderFormModel());
+    setErrors({});
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -95,7 +92,7 @@ export function TripRemindersTab({ trip }) {
       [name]: "",
     }));
 
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   async function handleSubmit(event) {
@@ -108,10 +105,13 @@ export function TripRemindersTab({ trip }) {
       return;
     }
 
-    await createReminder(trip.id, formData);
+    const createdReminder = await createReminder(trip.id, formData);
 
-    setFormData(createReminderFormModel());
-    setErrors({});
+    if (!createdReminder) {
+      return;
+    }
+
+    resetForm();
     setActiveTab("upcoming");
     setSuccessMessage("Reminder created successfully.");
 
@@ -119,13 +119,16 @@ export function TripRemindersTab({ trip }) {
   }
 
   function handleCancel() {
-    setFormData(createReminderFormModel());
-    setErrors({});
-    setSuccessMessage("");
+    resetForm();
+    clearSuccessMessage();
   }
 
   async function handleCompleteReminder(reminder) {
-    await completeReminder(reminder.id);
+    const completedReminder = await completeReminder(reminder.id);
+
+    if (!completedReminder) {
+      return;
+    }
 
     notifyTriggeredReminderCountChanged(-1);
 
@@ -137,7 +140,7 @@ export function TripRemindersTab({ trip }) {
 
   function handleOpenDeleteDialog(reminder) {
     setReminderToDelete(reminder);
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   function handleCancelDelete() {
@@ -149,7 +152,11 @@ export function TripRemindersTab({ trip }) {
       return;
     }
 
-    await deleteReminder(reminderToDelete.id);
+    const deletedReminder = await deleteReminder(reminderToDelete.id);
+
+    if (!deletedReminder) {
+      return;
+    }
 
     if (reminderToDelete.status === REMINDER_STATUSES.TRIGGERED) {
       notifyTriggeredReminderCountChanged(-1);
@@ -217,14 +224,14 @@ export function TripRemindersTab({ trip }) {
                 onChange={setActiveTab}
               />
 
-              {visibleReminders.length === 0 && (
+              {!hasVisibleReminders && (
                 <EmptyState
                   title={`No ${activeLabel.toLowerCase()} reminders`}
                   description="Reminders for this status will appear here."
                 />
               )}
 
-              {visibleReminders.length > 0 && (
+              {hasVisibleReminders && (
                 <ReminderList
                   reminders={visibleReminders}
                   completing={completingReminder}

@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { useSuccessMessage } from "../../../../hooks/common/useSuccessMessage";
 import { useCreateDestination } from "../../../../hooks/trips/destinations/create/useCreateDestination";
 import { useDeleteDestination } from "../../../../hooks/trips/destinations/delete/useDeleteDestination";
 import { useDestinations } from "../../../../hooks/trips/destinations/list/useDestinations";
@@ -16,8 +18,10 @@ import { SuccessBox } from "../../../ui/SuccessBox";
 export function TripDestinationsTab({ trip }) {
   const [formData, setFormData] = useState(() => createDestinationFormModel());
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
   const [destinationToDelete, setDestinationToDelete] = useState(null);
+
+  const { successMessage, setSuccessMessage, clearSuccessMessage } =
+    useSuccessMessage();
 
   const {
     destinations,
@@ -32,19 +36,12 @@ export function TripDestinationsTab({ trip }) {
   const { deletingDestination, deleteDestinationError, deleteDestination } =
     useDeleteDestination();
 
-  useEffect(() => {
-    if (!successMessage) {
-      return;
-    }
+  const hasDestinations = destinations.length > 0;
 
-    const timeoutId = setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [successMessage]);
+  function resetForm() {
+    setFormData(createDestinationFormModel());
+    setErrors({});
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -59,7 +56,7 @@ export function TripDestinationsTab({ trip }) {
       [name]: "",
     }));
 
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   async function handleSubmit(event) {
@@ -74,8 +71,12 @@ export function TripDestinationsTab({ trip }) {
 
     const createdDestination = await createDestination(trip.id, formData);
 
-    setFormData(createDestinationFormModel());
-    setErrors({});
+    if (!createdDestination) {
+      return;
+    }
+
+    resetForm();
+
     setSuccessMessage(
       `Destination "${createdDestination.name}" created successfully.`,
     );
@@ -84,14 +85,13 @@ export function TripDestinationsTab({ trip }) {
   }
 
   function handleCancel() {
-    setFormData(createDestinationFormModel());
-    setErrors({});
-    setSuccessMessage("");
+    resetForm();
+    clearSuccessMessage();
   }
 
   function handleDeleteClick(destination) {
     setDestinationToDelete(destination);
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   function handleCancelDelete() {
@@ -103,11 +103,19 @@ export function TripDestinationsTab({ trip }) {
       return;
     }
 
-    await deleteDestination(trip.id, destinationToDelete.id);
+    const deletedDestination = await deleteDestination(
+      trip.id,
+      destinationToDelete.id,
+    );
+
+    if (!deletedDestination) {
+      return;
+    }
 
     const deletedDestinationName = destinationToDelete.name;
 
     setDestinationToDelete(null);
+
     setSuccessMessage(
       `Destination "${deletedDestinationName}" deleted successfully.`,
     );
@@ -164,23 +172,19 @@ export function TripDestinationsTab({ trip }) {
           <ErrorBox message={destinationsError} />
         )}
 
-        {!loadingDestinations &&
-          !destinationsError &&
-          destinations.length === 0 && (
-            <EmptyState
-              title="No destinations yet"
-              description="Add the first destination to start building this travel plan."
-            />
-          )}
+        {!loadingDestinations && !destinationsError && !hasDestinations && (
+          <EmptyState
+            title="No destinations yet"
+            description="Add the first destination to start building this travel plan."
+          />
+        )}
 
-        {!loadingDestinations &&
-          !destinationsError &&
-          destinations.length > 0 && (
-            <DestinationList
-              destinations={destinations}
-              onDelete={handleDeleteClick}
-            />
-          )}
+        {!loadingDestinations && !destinationsError && hasDestinations && (
+          <DestinationList
+            destinations={destinations}
+            onDelete={handleDeleteClick}
+          />
+        )}
       </div>
 
       <ConfirmDialog

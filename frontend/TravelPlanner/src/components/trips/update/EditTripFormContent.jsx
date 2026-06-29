@@ -5,7 +5,7 @@ import { useUpdateTrip } from "../../../hooks/trips/update/useUpdateTrip";
 import { createUpdateTripFormModel } from "../../../models/trips/update/updateTripFormModel";
 import { validateUpdateTripForm } from "../../../validation/trips/update/tripUpdateValidation";
 import { ErrorBox } from "../../ui/ErrorBox";
-import { UpdateTripForm } from "./UpdateTripForm";
+import { TravelPlanForm } from "../form/TravelPlanForm";
 
 export function EditTripFormContent({ trip }) {
   const navigate = useNavigate();
@@ -62,10 +62,11 @@ export function EditTripFormContent({ trip }) {
         </div>
       )}
 
-      <UpdateTripForm
+      <TravelPlanForm
         formData={formData}
         errors={errors}
         submitting={updating}
+        submitLabel="Update travel plan"
         onChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppHeader } from "../../components/layout/AppHeader";
-import { CreateTripForm } from "../../components/trips/create/CreateTripForm";
+import { TravelPlanForm } from "../../components/trips/form/TravelPlanForm";
 import { ErrorBox } from "../../components/ui/ErrorBox";
 import { useCreateTrip } from "../../hooks/trips/create/useCreateTrip";
 import { createTripFormModel } from "../../models/trips/create/createTripFormModel";
@@ -72,10 +72,11 @@ export function CreateTripPage() {
             </div>
           )}
 
-          <CreateTripForm
+          <TravelPlanForm
             formData={formData}
             errors={errors}
             submitting={creating}
+            submitLabel="Create travel plan"
             onChange={handleChange}
             onSubmit={handleSubmit}
             onCancel={handleCancel}

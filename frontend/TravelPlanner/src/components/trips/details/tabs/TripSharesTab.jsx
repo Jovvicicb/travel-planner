@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { useSuccessMessage } from "../../../../hooks/common/useSuccessMessage";
 import { useCollaborators } from "../../../../hooks/trips/shares/collaborators/useCollaborators";
 import { useRemoveCollaborator } from "../../../../hooks/trips/shares/collaborators/useRemoveCollaborator";
 import { useCreateShare } from "../../../../hooks/trips/shares/create/useCreateShare";
@@ -6,17 +8,17 @@ import { useDeactivateShare } from "../../../../hooks/trips/shares/deactivate/us
 import { useShares } from "../../../../hooks/trips/shares/list/useShares";
 import { createShareFormModel } from "../../../../models/trips/shares/create/createShareFormModel";
 import { validateCreateShareForm } from "../../../../validation/trips/shares/create/shareCreateValidation";
-import { CollaboratorList } from "../../shares/collaborators/CollaboratorList";
-import { CreatedShareCard } from "../../shares/create/CreatedShareCard";
-import { CreateShareForm } from "../../shares/create/CreateShareForm";
-import { ShareList } from "../../shares/list/ShareList";
-import { SharingTabSwitcher } from "../../shares/tabs/SharingTabSwitcher";
 import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
+import { CollaboratorList } from "../../shares/collaborators/CollaboratorList";
+import { CreatedShareCard } from "../../shares/create/CreatedShareCard";
+import { CreateShareForm } from "../../shares/create/CreateShareForm";
+import { ShareList } from "../../shares/list/ShareList";
+import { SharingTabSwitcher } from "../../shares/tabs/SharingTabSwitcher";
 
 export function TripSharesTab({ trip }) {
   const [formData, setFormData] = useState(() => createShareFormModel());
@@ -25,7 +27,9 @@ export function TripSharesTab({ trip }) {
   const [shareToDeactivate, setShareToDeactivate] = useState(null);
   const [collaboratorToRemove, setCollaboratorToRemove] = useState(null);
   const [activeSharingTab, setActiveSharingTab] = useState("links");
-  const [successMessage, setSuccessMessage] = useState("");
+
+  const { successMessage, setSuccessMessage, clearSuccessMessage } =
+    useSuccessMessage();
 
   const { shares, loadingShares, sharesError, reloadShares } = useShares(
     trip.id,
@@ -46,19 +50,13 @@ export function TripSharesTab({ trip }) {
   const { removingCollaborator, removeCollaboratorError, removeCollaborator } =
     useRemoveCollaborator();
 
-  useEffect(() => {
-    if (!successMessage) {
-      return;
-    }
+  const hasShares = shares.length > 0;
+  const hasCollaborators = collaborators.length > 0;
 
-    const timeoutId = setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [successMessage]);
+  function resetForm() {
+    setFormData(createShareFormModel());
+    setErrors({});
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -73,7 +71,7 @@ export function TripSharesTab({ trip }) {
       [name]: "",
     }));
 
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   async function handleSubmit(event) {
@@ -88,9 +86,12 @@ export function TripSharesTab({ trip }) {
 
     const newShare = await createShare(trip.id, formData);
 
+    if (!newShare) {
+      return;
+    }
+
     setCreatedShare(newShare);
-    setFormData(createShareFormModel());
-    setErrors({});
+    resetForm();
     setActiveSharingTab("links");
     setSuccessMessage("Share link created successfully.");
 
@@ -98,10 +99,9 @@ export function TripSharesTab({ trip }) {
   }
 
   function handleCancel() {
-    setFormData(createShareFormModel());
-    setErrors({});
+    resetForm();
     setCreatedShare(null);
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   async function handleCopyLink(link) {
@@ -112,7 +112,7 @@ export function TripSharesTab({ trip }) {
 
   function handleDeactivateClick(share) {
     setShareToDeactivate(share);
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   function handleCancelDeactivate() {
@@ -124,7 +124,14 @@ export function TripSharesTab({ trip }) {
       return;
     }
 
-    await deactivateShare(trip.id, shareToDeactivate.id);
+    const deactivatedShare = await deactivateShare(
+      trip.id,
+      shareToDeactivate.id,
+    );
+
+    if (!deactivatedShare) {
+      return;
+    }
 
     setShareToDeactivate(null);
     setSuccessMessage("Share link deactivated successfully.");
@@ -134,7 +141,7 @@ export function TripSharesTab({ trip }) {
 
   function handleRemoveCollaboratorClick(collaborator) {
     setCollaboratorToRemove(collaborator);
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   function handleCancelRemoveCollaborator() {
@@ -146,7 +153,14 @@ export function TripSharesTab({ trip }) {
       return;
     }
 
-    await removeCollaborator(trip.id, collaboratorToRemove.userId);
+    const removedCollaborator = await removeCollaborator(
+      trip.id,
+      collaboratorToRemove.userId,
+    );
+
+    if (!removedCollaborator) {
+      return;
+    }
 
     const removedName =
       collaboratorToRemove.fullName || `User #${collaboratorToRemove.userId}`;
@@ -222,14 +236,14 @@ export function TripSharesTab({ trip }) {
               <ErrorBox message={sharesError} />
             )}
 
-            {!loadingShares && !sharesError && shares.length === 0 && (
+            {!loadingShares && !sharesError && !hasShares && (
               <EmptyState
                 title="No share links yet"
                 description="Create a share link to let someone open this travel plan."
               />
             )}
 
-            {!loadingShares && !sharesError && shares.length > 0 && (
+            {!loadingShares && !sharesError && hasShares && (
               <ShareList
                 shares={shares}
                 deactivating={deactivatingShare}
@@ -257,7 +271,7 @@ export function TripSharesTab({ trip }) {
 
             {!loadingCollaborators &&
               !collaboratorsError &&
-              collaborators.length === 0 && (
+              !hasCollaborators && (
                 <EmptyState
                   title="No collaborators yet"
                   description="Users who claim edit access from an edit share link will appear here."
@@ -266,7 +280,7 @@ export function TripSharesTab({ trip }) {
 
             {!loadingCollaborators &&
               !collaboratorsError &&
-              collaborators.length > 0 && (
+              hasCollaborators && (
                 <CollaboratorList
                   collaborators={collaborators}
                   removing={removingCollaborator}

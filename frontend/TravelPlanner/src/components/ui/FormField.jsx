@@ -5,9 +5,14 @@ const labelClassNames = {
   md: "text-sm font-black text-[#2f2924]",
 };
 
+const helperTextClassNames = {
+  sm: "mt-1 text-xs font-semibold text-[#7b6b5d]",
+  md: "mt-1 text-sm font-semibold text-[#7b6b5d]",
+};
+
 const inputSizeClassNames = {
   sm: "mt-1.5 rounded-xl px-3 py-2 text-sm focus:ring-2",
-  md: "rounded-2xl px-4 py-3 text-sm focus:ring-4",
+  md: "mt-2 rounded-2xl px-4 py-3 text-sm focus:ring-4",
 };
 
 const inputSurfaceClassNames = {
@@ -22,6 +27,7 @@ export function FormField({
   id,
   name,
   label,
+  helperText,
   type = "text",
   value,
   error,
@@ -43,9 +49,15 @@ export function FormField({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={fieldId} className={labelClassNames[size]}>
-        {label}
-      </label>
+      <div>
+        <label htmlFor={fieldId} className={labelClassNames[size]}>
+          {label}
+        </label>
+
+        {helperText && (
+          <p className={helperTextClassNames[size]}>{helperText}</p>
+        )}
+      </div>
 
       {multiline ? (
         <textarea

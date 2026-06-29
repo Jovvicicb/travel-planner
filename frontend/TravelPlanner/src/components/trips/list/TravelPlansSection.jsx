@@ -5,7 +5,7 @@ import { LoadingState } from "../../ui/LoadingState";
 import { SectionHeader } from "../../ui/SectionHeader";
 import { TripList } from "./TripList";
 
-export function TravelPlansTab({ trips, loadingTrips, tripsError }) {
+export function TravelPlansSection({ trips, loadingTrips, tripsError }) {
   return (
     <section className="rounded-b-3xl rounded-tr-3xl border border-t-0 border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
       <SectionHeader

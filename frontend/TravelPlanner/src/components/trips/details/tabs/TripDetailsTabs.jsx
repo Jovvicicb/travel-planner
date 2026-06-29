@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
 import { Tabs } from "../../../ui/Tabs";
 import { TripActivitiesTab } from "./TripActivitiesTab";
 import { TripChecklistTab } from "./TripChecklistTab";
 import { TripDestinationsTab } from "./TripDestinationsTab";
 import { TripExpensesTab } from "./TripExpensesTab";
 import { TripOverviewTab } from "./TripOverviewTab";
-import { TripSharesTab } from "./TripSharesTab";
 import { TripRemindersTab } from "./TripRemindersTab";
+import { TripSharesTab } from "./TripSharesTab";
 
 const TRIP_DETAILS_TABS = [
   {
@@ -40,13 +40,20 @@ const TRIP_DETAILS_TABS = [
   },
 ];
 
+const DEFAULT_TAB = "overview";
+
+function getValidTab(tabId) {
+  const tabExists = TRIP_DETAILS_TABS.some((tab) => tab.id === tabId);
+
+  return tabExists ? tabId : DEFAULT_TAB;
+}
+
 export function TripDetailsTabs({ trip }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = searchParams.get("tab") || "overview";
-  const [activeTab, setActiveTab] = useState(initialTab);
+
+  const activeTab = getValidTab(searchParams.get("tab"));
 
   function handleTabChange(tabId) {
-    setActiveTab(tabId);
     setSearchParams({ tab: tabId });
   }
 

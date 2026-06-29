@@ -1,23 +1,27 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { useSuccessMessage } from "../../../../hooks/common/useSuccessMessage";
 import { useCreateExpense } from "../../../../hooks/trips/expenses/create/useCreateExpense";
 import { useDeleteExpense } from "../../../../hooks/trips/expenses/delete/useDeleteExpense";
 import { useExpenses } from "../../../../hooks/trips/expenses/list/useExpenses";
 import { createExpenseFormModel } from "../../../../models/trips/expenses/create/createExpenseFormModel";
 import { validateCreateExpenseForm } from "../../../../validation/trips/expenses/create/expenseCreateValidation";
-import { CreateExpenseForm } from "../../expenses/create/CreateExpenseForm";
-import { ExpenseList } from "../../expenses/list/ExpenseList";
 import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
+import { CreateExpenseForm } from "../../expenses/create/CreateExpenseForm";
+import { ExpenseList } from "../../expenses/list/ExpenseList";
 
 export function TripExpensesTab({ trip }) {
   const [formData, setFormData] = useState(() => createExpenseFormModel());
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+
+  const { successMessage, setSuccessMessage, clearSuccessMessage } =
+    useSuccessMessage();
 
   const { expenses, loadingExpenses, expensesError, reloadExpenses } =
     useExpenses(trip.id);
@@ -28,19 +32,12 @@ export function TripExpensesTab({ trip }) {
   const { deletingExpense, deleteExpenseError, deleteExpense } =
     useDeleteExpense();
 
-  useEffect(() => {
-    if (!successMessage) {
-      return;
-    }
+  const hasExpenses = expenses.length > 0;
 
-    const timeoutId = setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [successMessage]);
+  function resetForm() {
+    setFormData(createExpenseFormModel());
+    setErrors({});
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -55,7 +52,7 @@ export function TripExpensesTab({ trip }) {
       [name]: "",
     }));
 
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   async function handleSubmit(event) {
@@ -70,8 +67,12 @@ export function TripExpensesTab({ trip }) {
 
     const createdExpense = await createExpense(trip.id, formData);
 
-    setFormData(createExpenseFormModel());
-    setErrors({});
+    if (!createdExpense) {
+      return;
+    }
+
+    resetForm();
+
     setSuccessMessage(
       `Expense "${createdExpense.title}" created successfully.`,
     );
@@ -80,14 +81,13 @@ export function TripExpensesTab({ trip }) {
   }
 
   function handleCancel() {
-    setFormData(createExpenseFormModel());
-    setErrors({});
-    setSuccessMessage("");
+    resetForm();
+    clearSuccessMessage();
   }
 
   function handleDeleteClick(expense) {
     setExpenseToDelete(expense);
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   function handleCancelDelete() {
@@ -99,7 +99,11 @@ export function TripExpensesTab({ trip }) {
       return;
     }
 
-    await deleteExpense(trip.id, expenseToDelete.id);
+    const deletedExpense = await deleteExpense(trip.id, expenseToDelete.id);
+
+    if (!deletedExpense) {
+      return;
+    }
 
     const deletedExpenseTitle = expenseToDelete.title;
 
@@ -155,14 +159,14 @@ export function TripExpensesTab({ trip }) {
           <ErrorBox message={expensesError} />
         )}
 
-        {!loadingExpenses && !expensesError && expenses.length === 0 && (
+        {!loadingExpenses && !expensesError && !hasExpenses && (
           <EmptyState
             title="No expenses yet"
             description="Add the first expense to start tracking travel costs."
           />
         )}
 
-        {!loadingExpenses && !expensesError && expenses.length > 0 && (
+        {!loadingExpenses && !expensesError && hasExpenses && (
           <ExpenseList
             expenses={expenses}
             tripId={trip.id}

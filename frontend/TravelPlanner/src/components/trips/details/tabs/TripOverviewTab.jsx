@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toTripDetailsDisplayModel } from "../../../../mappers/trips/details/tripDetailsDisplayMapper";
-import { useDeleteTrip } from "../../../../hooks/trips/delete/useDeleteTrip";
+
 import { useBudgetSummary } from "../../../../hooks/trips/budget/useBudgetSummary";
+import { useDeleteTrip } from "../../../../hooks/trips/delete/useDeleteTrip";
+import { toTripDetailsDisplayModel } from "../../../../mappers/trips/details/tripDetailsDisplayMapper";
 import { BudgetSummaryCard } from "../../budget/BudgetSummaryCard";
 import { Button } from "../../../ui/Button";
 import { ButtonLink } from "../../../ui/ButtonLink";
@@ -14,9 +15,13 @@ import { TripInfoItem } from "../TripInfoItem";
 
 export function TripOverviewTab({ trip }) {
   const navigate = useNavigate();
-  const displayTrip = toTripDetailsDisplayModel(trip);
-  const { deleting, deleteError, deleteTrip } = useDeleteTrip();
+
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const displayTrip = toTripDetailsDisplayModel(trip);
+
+  const { deleting, deleteError, deleteTrip } = useDeleteTrip();
+
   const { budgetSummary, loadingBudgetSummary, budgetSummaryError } =
     useBudgetSummary(trip.id);
 
@@ -29,7 +34,11 @@ export function TripOverviewTab({ trip }) {
   }
 
   async function handleConfirmDelete() {
-    await deleteTrip(displayTrip.id);
+    const deletedTrip = await deleteTrip(displayTrip.id);
+
+    if (!deletedTrip) {
+      return;
+    }
 
     setShowDeleteDialog(false);
     navigate("/trips");

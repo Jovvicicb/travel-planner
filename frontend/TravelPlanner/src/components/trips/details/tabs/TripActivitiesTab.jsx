@@ -1,19 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
+import { useSuccessMessage } from "../../../../hooks/common/useSuccessMessage";
 import { useActivityCalendar } from "../../../../hooks/trips/activities/calendar/useActivityCalendar";
 import { useDeleteActivity } from "../../../../hooks/trips/activities/delete/useDeleteActivity";
 import { useActivities } from "../../../../hooks/trips/activities/list/useActivities";
 import { useDestinations } from "../../../../hooks/trips/destinations/list/useDestinations";
 import { toDestinationListItemDisplayModel } from "../../../../mappers/trips/destinations/list/destinationListItemDisplayMapper";
-import { ActivityCalendarMonthView } from "../../activities/calendar/ActivityCalendarMonthView";
-import { ActivityList } from "../../activities/list/ActivityList";
-import { ActivityTabSwitcher } from "../../activities/tabs/ActivityTabSwitcher";
 import { ConfirmDialog } from "../../../ui/ConfirmDialog";
 import { EmptyState } from "../../../ui/EmptyState";
 import { ErrorBox } from "../../../ui/ErrorBox";
 import { LoadingState } from "../../../ui/LoadingState";
 import { SectionHeader } from "../../../ui/SectionHeader";
 import { SuccessBox } from "../../../ui/SuccessBox";
+import { ActivityCalendarMonthView } from "../../activities/calendar/ActivityCalendarMonthView";
+import { ActivityList } from "../../activities/list/ActivityList";
+import { ActivityTabSwitcher } from "../../activities/tabs/ActivityTabSwitcher";
 
 export function TripActivitiesTab({ trip }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,9 +25,12 @@ export function TripActivitiesTab({ trip }) {
 
   const [selectedDestinationId, setSelectedDestinationId] =
     useState(initialDestinationId);
+
   const [activeActivityView, setActiveActivityView] = useState(initialView);
   const [activityToDelete, setActivityToDelete] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
+
+  const { successMessage, setSuccessMessage, clearSuccessMessage } =
+    useSuccessMessage();
 
   const { destinations, loadingDestinations, destinationsError } =
     useDestinations(trip.id);
@@ -47,19 +52,9 @@ export function TripActivitiesTab({ trip }) {
     (destination) => destination.id === Number(selectedDestinationId),
   );
 
-  useEffect(() => {
-    if (!successMessage) {
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      setSuccessMessage("");
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [successMessage]);
+  const hasDestinations = destinations.length > 0;
+  const hasActivities = activities.length > 0;
+  const hasCalendarDays = calendarDays.length > 0;
 
   function updateActivityUrl(view, destinationId = selectedDestinationId) {
     const nextParams = {
@@ -83,7 +78,9 @@ export function TripActivitiesTab({ trip }) {
     const destinationId = event.target.value;
 
     setSelectedDestinationId(destinationId);
-    setSuccessMessage("");
+    setActiveActivityView("list");
+    clearSuccessMessage();
+
     updateActivityUrl("list", destinationId);
   }
 
@@ -92,13 +89,14 @@ export function TripActivitiesTab({ trip }) {
 
     setSelectedDestinationId(destinationId);
     setActiveActivityView("list");
-    setSuccessMessage("");
+    clearSuccessMessage();
+
     updateActivityUrl("list", destinationId);
   }
 
   function handleDeleteClick(activity) {
     setActivityToDelete(activity);
-    setSuccessMessage("");
+    clearSuccessMessage();
   }
 
   function handleCancelDelete() {
@@ -110,15 +108,20 @@ export function TripActivitiesTab({ trip }) {
       return;
     }
 
-    await deleteActivity(
+    const deletedActivity = await deleteActivity(
       trip.id,
       activityToDelete.destinationId,
       activityToDelete.id,
     );
 
+    if (!deletedActivity) {
+      return;
+    }
+
     const deletedActivityTitle = activityToDelete.title;
 
     setActivityToDelete(null);
+
     setSuccessMessage(
       `Activity "${deletedActivityTitle}" deleted successfully.`,
     );
@@ -161,17 +164,16 @@ export function TripActivitiesTab({ trip }) {
         <LoadingState message="Loading destinations..." />
       )}
 
-      {!loadingDestinations &&
-        destinations.length === 0 &&
-        !destinationsError && (
-          <EmptyState
-            title="No destinations available"
-            description="Add a destination first before reviewing activities."
-          />
-        )}
+      {!loadingDestinations && !destinationsError && !hasDestinations && (
+        <EmptyState
+          title="No destinations available"
+          description="Add a destination first before reviewing activities."
+        />
+      )}
 
       {!loadingDestinations &&
-        destinations.length > 0 &&
+        !destinationsError &&
+        hasDestinations &&
         activeActivityView === "list" && (
           <>
             <section className="rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] p-4 shadow-sm shadow-[#2f2924]/5">
@@ -244,7 +246,7 @@ export function TripActivitiesTab({ trip }) {
               {selectedDestinationId &&
                 !loadingActivities &&
                 !activitiesError &&
-                activities.length === 0 && (
+                !hasActivities && (
                   <EmptyState
                     title="No activities yet"
                     description="This destination does not have any planned activities yet."
@@ -254,7 +256,7 @@ export function TripActivitiesTab({ trip }) {
               {selectedDestinationId &&
                 !loadingActivities &&
                 !activitiesError &&
-                activities.length > 0 && (
+                hasActivities && (
                   <ActivityList
                     activities={activities}
                     tripId={trip.id}
@@ -266,7 +268,8 @@ export function TripActivitiesTab({ trip }) {
         )}
 
       {!loadingDestinations &&
-        destinations.length > 0 &&
+        !destinationsError &&
+        hasDestinations &&
         activeActivityView === "calendar" && (
           <section>
             <SectionHeader
@@ -284,7 +287,7 @@ export function TripActivitiesTab({ trip }) {
 
             {!loadingActivityCalendar &&
               !activityCalendarError &&
-              calendarDays.length === 0 && (
+              !hasCalendarDays && (
                 <EmptyState
                   title="No activities in calendar"
                   description="Create activities for destinations to build the day-by-day travel calendar."
@@ -293,7 +296,7 @@ export function TripActivitiesTab({ trip }) {
 
             {!loadingActivityCalendar &&
               !activityCalendarError &&
-              calendarDays.length > 0 && (
+              hasCalendarDays && (
                 <ActivityCalendarMonthView
                   trip={trip}
                   destinations={destinations}
