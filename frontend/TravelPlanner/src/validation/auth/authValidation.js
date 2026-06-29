@@ -18,17 +18,54 @@ function hasNumber(value) {
   return /\d/.test(value);
 }
 
+function validateEmailField(email) {
+  if (isEmpty(email)) {
+    return "Email is required.";
+  }
+
+  if (email.length > 150) {
+    return "Email cannot be longer than 150 characters.";
+  }
+
+  if (!isValidEmail(email)) {
+    return "Email format is not valid.";
+  }
+
+  return "";
+}
+
+function validatePasswordField(password) {
+  if (isEmpty(password)) {
+    return "Password is required.";
+  }
+
+  if (password.length < 8) {
+    return "Password must contain at least 8 characters.";
+  }
+
+  if (!hasUppercaseLetter(password)) {
+    return "Password must contain at least one uppercase letter.";
+  }
+
+  if (!hasLowercaseLetter(password)) {
+    return "Password must contain at least one lowercase letter.";
+  }
+
+  if (!hasNumber(password)) {
+    return "Password must contain at least one number.";
+  }
+
+  return "";
+}
+
 export function validateLoginForm(data) {
   const errors = {};
 
   const normalizedEmail = data.email?.trim() || "";
+  const emailError = validateEmailField(normalizedEmail);
 
-  if (isEmpty(normalizedEmail)) {
-    errors.email = "Email is required.";
-  } else if (normalizedEmail.length > 150) {
-    errors.email = "Email cannot be longer than 150 characters.";
-  } else if (!isValidEmail(normalizedEmail)) {
-    errors.email = "Email format is not valid.";
+  if (emailError) {
+    errors.email = emailError;
   }
 
   if (isEmpty(data.password)) {
@@ -46,6 +83,8 @@ export function validateRegisterForm(data) {
 
   const normalizedFullName = data.fullName?.trim() || "";
   const normalizedEmail = data.email?.trim() || "";
+  const emailError = validateEmailField(normalizedEmail);
+  const passwordError = validatePasswordField(data.password);
 
   if (isEmpty(normalizedFullName)) {
     errors.fullName = "Full name is required.";
@@ -55,24 +94,12 @@ export function validateRegisterForm(data) {
     errors.fullName = "Full name cannot be longer than 100 characters.";
   }
 
-  if (isEmpty(normalizedEmail)) {
-    errors.email = "Email is required.";
-  } else if (normalizedEmail.length > 150) {
-    errors.email = "Email cannot be longer than 150 characters.";
-  } else if (!isValidEmail(normalizedEmail)) {
-    errors.email = "Email format is not valid.";
+  if (emailError) {
+    errors.email = emailError;
   }
 
-  if (isEmpty(data.password)) {
-    errors.password = "Password is required.";
-  } else if (data.password.length < 8) {
-    errors.password = "Password must contain at least 8 characters.";
-  } else if (!hasUppercaseLetter(data.password)) {
-    errors.password = "Password must contain at least one uppercase letter.";
-  } else if (!hasLowercaseLetter(data.password)) {
-    errors.password = "Password must contain at least one lowercase letter.";
-  } else if (!hasNumber(data.password)) {
-    errors.password = "Password must contain at least one number.";
+  if (passwordError) {
+    errors.password = passwordError;
   }
 
   if (data.password !== data.confirmPassword) {

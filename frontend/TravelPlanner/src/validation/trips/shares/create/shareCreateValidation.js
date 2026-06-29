@@ -1,3 +1,5 @@
+import { isValidShareAccessLevel } from "../../../../constants/enums/shareAccessLevels";
+
 function toDateEndOfDay(value) {
   if (!value) {
     return null;
@@ -14,7 +16,7 @@ export function validateCreateShareForm(data) {
   if (
     data.accessLevel === "" ||
     Number.isNaN(accessLevel) ||
-    ![0, 1].includes(accessLevel)
+    !isValidShareAccessLevel(accessLevel)
   ) {
     errors.accessLevel = "Share access level is not valid.";
   }

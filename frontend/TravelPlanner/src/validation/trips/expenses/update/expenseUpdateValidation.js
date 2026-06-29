@@ -1,5 +1,5 @@
-import { validateCreateExpenseForm } from "../create/expenseCreateValidation";
+import { validateExpenseForm } from "../common/expenseValidationRules";
 
 export function validateUpdateExpenseForm(data) {
-  return validateCreateExpenseForm(data);
+  return validateExpenseForm(data);
 }

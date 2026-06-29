@@ -46,3 +46,10 @@ export const EXPENSE_CATEGORY_LABELS = {
 export function getExpenseCategoryLabel(category) {
   return EXPENSE_CATEGORY_LABELS[category] || "Unknown";
 }
+
+export function isValidExpenseCategory(category) {
+  return Object.prototype.hasOwnProperty.call(
+    EXPENSE_CATEGORY_LABELS,
+    category,
+  );
+}

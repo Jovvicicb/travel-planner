@@ -35,3 +35,10 @@ export function getShareAccessLevelBadgeLabel(accessLevel) {
 export function canClaimShareEditAccess(accessLevel) {
   return Number(accessLevel) === SHARE_ACCESS_LEVELS.EDIT;
 }
+
+export function isValidShareAccessLevel(accessLevel) {
+  return Object.prototype.hasOwnProperty.call(
+    SHARE_ACCESS_LEVEL_LABELS,
+    accessLevel,
+  );
+}

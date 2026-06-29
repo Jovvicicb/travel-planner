@@ -1,5 +1,5 @@
-import { validateCreateChecklistItemForm } from "../create/checklistItemCreateValidation";
+import { validateChecklistItemForm } from "../common/checklistItemValidationRules";
 
 export function validateUpdateChecklistItemForm(data) {
-  return validateCreateChecklistItemForm(data);
+  return validateChecklistItemForm(data);
 }
