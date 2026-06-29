@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+
 import { AppHeader } from "../../components/layout/AppHeader";
 import { TripDetailsTabs } from "../../components/trips/details/tabs/TripDetailsTabs";
 import { Button } from "../../components/ui/Button";
@@ -7,6 +8,8 @@ import { ErrorBox } from "../../components/ui/ErrorBox";
 import { LoadingState } from "../../components/ui/LoadingState";
 import { useDownloadTripReport } from "../../hooks/reports/useDownloadTripReport";
 import { useTripDetails } from "../../hooks/trips/details/useTripDetails";
+
+const REPORT_ERROR_TIMEOUT_MS = 3000;
 
 export function TripDetailsPage() {
   const { tripId } = useParams();
@@ -26,7 +29,7 @@ export function TripDetailsPage() {
 
     const timeoutId = setTimeout(() => {
       clearDownloadReportError();
-    }, 3000);
+    }, REPORT_ERROR_TIMEOUT_MS);
 
     return () => {
       clearTimeout(timeoutId);
@@ -34,6 +37,10 @@ export function TripDetailsPage() {
   }, [downloadReportError, clearDownloadReportError]);
 
   function handleDownloadReport() {
+    if (!tripId) {
+      return;
+    }
+
     downloadTripReport(tripId);
   }
 
@@ -49,7 +56,7 @@ export function TripDetailsPage() {
         backTo="/trips"
         backLabel="Back to travel plans"
         action={
-          trip && (
+          trip ? (
             <Button
               type="button"
               size="sm"
@@ -58,7 +65,7 @@ export function TripDetailsPage() {
             >
               {downloadingReport ? "Downloading..." : "Download report"}
             </Button>
-          )
+          ) : null
         }
       />
 

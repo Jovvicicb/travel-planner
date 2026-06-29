@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { AppHeader } from "../../components/layout/AppHeader";
 import { CreateTripForm } from "../../components/trips/create/CreateTripForm";
+import { ErrorBox } from "../../components/ui/ErrorBox";
 import { useCreateTrip } from "../../hooks/trips/create/useCreateTrip";
 import { createTripFormModel } from "../../models/trips/create/createTripFormModel";
 import { validateCreateTripForm } from "../../validation/trips/create/tripCreateValidation";
-import { ErrorBox } from "../../components/ui/ErrorBox";
 
 export function CreateTripPage() {
   const navigate = useNavigate();
   const { creating, createError, createTrip } = useCreateTrip();
 
-  const [formData, setFormData] = useState(createTripFormModel);
+  const [formData, setFormData] = useState(() => ({
+    ...createTripFormModel,
+  }));
+
   const [errors, setErrors] = useState({});
 
   function handleChange(event) {
@@ -40,7 +44,15 @@ export function CreateTripPage() {
 
     const createdTrip = await createTrip(formData);
 
+    if (!createdTrip) {
+      return;
+    }
+
     navigate(`/trips/${createdTrip.id}`, { replace: true });
+  }
+
+  function handleCancel() {
+    navigate("/trips");
   }
 
   return (
@@ -66,7 +78,7 @@ export function CreateTripPage() {
             submitting={creating}
             onChange={handleChange}
             onSubmit={handleSubmit}
-            onCancel={() => navigate("/trips")}
+            onCancel={handleCancel}
           />
         </div>
       </main>

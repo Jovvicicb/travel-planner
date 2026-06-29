@@ -1,4 +1,4 @@
-export function AppBackgroundPattern() {
+export function AuthBackgroundPattern() {
   return (
     <>
       <div className="pointer-events-none absolute -right-32 top-10 h-96 w-96 rounded-full bg-[#5a4d41]/10 blur-3xl" />

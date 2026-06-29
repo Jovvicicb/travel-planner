@@ -1,71 +1,24 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
 import { AppHeader } from "../../components/layout/AppHeader";
-import { UpdateExpenseForm } from "../../components/trips/expenses/update/UpdateExpenseForm";
+import { EditExpenseFormContent } from "../../components/trips/expenses/update/EditExpenseFormContent";
 import { ErrorBox } from "../../components/ui/ErrorBox";
 import { LoadingState } from "../../components/ui/LoadingState";
-import { SectionHeader } from "../../components/ui/SectionHeader";
-import { useExpenses } from "../../hooks/trips/expenses/list/useExpenses";
-import { useUpdateExpense } from "../../hooks/trips/expenses/update/useUpdateExpense";
 import { useTripDetails } from "../../hooks/trips/details/useTripDetails";
-import { createUpdateExpenseFormModel } from "../../models/trips/expenses/update/updateExpenseFormModel";
-import { validateUpdateExpenseForm } from "../../validation/trips/expenses/update/expenseUpdateValidation";
+import { useExpenses } from "../../hooks/trips/expenses/list/useExpenses";
 
 export function EditExpensePage() {
   const { tripId, expenseId } = useParams();
-  const navigate = useNavigate();
 
   const { trip, loadingTrip, tripError } = useTripDetails(tripId);
-
   const { expenses, loadingExpenses, expensesError } = useExpenses(tripId);
 
-  const { updatingExpense, updateExpenseError, updateExpense } =
-    useUpdateExpense();
-
   const expense = expenses.find((item) => item.id === Number(expenseId));
-
-  const [formData, setFormData] = useState(null);
-  const [errors, setErrors] = useState({});
 
   const loading = loadingTrip || loadingExpenses;
   const error = tripError || expensesError;
 
-  if (!formData && expense) {
-    setFormData(createUpdateExpenseFormModel(expense));
-  }
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
-    setErrors((current) => ({
-      ...current,
-      [name]: "",
-    }));
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const validation = validateUpdateExpenseForm(formData);
-
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
-    }
-
-    await updateExpense(trip.id, expense.id, formData);
-
-    navigate(`/trips/${trip.id}?tab=expenses`);
-  }
-
-  function handleCancel() {
-    navigate(`/trips/${tripId}?tab=expenses`);
-  }
+  const backTo = `/trips/${tripId}?tab=expenses`;
 
   return (
     <>
@@ -76,7 +29,7 @@ export function EditExpensePage() {
             ? `Update expense "${expense.title}".`
             : "Update selected expense."
         }
-        backTo={`/trips/${tripId}?tab=expenses`}
+        backTo={backTo}
         backLabel="Back to expenses"
       />
 
@@ -90,28 +43,12 @@ export function EditExpensePage() {
             <ErrorBox message="Expense not found." />
           )}
 
-          {!loading && !error && trip && expense && formData && (
-            <>
-              <SectionHeader
-                title="Update expense"
-                description="Change expense details and save updated travel cost information."
-              />
-
-              {updateExpenseError && (
-                <div className="mb-5">
-                  <ErrorBox message={updateExpenseError} />
-                </div>
-              )}
-
-              <UpdateExpenseForm
-                formData={formData}
-                errors={errors}
-                submitting={updatingExpense}
-                onChange={handleChange}
-                onSubmit={handleSubmit}
-                onCancel={handleCancel}
-              />
-            </>
+          {!loading && !error && trip && expense && (
+            <EditExpenseFormContent
+              key={expense.id}
+              trip={trip}
+              expense={expense}
+            />
           )}
         </section>
       </main>

@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+
 import { AppHeader } from "../../components/layout/AppHeader";
 import { EditReminderFormContent } from "../../components/trips/reminders/update/EditReminderFormContent";
 import { ErrorBox } from "../../components/ui/ErrorBox";
@@ -11,12 +12,14 @@ export function EditReminderPage() {
   const { reminder, loadingReminder, reminderError } =
     useReminderDetails(reminderId);
 
+  const remindersPath = `/trips/${tripId}?tab=reminders`;
+
   return (
     <>
       <AppHeader
         title="Edit reminder"
         description="Update reminder details and schedule a new future local date and time."
-        backTo={`/trips/${tripId}?tab=reminders`}
+        backTo={remindersPath}
         backLabel="Back to reminders"
       />
 
@@ -26,6 +29,10 @@ export function EditReminderPage() {
 
           {!loadingReminder && reminderError && (
             <ErrorBox message={reminderError} />
+          )}
+
+          {!loadingReminder && !reminderError && !reminder && (
+            <ErrorBox message="Reminder not found." />
           )}
 
           {!loadingReminder && !reminderError && reminder && (

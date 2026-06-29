@@ -1,77 +1,28 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
 import { AppHeader } from "../../components/layout/AppHeader";
-import { UpdateChecklistItemForm } from "../../components/trips/checklist/update/UpdateChecklistItemForm";
+import { EditChecklistItemFormContent } from "../../components/trips/checklist/update/EditChecklistItemFormContent";
 import { ErrorBox } from "../../components/ui/ErrorBox";
 import { LoadingState } from "../../components/ui/LoadingState";
-import { SectionHeader } from "../../components/ui/SectionHeader";
 import { useChecklistItems } from "../../hooks/trips/checklist/list/useChecklistItems";
-import { useUpdateChecklistItem } from "../../hooks/trips/checklist/update/useUpdateChecklistItem";
 import { useTripDetails } from "../../hooks/trips/details/useTripDetails";
-import { createUpdateChecklistItemFormModel } from "../../models/trips/checklist/update/updateChecklistItemFormModel";
-import { validateUpdateChecklistItemForm } from "../../validation/trips/checklist/update/checklistItemUpdateValidation";
 
 export function EditChecklistItemPage() {
   const { tripId, itemId } = useParams();
-  const navigate = useNavigate();
 
   const { trip, loadingTrip, tripError } = useTripDetails(tripId);
 
   const { checklistItems, loadingChecklistItems, checklistItemsError } =
     useChecklistItems(tripId);
 
-  const {
-    updatingChecklistItem,
-    updateChecklistItemError,
-    updateChecklistItem,
-  } = useUpdateChecklistItem();
-
   const item = checklistItems.find(
     (checklistItem) => checklistItem.id === Number(itemId),
   );
 
-  const [formData, setFormData] = useState(null);
-  const [errors, setErrors] = useState({});
-
   const loading = loadingTrip || loadingChecklistItems;
   const error = tripError || checklistItemsError;
 
-  if (!formData && item) {
-    setFormData(createUpdateChecklistItemFormModel(item));
-  }
-
-  function handleChange(event) {
-    const { name, value, type, checked } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    setErrors((current) => ({
-      ...current,
-      [name]: "",
-    }));
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const validation = validateUpdateChecklistItemForm(formData);
-
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
-    }
-
-    await updateChecklistItem(trip.id, item.id, formData);
-
-    navigate(`/trips/${trip.id}?tab=checklist`);
-  }
-
-  function handleCancel() {
-    navigate(`/trips/${tripId}?tab=checklist`);
-  }
+  const backTo = `/trips/${tripId}?tab=checklist`;
 
   return (
     <>
@@ -82,7 +33,7 @@ export function EditChecklistItemPage() {
             ? `Update checklist item "${item.title}".`
             : "Update selected checklist item."
         }
-        backTo={`/trips/${tripId}?tab=checklist`}
+        backTo={backTo}
         backLabel="Back to checklist"
       />
 
@@ -96,28 +47,12 @@ export function EditChecklistItemPage() {
             <ErrorBox message="Checklist item not found." />
           )}
 
-          {!loading && !error && trip && item && formData && (
-            <>
-              <SectionHeader
-                title="Update checklist item"
-                description="Change checklist item title and completion status."
-              />
-
-              {updateChecklistItemError && (
-                <div className="mb-5">
-                  <ErrorBox message={updateChecklistItemError} />
-                </div>
-              )}
-
-              <UpdateChecklistItemForm
-                formData={formData}
-                errors={errors}
-                submitting={updatingChecklistItem}
-                onChange={handleChange}
-                onSubmit={handleSubmit}
-                onCancel={handleCancel}
-              />
-            </>
+          {!loading && !error && trip && item && (
+            <EditChecklistItemFormContent
+              key={item.id}
+              trip={trip}
+              item={item}
+            />
           )}
         </section>
       </main>

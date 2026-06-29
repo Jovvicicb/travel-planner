@@ -1,75 +1,10 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
 import { AppHeader } from "../../components/layout/AppHeader";
-import { UpdateTripForm } from "../../components/trips/update/UpdateTripForm";
+import { EditTripFormContent } from "../../components/trips/update/EditTripFormContent";
 import { ErrorBox } from "../../components/ui/ErrorBox";
 import { LoadingState } from "../../components/ui/LoadingState";
-import { createUpdateTripFormModel } from "../../models/trips/update/updateTripFormModel";
 import { useTripDetails } from "../../hooks/trips/details/useTripDetails";
-import { useUpdateTrip } from "../../hooks/trips/update/useUpdateTrip";
-import { validateUpdateTripForm } from "../../validation/trips/update/tripUpdateValidation";
-
-function EditTripPageContent({ trip }) {
-  const navigate = useNavigate();
-  const { updateTrip, updating, updateError } = useUpdateTrip();
-
-  const [formData, setFormData] = useState(() =>
-    createUpdateTripFormModel(trip),
-  );
-  const [errors, setErrors] = useState({});
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
-    setErrors((current) => ({
-      ...current,
-      [name]: "",
-    }));
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const validation = validateUpdateTripForm(formData);
-
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
-    }
-
-    const updatedTrip = await updateTrip(trip.id, formData);
-
-    navigate(`/trips/${updatedTrip.id}`);
-  }
-
-  function handleCancel() {
-    navigate(`/trips/${trip.id}`);
-  }
-
-  return (
-    <>
-      {updateError && (
-        <div className="mb-5">
-          <ErrorBox message={updateError} />
-        </div>
-      )}
-
-      <UpdateTripForm
-        formData={formData}
-        errors={errors}
-        submitting={updating}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-      />
-    </>
-  );
-}
 
 export function EditTripPage() {
   const { tripId } = useParams();
@@ -91,7 +26,7 @@ export function EditTripPage() {
           {!loadingTrip && tripError && <ErrorBox message={tripError} />}
 
           {!loadingTrip && !tripError && trip && (
-            <EditTripPageContent trip={trip} />
+            <EditTripFormContent key={trip.id} trip={trip} />
           )}
         </div>
       </main>

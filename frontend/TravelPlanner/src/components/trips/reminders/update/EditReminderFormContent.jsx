@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useUpdateReminder } from "../../../../hooks/reminders/update/useUpdateReminder";
 import { toUpdateReminderFormModel } from "../../../../mappers/reminders/update/updateReminderFormMapper";
 import { validateUpdateReminderForm } from "../../../../validation/reminders/update/reminderUpdateValidation";
@@ -18,6 +19,8 @@ export function EditReminderFormContent({ tripId, reminder }) {
   );
 
   const [errors, setErrors] = useState({});
+
+  const remindersPath = `/trips/${tripId}?tab=reminders`;
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -43,13 +46,17 @@ export function EditReminderFormContent({ tripId, reminder }) {
       return;
     }
 
-    await updateReminder(reminder.id, formData);
+    const updatedReminder = await updateReminder(reminder.id, formData);
 
-    navigate(`/trips/${tripId}?tab=reminders`);
+    if (!updatedReminder) {
+      return;
+    }
+
+    navigate(remindersPath);
   }
 
   function handleCancel() {
-    navigate(`/trips/${tripId}?tab=reminders`);
+    navigate(remindersPath);
   }
 
   return (
