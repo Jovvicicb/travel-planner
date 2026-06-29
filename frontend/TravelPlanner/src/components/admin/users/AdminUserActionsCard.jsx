@@ -5,6 +5,15 @@ import {
 } from "../../../mappers/admin/users/adminUserDisplayMapper";
 import { Button } from "../../ui/Button";
 
+const cardContentClassName =
+  "flex flex-col justify-between gap-4 sm:flex-row sm:items-start";
+
+const roleCardClassName =
+  "rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5";
+
+const dangerCardClassName =
+  "rounded-3xl border border-[#d7a6a6] bg-[#fff5f5] p-5 shadow-sm shadow-[#2f2924]/5";
+
 export function AdminUserActionsCard({
   user,
   updatingRole,
@@ -16,10 +25,12 @@ export function AdminUserActionsCard({
   const nextRole = getNextUserRole(user);
   const roleActionLabel = getRoleActionLabel(user);
 
+  const actionDisabled = updatingRole || deletingUser;
+
   return (
     <section className="grid gap-5 lg:grid-cols-2">
-      <article className="rounded-3xl border border-[#d6c8b8] bg-[#f8f3ec] p-5 shadow-sm shadow-[#2f2924]/5">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+      <article className={roleCardClassName}>
+        <div className={cardContentClassName}>
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#7b6b5d]">
               Role management
@@ -39,7 +50,7 @@ export function AdminUserActionsCard({
             <Button
               type="button"
               size="sm"
-              disabled={updatingRole || deletingUser}
+              disabled={actionDisabled}
               onClick={() => onUpdateRole(nextRole)}
             >
               {updatingRole ? "Updating..." : roleActionLabel}
@@ -48,8 +59,8 @@ export function AdminUserActionsCard({
         </div>
       </article>
 
-      <article className="rounded-3xl border border-[#d7a6a6] bg-[#fff5f5] p-5 shadow-sm shadow-[#2f2924]/5">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+      <article className={dangerCardClassName}>
+        <div className={cardContentClassName}>
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#9a4b4b]">
               Danger zone
@@ -70,7 +81,7 @@ export function AdminUserActionsCard({
               type="button"
               variant="danger"
               size="sm"
-              disabled={updatingRole || deletingUser}
+              disabled={actionDisabled}
               onClick={onDelete}
             >
               {deletingUser ? "Deleting..." : "Delete user"}

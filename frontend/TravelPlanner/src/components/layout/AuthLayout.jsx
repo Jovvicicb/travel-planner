@@ -3,6 +3,8 @@ import { AuthBackgroundPattern } from "./AuthBackgroundPattern";
 import { AuthBrandPanel } from "./AuthBrandPanel";
 
 export function AuthLayout({ title, subtitle, children }) {
+  const showSubtitle = Boolean(subtitle);
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#eee6dc] px-6 py-10 text-[#2f2924]">
       <AuthBackgroundPattern />
@@ -21,7 +23,7 @@ export function AuthLayout({ title, subtitle, children }) {
                 {title}
               </h2>
 
-              {subtitle && (
+              {showSubtitle && (
                 <p className="mt-2 text-sm font-semibold leading-6 text-[#7b6b5d]">
                   {subtitle}
                 </p>

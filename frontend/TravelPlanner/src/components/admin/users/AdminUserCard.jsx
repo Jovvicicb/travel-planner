@@ -1,6 +1,12 @@
 import { toAdminUserDisplayModel } from "../../../mappers/admin/users/adminUserDisplayMapper";
 import { ButtonLink } from "../../ui/ButtonLink";
 
+const primaryBadgeClassName =
+  "rounded-full border border-[#746454] bg-[#6f5f48] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#fffaf3]";
+
+const secondaryBadgeClassName =
+  "rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#4b4036]";
+
 export function AdminUserCard({ user }) {
   const displayUser = toAdminUserDisplayModel(user);
 
@@ -9,15 +15,15 @@ export function AdminUserCard({ user }) {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-[#746454] bg-[#6f5f48] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#fffaf3]">
+            <span className={primaryBadgeClassName}>
               {displayUser.roleLabel}
             </span>
 
-            <span className="rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#4b4036]">
+            <span className={secondaryBadgeClassName}>
               {displayUser.statusLabel}
             </span>
 
-            <span className="rounded-full border border-[#cdbca9] bg-[#f8f3ec] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#4b4036]">
+            <span className={secondaryBadgeClassName}>
               User #{displayUser.id}
             </span>
           </div>

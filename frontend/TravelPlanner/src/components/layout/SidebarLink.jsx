@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
 
 export function SidebarLink({ to, label, icon, badge }) {
-  const showBadge = Number(badge) > 0;
-  const badgeLabel = Number(badge) > 99 ? "99+" : badge;
+  const badgeValue = Number(badge);
+  const showBadge = badgeValue > 0;
+  const badgeLabel = badgeValue > 99 ? "99+" : badgeValue;
 
   return (
     <NavLink

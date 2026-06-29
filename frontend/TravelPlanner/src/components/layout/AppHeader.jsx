@@ -7,6 +7,8 @@ export function AppHeader({
   backTo,
   backLabel = "Back",
 }) {
+  const showActions = backTo || action;
+
   return (
     <header className="border-b border-[#d6c8b8] bg-[#f8f3ec] px-6 py-5 shadow-sm shadow-[#2f2924]/5 lg:px-8">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -26,7 +28,7 @@ export function AppHeader({
           )}
         </div>
 
-        {(backTo || action) && (
+        {showActions && (
           <div className="flex shrink-0 items-center gap-3">
             {backTo && (
               <ButtonLink to={backTo} variant="secondary">
@@ -35,7 +37,7 @@ export function AppHeader({
               </ButtonLink>
             )}
 
-            {action}
+            {action && action}
           </div>
         )}
       </div>

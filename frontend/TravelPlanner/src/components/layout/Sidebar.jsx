@@ -1,4 +1,5 @@
 import logo from "../../assets/TravelPlaner_logo.png";
+
 import { useAuth } from "../../hooks/auth/useAuth";
 import { useTriggeredReminderCount } from "../../hooks/reminders/count/useTriggeredReminderCount";
 import { SidebarLink } from "./SidebarLink";

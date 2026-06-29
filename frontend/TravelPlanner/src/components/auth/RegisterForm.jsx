@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../hooks/auth/useAuth";
 import { createRegisterFormModel } from "../../models/auth/registerFormModel";
 import { validateRegisterForm } from "../../validation/auth/authValidation";
 import { Button } from "../ui/Button";
-import { FieldError } from "../ui/FieldError";
 import { ErrorBox } from "../ui/ErrorBox";
+import { FormField } from "../ui/FormField";
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -44,7 +45,11 @@ export function RegisterForm() {
       setSubmitting(true);
       setSubmitError("");
 
-      await register(formData);
+      const currentUser = await register(formData);
+
+      if (!currentUser) {
+        return;
+      }
 
       navigate("/trips", { replace: true });
     } catch (error) {
@@ -58,87 +63,52 @@ export function RegisterForm() {
     <form className="mt-7 space-y-5" onSubmit={handleSubmit} noValidate>
       <ErrorBox message={submitError || authError} />
 
-      <div className="space-y-2">
-        <label htmlFor="fullName" className="text-sm font-black text-[#2f2924]">
-          Full name
-        </label>
+      <FormField
+        name="fullName"
+        label="Full name"
+        value={formData.fullName}
+        placeholder="Enter your full name"
+        disabled={submitting}
+        autoComplete="name"
+        error={errors.fullName}
+        onChange={handleChange}
+      />
 
-        <input
-          id="fullName"
-          name="fullName"
-          value={formData.fullName}
-          placeholder="Enter your full name"
-          disabled={submitting}
-          onChange={handleChange}
-          autoComplete="name"
-          className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
-        />
+      <FormField
+        name="email"
+        label="Email"
+        type="email"
+        value={formData.email}
+        placeholder="Enter your email"
+        disabled={submitting}
+        autoComplete="email"
+        error={errors.email}
+        onChange={handleChange}
+      />
 
-        <FieldError message={errors.fullName} />
-      </div>
+      <FormField
+        name="password"
+        label="Password"
+        type="password"
+        value={formData.password}
+        placeholder="Create a password"
+        disabled={submitting}
+        autoComplete="new-password"
+        error={errors.password}
+        onChange={handleChange}
+      />
 
-      <div className="space-y-2">
-        <label htmlFor="email" className="text-sm font-black text-[#2f2924]">
-          Email
-        </label>
-
-        <input
-          id="email"
-          name="email"
-          type="email"
-          value={formData.email}
-          placeholder="Enter your email"
-          disabled={submitting}
-          onChange={handleChange}
-          autoComplete="email"
-          className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
-        />
-
-        <FieldError message={errors.email} />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="password" className="text-sm font-black text-[#2f2924]">
-          Password
-        </label>
-
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={formData.password}
-          placeholder="Create a password"
-          disabled={submitting}
-          onChange={handleChange}
-          autoComplete="new-password"
-          className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
-        />
-
-        <FieldError message={errors.password} />
-      </div>
-
-      <div className="space-y-2">
-        <label
-          htmlFor="confirmPassword"
-          className="text-sm font-black text-[#2f2924]"
-        >
-          Confirm password
-        </label>
-
-        <input
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          placeholder="Repeat your password"
-          disabled={submitting}
-          onChange={handleChange}
-          autoComplete="new-password"
-          className="w-full rounded-2xl border border-[#d6c8b8] bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#2f2924] outline-none transition placeholder:text-[#9a8b7b] focus:border-[#746454] focus:ring-4 focus:ring-[#746454]/10 disabled:cursor-not-allowed disabled:bg-[#eee6dc]"
-        />
-
-        <FieldError message={errors.confirmPassword} />
-      </div>
+      <FormField
+        name="confirmPassword"
+        label="Confirm password"
+        type="password"
+        value={formData.confirmPassword}
+        placeholder="Repeat your password"
+        disabled={submitting}
+        autoComplete="new-password"
+        error={errors.confirmPassword}
+        onChange={handleChange}
+      />
 
       <Button type="submit" fullWidth disabled={submitting}>
         {submitting ? "Creating account..." : "Create account"}
