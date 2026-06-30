@@ -6,6 +6,7 @@ using TravelPlanner.TripService.Repositories.Destinations;
 using TravelPlanner.TripService.Repositories.TravelPlans;
 using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Validation.Destinations;
+using TravelPlanner.TripService.Repositories.Activities;
 
 namespace TravelPlanner.TripService.Services.Destinations
 {
@@ -14,15 +15,18 @@ namespace TravelPlanner.TripService.Services.Destinations
         private readonly IDestinationRepository destinationRepository;
         private readonly ITravelPlanRepository travelPlanRepository;
         private readonly ITravelPlanPermissionService permissionService;
+        private readonly IActivityRepository activityRepository;
 
         public DestinationManager(
             IDestinationRepository destinationRepository,
             ITravelPlanRepository travelPlanRepository,
-            ITravelPlanPermissionService permissionService)
+            ITravelPlanPermissionService permissionService,
+            IActivityRepository activityRepository)
         {
             this.destinationRepository = destinationRepository;
             this.travelPlanRepository = travelPlanRepository;
             this.permissionService = permissionService;
+            this.activityRepository = activityRepository;
         }
 
         public async Task<ServiceResultDto<DestinationResponseDto>> CreateDestinationAsync(CreateDestinationCommandDto command)
@@ -179,6 +183,21 @@ namespace TravelPlanner.TripService.Services.Destinations
                 return ServiceResultDto<DestinationResponseDto>.Fail(
                     validation.Message,
                     validation.StatusCode
+                );
+            }
+
+            var activities = await activityRepository.GetByDestinationIdAsync(command.DestinationId);
+
+            var hasActivityOutsideNewDateRange = activities.Any(activity =>
+                activity.ActivityDate.Date < command.StartDate.Date ||
+                activity.ActivityDate.Date > command.EndDate.Date
+            );
+
+            if (hasActivityOutsideNewDateRange)
+            {
+                return ServiceResultDto<DestinationResponseDto>.Fail(
+                    "Destination dates cannot be updated because one or more activities are outside the new date range.",
+                    400
                 );
             }
 

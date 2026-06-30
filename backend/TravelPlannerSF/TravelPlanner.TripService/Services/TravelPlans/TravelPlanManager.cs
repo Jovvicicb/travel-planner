@@ -6,6 +6,7 @@ using TravelPlanner.TripService.Repositories.Collaborators;
 using TravelPlanner.TripService.Repositories.TravelPlans;
 using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Validation.TravelPlans;
+using TravelPlanner.TripService.Repositories.Destinations;
 
 namespace TravelPlanner.TripService.Services.TravelPlans
 {
@@ -17,14 +18,18 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
         private readonly ITravelPlanPermissionService permissionService;
 
+        private readonly IDestinationRepository destinationRepository;
+
         public TravelPlanManager(
             ITravelPlanRepository travelPlanRepository,
             ITravelPlanCollaboratorRepository collaboratorRepository,
-            ITravelPlanPermissionService permissionService)
+            ITravelPlanPermissionService permissionService,
+            IDestinationRepository destinationRepository)
         {
             this.travelPlanRepository = travelPlanRepository;
             this.collaboratorRepository = collaboratorRepository;
             this.permissionService = permissionService;
+            this.destinationRepository = destinationRepository;
         }
 
         public async Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command)
@@ -173,6 +178,21 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 return ServiceResultDto<TravelPlanResponseDto>.Fail(
                     "You do not have permission to update this travel plan.",
                     403
+                );
+            }
+
+            var destinations = await destinationRepository.GetByTravelPlanIdAsync(command.PlanId);
+
+            var hasDestinationOutsideNewDateRange = destinations.Any(destination =>
+                destination.StartDate.Date < command.StartDate.Date ||
+                destination.EndDate.Date > command.EndDate.Date
+            );
+
+            if (hasDestinationOutsideNewDateRange)
+            {
+                return ServiceResultDto<TravelPlanResponseDto>.Fail(
+                    "Travel plan dates cannot be updated because one or more destinations are outside the new date range.",
+                    400
                 );
             }
 
