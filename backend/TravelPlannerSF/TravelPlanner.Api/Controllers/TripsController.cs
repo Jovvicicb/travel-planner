@@ -28,7 +28,7 @@ namespace TravelPlanner.Api.Controllers
             );
         }
 
-        //TravelPlan
+        // Travel plans
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTravelPlanRequestDto request)
         {
@@ -155,7 +155,7 @@ namespace TravelPlanner.Api.Controllers
         }
 
 
-        //Destination
+        // Destinations
         [HttpPost("{tripId:int}/destinations")]
         public async Task<IActionResult> CreateDestination(int tripId, [FromBody] CreateDestinationRequestDto request)
         {
@@ -263,7 +263,7 @@ namespace TravelPlanner.Api.Controllers
         }
 
 
-        //Activity
+        // Activities
         [HttpPost("{tripId:int}/destinations/{destinationId:int}/activities")]
         public async Task<IActionResult> CreateActivity(int tripId, int destinationId, [FromBody] CreateActivityRequestDto request)
         {
@@ -403,7 +403,7 @@ namespace TravelPlanner.Api.Controllers
         }
 
 
-        //Expense
+        // Expenses and budget
         [HttpPost("{tripId:int}/expenses")]
         public async Task<IActionResult> CreateExpense(int tripId, [FromBody] CreateExpenseRequestDto request)
         {
@@ -533,7 +533,7 @@ namespace TravelPlanner.Api.Controllers
         }
 
 
-        //Checklist
+        // Checklist
         [HttpPost("{tripId:int}/checklist")]
         public async Task<IActionResult> CreateChecklistItem(int tripId, [FromBody] CreateChecklistItemRequestDto request)
         {
@@ -657,7 +657,7 @@ namespace TravelPlanner.Api.Controllers
         }
 
 
-        //Share
+        // Sharing and collaborators
         [HttpPost("{tripId:int}/shares")]
         public async Task<IActionResult> CreateShare(int tripId, [FromBody] CreateTravelPlanShareRequestDto request)
         {
