@@ -24,9 +24,7 @@ export function formatDisplayWeekdayDate(value) {
 }
 
 export function formatDisplayDateTime(value) {
-  if (!value) {
-    return "";
-  }
+  if (!value) return "";
 
   return new Intl.DateTimeFormat("en", {
     year: "numeric",
@@ -34,7 +32,7 @@ export function formatDisplayDateTime(value) {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  }).format(new Date(normalizeUtcDateTime(value)));
 }
 
 export function formatDisplayTime(value) {
@@ -67,9 +65,7 @@ export function formatDisplayLongDate(value, fallback = "") {
 }
 
 export function formatDisplayLongDateTime(value, fallback = "") {
-  if (!value) {
-    return fallback;
-  }
+  if (!value) return fallback;
 
   return new Intl.DateTimeFormat("en", {
     year: "numeric",
@@ -77,7 +73,7 @@ export function formatDisplayLongDateTime(value, fallback = "") {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  }).format(new Date(normalizeUtcDateTime(value)));
 }
 
 export function formatDisplayDecimal(value) {
@@ -85,4 +81,18 @@ export function formatDisplayDecimal(value) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value ?? 0);
+}
+
+function normalizeUtcDateTime(value) {
+  if (!value || typeof value !== "string") {
+    return value;
+  }
+
+  const hasTimezone = value.endsWith("Z") || /[+-]\d{2}:\d{2}$/.test(value);
+
+  if (hasTimezone) {
+    return value;
+  }
+
+  return `${value}Z`;
 }

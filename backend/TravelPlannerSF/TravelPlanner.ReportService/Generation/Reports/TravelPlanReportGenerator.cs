@@ -416,7 +416,7 @@ namespace TravelPlanner.ReportService.Generation.Reports
                             item.Spacing(4);
 
                             AddLabelValue(item, "Access level", share.AccessLevel.ToString());
-                            AddLabelValue(item, "Created at", FormatDateTime(share.CreatedAt));
+                            AddLabelValue(item, "Created at", FormatUtcDateTime(share.CreatedAt));
 
                             AddLabelValue(
                                 item,
@@ -473,6 +473,22 @@ namespace TravelPlanner.ReportService.Generation.Reports
         private static string FormatDateTime(DateTime dateTime)
         {
             return dateTime.ToString("dd.MM.yyyy HH:mm");
+        }
+
+        private static string FormatUtcDateTime(DateTime dateTime)
+        {
+            if (dateTime == default)
+            {
+                return "-";
+            }
+
+            var utcDateTime = dateTime.Kind == DateTimeKind.Utc
+                ? dateTime
+                : DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+
+            return utcDateTime
+                .ToLocalTime()
+                .ToString("dd.MM.yyyy HH:mm");
         }
 
         private static string FormatTime(TimeSpan time)
