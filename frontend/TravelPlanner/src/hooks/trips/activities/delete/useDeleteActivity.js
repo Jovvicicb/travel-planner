@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { tripService } from "../../../../api_service/trips/tripService";
 
 export function useDeleteActivity() {
@@ -8,17 +9,17 @@ export function useDeleteActivity() {
   async function deleteActivity(tripId, destinationId, activityId) {
     if (!tripId || Number(tripId) <= 0) {
       setDeleteActivityError("Travel plan id is not valid.");
-      return;
+      return false;
     }
 
     if (!destinationId || Number(destinationId) <= 0) {
       setDeleteActivityError("Destination id is not valid.");
-      return;
+      return false;
     }
 
     if (!activityId || Number(activityId) <= 0) {
       setDeleteActivityError("Activity id is not valid.");
-      return;
+      return false;
     }
 
     try {
@@ -26,6 +27,8 @@ export function useDeleteActivity() {
       setDeleteActivityError("");
 
       await tripService.deleteActivity(tripId, destinationId, activityId);
+
+      return true;
     } catch (error) {
       setDeleteActivityError(error.message);
       throw error;

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { reminderService } from "../../../api_service/reminders/reminderService";
 
 export function useDeleteReminder() {
@@ -6,9 +7,9 @@ export function useDeleteReminder() {
   const [deleteReminderError, setDeleteReminderError] = useState("");
 
   async function deleteReminder(reminderId) {
-    if (!reminderId) {
+    if (!reminderId || Number(reminderId) <= 0) {
       setDeleteReminderError("Reminder id is not valid.");
-      return;
+      return false;
     }
 
     try {
@@ -16,6 +17,8 @@ export function useDeleteReminder() {
       setDeleteReminderError("");
 
       await reminderService.delete(reminderId);
+
+      return true;
     } catch (error) {
       setDeleteReminderError(error.message);
       throw error;

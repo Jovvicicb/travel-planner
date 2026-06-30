@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { adminUserService } from "../../../api_service/admin/users/adminUserService";
 
 export function useDeleteAdminUser() {
@@ -8,7 +9,7 @@ export function useDeleteAdminUser() {
   async function deleteUser(userId) {
     if (!userId || Number(userId) <= 0) {
       setDeleteUserError("User id is not valid.");
-      return;
+      return false;
     }
 
     try {
@@ -16,6 +17,8 @@ export function useDeleteAdminUser() {
       setDeleteUserError("");
 
       await adminUserService.deleteUser(userId);
+
+      return true;
     } catch (error) {
       setDeleteUserError(error.message);
       throw error;

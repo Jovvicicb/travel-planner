@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { tripService } from "../../../../api_service/trips/tripService";
 
 export function useDeactivateShare() {
@@ -8,12 +9,12 @@ export function useDeactivateShare() {
   async function deactivateShare(tripId, shareId) {
     if (!tripId || Number(tripId) <= 0) {
       setDeactivateShareError("Travel plan id is not valid.");
-      return;
+      return false;
     }
 
     if (!shareId || Number(shareId) <= 0) {
       setDeactivateShareError("Share link id is not valid.");
-      return;
+      return false;
     }
 
     try {
@@ -21,6 +22,8 @@ export function useDeactivateShare() {
       setDeactivateShareError("");
 
       await tripService.deactivateShare(tripId, shareId);
+
+      return true;
     } catch (error) {
       setDeactivateShareError(error.message);
       throw error;

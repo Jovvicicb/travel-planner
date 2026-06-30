@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { tripService } from "../../../../api_service/trips/tripService";
 
 export function useDeleteChecklistItem() {
@@ -8,12 +9,12 @@ export function useDeleteChecklistItem() {
   async function deleteChecklistItem(tripId, itemId) {
     if (!tripId || Number(tripId) <= 0) {
       setDeleteChecklistItemError("Travel plan id is not valid.");
-      return;
+      return false;
     }
 
     if (!itemId || Number(itemId) <= 0) {
       setDeleteChecklistItemError("Checklist item id is not valid.");
-      return;
+      return false;
     }
 
     try {
@@ -21,6 +22,8 @@ export function useDeleteChecklistItem() {
       setDeleteChecklistItemError("");
 
       await tripService.deleteChecklistItem(tripId, itemId);
+
+      return true;
     } catch (error) {
       setDeleteChecklistItemError(error.message);
       throw error;

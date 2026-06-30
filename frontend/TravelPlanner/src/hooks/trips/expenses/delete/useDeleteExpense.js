@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { tripService } from "../../../../api_service/trips/tripService";
 
 export function useDeleteExpense() {
@@ -8,12 +9,12 @@ export function useDeleteExpense() {
   async function deleteExpense(tripId, expenseId) {
     if (!tripId || Number(tripId) <= 0) {
       setDeleteExpenseError("Travel plan id is not valid.");
-      return;
+      return false;
     }
 
     if (!expenseId || Number(expenseId) <= 0) {
       setDeleteExpenseError("Expense id is not valid.");
-      return;
+      return false;
     }
 
     try {
@@ -21,6 +22,8 @@ export function useDeleteExpense() {
       setDeleteExpenseError("");
 
       await tripService.deleteExpense(tripId, expenseId);
+
+      return true;
     } catch (error) {
       setDeleteExpenseError(error.message);
       throw error;
