@@ -7,6 +7,9 @@ using TravelPlanner.TripService.Repositories.TravelPlans;
 using TravelPlanner.TripService.Services.Permissions;
 using TravelPlanner.TripService.Validation.TravelPlans;
 using TravelPlanner.TripService.Repositories.Destinations;
+using Microsoft.ServiceFabric.Services.Client;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
+using TravelPlanner.Contracts.Interfaces.Notifications;
 
 namespace TravelPlanner.TripService.Services.TravelPlans
 {
@@ -20,6 +23,8 @@ namespace TravelPlanner.TripService.Services.TravelPlans
 
         private readonly IDestinationRepository destinationRepository;
 
+        private readonly INotificationService notificationService;
+
         public TravelPlanManager(
             ITravelPlanRepository travelPlanRepository,
             ITravelPlanCollaboratorRepository collaboratorRepository,
@@ -30,6 +35,11 @@ namespace TravelPlanner.TripService.Services.TravelPlans
             this.collaboratorRepository = collaboratorRepository;
             this.permissionService = permissionService;
             this.destinationRepository = destinationRepository;
+
+            this.notificationService = ServiceProxy.Create<INotificationService>(
+                new Uri("fabric:/TravelPlannerSF/TravelPlanner.NotificationService"),
+                new ServicePartitionKey(0)
+            );
         }
 
         public async Task<ServiceResultDto<TravelPlanResponseDto>> CreateTravelPlanAsync(CreateTravelPlanCommandDto command)
@@ -241,6 +251,16 @@ namespace TravelPlanner.TripService.Services.TravelPlans
                 );
             }
 
+            var remindersDeleteResult = await notificationService.DeleteRemindersByTravelPlanAsync(plan.Id);
+
+            if (!remindersDeleteResult.Success)
+            {
+                return ServiceResultDto.Fail(
+                    remindersDeleteResult.Message,
+                    remindersDeleteResult.StatusCode
+                );
+            }
+
             await travelPlanRepository.DeleteAsync(plan);
 
             return ServiceResultDto.Ok("Travel plan deleted successfully.");
@@ -264,6 +284,19 @@ namespace TravelPlanner.TripService.Services.TravelPlans
             if (travelPlans.Count == 0)
             {
                 return ServiceResultDto.Ok("User has no travel plans to delete.");
+            }
+
+            foreach (var travelPlan in travelPlans)
+            {
+                var remindersDeleteResult = await notificationService.DeleteRemindersByTravelPlanAsync(travelPlan.Id);
+
+                if (!remindersDeleteResult.Success)
+                {
+                    return ServiceResultDto.Fail(
+                        remindersDeleteResult.Message,
+                        remindersDeleteResult.StatusCode
+                    );
+                }
             }
 
             await travelPlanRepository.DeleteRangeAsync(travelPlans);

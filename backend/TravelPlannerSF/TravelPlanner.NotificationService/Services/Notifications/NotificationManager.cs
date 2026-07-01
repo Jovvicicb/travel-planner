@@ -342,5 +342,22 @@ namespace TravelPlanner.NotificationService.Services.Notifications
 
             return ServiceResultDto.Ok("Reminder deleted successfully.");
         }
+
+        public async Task<ServiceResultDto> DeleteRemindersByTravelPlanAsync(int travelPlanId)
+        {
+            if (travelPlanId <= 0)
+            {
+                return ServiceResultDto.Fail("Travel plan id is not valid.", 400);
+            }
+
+            var deletedReminders = await reminderRepository.DeleteByTravelPlanIdAsync(travelPlanId);
+
+            foreach (var reminder in deletedReminders)
+            {
+                await reminderStateStore.RemoveAsync(reminder.Id);
+            }
+
+            return ServiceResultDto.Ok("Travel plan reminders deleted successfully.");
+        }
     }
 }

@@ -73,5 +73,23 @@ namespace TravelPlanner.NotificationService.Repositories.Notifications
 
             await context.SaveChangesAsync();
         }
+
+        public async Task<List<Reminder>> DeleteByTravelPlanIdAsync(int travelPlanId)
+        {
+            var reminders = await context.Reminders
+                .Where(reminder => reminder.TravelPlanId == travelPlanId)
+                .ToListAsync();
+
+            if (reminders.Count == 0)
+            {
+                return reminders;
+            }
+
+            context.Reminders.RemoveRange(reminders);
+
+            await context.SaveChangesAsync();
+
+            return reminders;
+        }
     }
 }
