@@ -20,6 +20,7 @@ import { SharedAccessPage } from "../pages/sharedTrips/SharedAccessPage";
 import { AdminUserDetailsPage } from "../pages/admin/AdminUserDetailsPage";
 import { EditReminderPage } from "../pages/trips/EditReminderPage";
 import { RemindersPage } from "../pages/reminders/RemindersPage";
+import { NotFoundPage } from "../pages/NotFoundPage";
 
 export function AppRouter() {
   return (
@@ -88,7 +89,7 @@ export function AppRouter() {
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/trips" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
