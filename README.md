@@ -366,10 +366,10 @@ Backend services are separated by responsibility:
 
 - `AuthService` handles authentication and user management
 - `TripService` handles the main travel planning logic
-- `NotificationService` handles reminders and triggered reminder state
+- `NotificationService` handles reminders, pending reminder state and background reminder processing
 - `ReportService` generates PDF reports
 
-The system uses separate SQL Server databases for authentication, travel planning and notifications.
+The system uses separate SQL Server Express databases for authentication, travel planning and notifications.
 
 ### Architecture Diagram
 
@@ -489,10 +489,12 @@ Responsibilities:
 
 - create reminders
 - store reminders in `NotificationDb`
-- check reminders in background process
-- keep triggered reminders in Reliable Dictionary
+- keep pending reminders in Reliable Dictionary
+- check pending reminders in background process
+- change reminder status from `Pending` to `Triggered` when reminder time is reached
 - return triggered reminder count
 - complete and delete reminders
+- clean reminder data when a travel plan is deleted
 
 Database:
 
@@ -500,7 +502,7 @@ Database:
 
 Stateful storage:
 
-- Reliable Dictionary for triggered reminders
+- Reliable Dictionary for pending reminder state
 
 ---
 
@@ -559,6 +561,7 @@ Internal Service Fabric Remoting calls:
 TravelPlanner.NotificationService -> ITripService -> TravelPlanner.TripService
 
 TravelPlanner.TripService -> IAuthService -> TravelPlanner.AuthService
+TravelPlanner.TripService -> INotificationService -> TravelPlanner.NotificationService
 
 TravelPlanner.ReportService -> ITripService -> TravelPlanner.TripService
 TravelPlanner.ReportService -> INotificationService -> TravelPlanner.NotificationService
@@ -570,13 +573,15 @@ TravelPlanner.ReportService -> INotificationService -> TravelPlanner.Notificatio
 
 `TripService` calls `AuthService` when working with collaborators. Collaborator records store user ids, while user profile data is owned by `AuthService`, so `TripService` requests user data when it needs to display collaborator information.
 
+`TripService` calls `NotificationService` when deleting a travel plan, so all reminders connected to that travel plan are removed from `NotificationDb`, and any pending reminder state is removed from the Reliable Dictionary.
+
 `ReportService` calls `TripService` and `NotificationService` when generating a PDF report. It collects travel plan data, destinations, activities, expenses, budget summary, checklist items, share links and reminders, and then generates the PDF file.
 
 This keeps each service focused on its own responsibility:
 
 - `AuthService` owns user and authentication data
-- `TripService` owns travel plan data and collaboration data
-- `NotificationService` owns reminder data and triggered reminder state
+- `TripService` owns travel plan data, collaboration data and travel plan deletion flow
+- `NotificationService` owns reminder data, pending reminder state, background reminder processing and reminder cleanup logic
 - `ReportService` generates PDF reports using data collected from other services
 
 ---
@@ -681,6 +686,10 @@ Reminder statuses:
 - Pending
 - Triggered
 - Completed
+
+Pending reminders are stored in the Reliable Dictionary until their reminder time is reached.
+
+When the reminder time is reached, the background process changes the reminder status from `Pending` to `Triggered`.
 
 Triggered reminders are shown to the user and counted in the sidebar badge.
 
